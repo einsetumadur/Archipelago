@@ -6,6 +6,9 @@
 class Cercle { //ou structure ? a reflechir
 public:
   Cercle();
+  double getx();
+  double gety();
+  double getRayon();
 private:
   double coordx,coordy;
   double rayon;

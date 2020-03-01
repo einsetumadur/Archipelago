@@ -3,6 +3,8 @@
 
 Cercle::Cercle(){}
 
+// dans l'énoncé c'est demandé explicitement de faire le code de tools.cc en struct, et non en class
+
 double Cercle::getx(){
   return coordx;
 }

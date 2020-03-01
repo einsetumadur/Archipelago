@@ -2,7 +2,7 @@
   ICC semestre 2 2020
   rendu premier
   Gilles Regamey
-  Sufyan truc
+  Sufyan Zakeeruddin
 */
 
 #include<iostream>

@@ -1,6 +1,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+using namespace std;
 
 #ifndef VILLE_H
 #define VILLE_H
@@ -8,7 +9,7 @@
 class Ville{
   public:
     Ville(string file);
-    ~Ville(string file);
+    ~Ville();
 
   private:
     void chargement(string file);
@@ -22,4 +23,4 @@ class Ville{
     vector<Lien> ponts;
 };
 
-#endif VILLE_H
+#endif

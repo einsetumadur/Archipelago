@@ -16,6 +16,32 @@ Ville::~Ville(){
   sauvegarde(fichier);
 }
 
+double ENJ(){
+  double sumL(0),sumTP(0);
+
+  for(auto noeud : logement){    // pourquoi il arrive pas a trouver Ville.logement ?
+    sumL =+ noeud.nbp();
+  }
+  for(auto noeud : production){
+    sumTP =+ noeud.nbp();
+  }
+  for(auto noeud : transport){
+    sumTP =+ noeud.nbp();
+  }
+
+return (sumL - sumTP)/(sumL + sumTP);
+}
+
+double CI(){
+
+return -1;
+}
+
+double MTA(){
+
+return -1;
+}
+
 void Ville::chargement(string file){
   fstream fichier;
   fichier.open(file, ios::out);

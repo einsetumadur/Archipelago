@@ -10,6 +10,9 @@ class Ville{
   public:
     Ville(string file);
     ~Ville();
+    double ENJ();
+    double CI();
+    double MTA();
 
   private:
     void chargement(string file);

@@ -20,13 +20,13 @@ double ENJ(){
   double sumL(0),sumTP(0);
 
   for(auto noeud : logement){    // pourquoi il arrive pas a trouver Ville.logement ?
-    sumL =+ noeud.nbp();
+    sumL =+ noeud.capacite();
   }
   for(auto noeud : production){
-    sumTP =+ noeud.nbp();
+    sumTP =+ noeud.capacite();
   }
   for(auto noeud : transport){
-    sumTP =+ noeud.nbp();
+    sumTP =+ noeud.capacite();
   }
 
 return (sumL - sumTP)/(sumL + sumTP);

@@ -8,7 +8,7 @@ class Noeud{
     public:
         Noeud(unsigned int id,double x, double y, unsigned int capacite): uid(id),nbp(capacite),posx(x),posy(y){}
         unsigned int capacite(){return nbp;}
-        string print(){return to_string(uid)+" "+to_string(nbp);}
+        string print(){return to_string(uid)+" "+to_string(posx)+" "+to_string(posy)+" "+to_string(nbp);}
     private: 
         unsigned int uid;
         unsigned int nbp;
@@ -20,6 +20,7 @@ class Ville{
     Ville(string file){
         cout<<"entrée constructeur"<<endl;
         chargement(file);
+        sauvegarde(file);
         }
     //~Ville();
     //double ENJ();
@@ -57,9 +58,60 @@ void Ville::chargement(string file){
     string ligne;
     size_t compte =0 ;
     while(getline(fichier,ligne)){ //peut etre une mauvaise idée pour prendre des donées une par une.
-      if(ligne[0] == *"#"){}
+      if(ligne[0] == *"#" || ligne[0]==*"\n" || ligne[0]==*"\t"){}
       else{
-        cout<<ligne<<endl;
+          int newsize,uid,cap;
+          double x,y;
+        fichier>>newsize;
+        cout<<newsize<<endl;
+        switch (compte)
+        {
+        case 0:
+            for (size_t i = 0; i < newsize; i++)
+            {
+                fichier>>uid;
+                fichier>>x;
+                fichier>>y;
+                fichier>>cap;
+                Noeud tmp(uid,x,y,cap);
+                logement.push_back(tmp);
+                cout<<"new logement node"<<endl;
+            }
+            
+            break;
+        
+        case 1:
+            for (size_t i = 0; i < newsize; i++)
+            {
+                fichier>>uid;
+                fichier>>x;
+                fichier>>y;
+                fichier>>cap;
+                Noeud tmp(uid,x,y,cap);
+                production.push_back(tmp);
+                cout<<"new production node"<<endl;
+            }
+            
+            break;
+
+        case 2:
+            for (size_t i = 0; i < newsize; i++)
+            {
+                fichier>>uid;
+                fichier>>x;
+                fichier>>y;
+                fichier>>cap;
+                Noeud tmp(uid,x,y,cap);
+                transport.push_back(tmp);
+                cout<<"new transport node"<<endl;
+            }
+            
+            break;
+
+        default:
+            break;
+        }
+    
         compte++;
         if(compte >= 100){cout<<"fichier trop grand"<<endl;break;}
       }
@@ -72,7 +124,7 @@ void Ville::chargement(string file){
 
 void Ville::sauvegarde(string file){
   fstream fichier;
-  fichier.open(file, ios::in | ios::trunc);
+  fichier.open("sauvegarde.txt", ios::out | ios::trunc);
 
 if(!fichier.is_open()){
     std::cout<<"impossible d'enregistrer "<<file<<std::endl;
@@ -82,17 +134,17 @@ if(!fichier.is_open()){
     fichier<<logement.size()<<endl;
     for (auto noeud : logement)
     {
-      fichier<<noeud.print()<<endl;
+      fichier<<"\t"<<noeud.print()<<endl;
     }
     fichier<<production.size()<<endl;
     for (auto noeud : production)
     {
-      fichier<<noeud.print()<<endl;
+      fichier<<"\t"<<noeud.print()<<endl;
     }
     fichier<<transport.size()<<endl;
     for (auto noeud : transport)
     {
-      fichier<<noeud.print()<<endl;
+      fichier<<"\t"<<noeud.print()<<endl;
     }
   /*fichier<<ponts.size()<<endl;
     for (auto lien : ponts)

@@ -1,6 +1,5 @@
 #include<iostream>
 #include<string>
-#include<math.h>
 #include"noeud.h"
 using namespace std;
 
@@ -22,10 +21,3 @@ string Noeud::print()
 
 double Noeud::getx(){return posx;}
 double Noeud::gety(){return posy;}
-
-double distance(Noeud nd1, Noeud nd2)
-{
-    double diffx = nd1.getx() - nd2.getx();
-    double diffy = nd1.gety() - nd2.gety();
-    return sqrt(diffx*diffx + diffy*diffy) ;
-}

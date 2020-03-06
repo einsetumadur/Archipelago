@@ -72,7 +72,8 @@ void Ville::chargement(string file){
       cout<<"fichier ouvert sans problème "<<file<<endl;
     string ligne;
     size_t compte =0 ;
-    while(getline(fichier,ligne)){ //peut etre une mauvaise idée pour prendre des donées une par une.
+    while(getline(fichier >> ws ,ligne)){ //peut etre une mauvaise idée pour prendre des donées une par une.
+      //istringstream data(ligne) , data se comporte comme un fichier. while(data>>valeur) est une boucle valide
       if(ligne[0] == '#' || ligne[0]=='\n' || ligne[0]=='\t'){}
       else{
           int newsize,uid,cap;

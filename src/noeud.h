@@ -25,6 +25,4 @@ class Noeud{
         double posx,posy;
 };
 
-double distance(Noeud nd1, Noeud nd2);
-
 #endif NOEUD_H

@@ -1,7 +1,8 @@
 #include<iostream>
 #include<string>
 #include<vector>
-using namespace std;
+#include"noeud.h"
+#include"error.h"
 
 #ifndef VILLE_H
 #define VILLE_H
@@ -19,9 +20,9 @@ class Ville{
     void sauvegarde(string file);
 
     string fichier;
-    vector<Noeud_L> logement;
-    vector<Noeud_P> production;
-    vector<Noeud_T> transport;
+    vector<Noeud> logement;
+    vector<Noeud> production;
+    vector<Noeud> transport;
     vector<Lien> ponts;
 };
 

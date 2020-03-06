@@ -3,6 +3,7 @@
 #include<string>
 #include<vector>
 #include"ville.h"
+#include"noeud.h"
 #include"error.h"
 #include"constantes.h"
 using namespace std;

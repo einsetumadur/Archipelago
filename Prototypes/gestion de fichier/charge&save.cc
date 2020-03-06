@@ -15,6 +15,21 @@ class Noeud{
         double posx,posy;
 };
 
+vector<string> parse(string str){
+  vector<string> words;
+  str.shrink_to_fit();
+  str.resize(str.find_first_of("#") - 1);
+  if(str[0] ==' '|| str[0] =='\n'||str[0] =='\t'||str[0] =='\r')
+  {
+    while(str.empty())
+  }else{
+
+  }
+  
+  
+  str.find(' '||'\n'||'\t'||'\r')
+
+}
 class Ville{
   public:
     Ville(string file){
@@ -58,7 +73,7 @@ void Ville::chargement(string file){
     string ligne;
     size_t compte =0 ;
     while(getline(fichier,ligne)){ //peut etre une mauvaise idée pour prendre des donées une par une.
-      if(ligne[0] == *"#" || ligne[0]==*"\n" || ligne[0]==*"\t"){}
+      if(ligne[0] == '#' || ligne[0]=='\n' || ligne[0]=='\t'){}
       else{
           int newsize,uid,cap;
           double x,y;

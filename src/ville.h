@@ -17,7 +17,6 @@ class Ville{
   private:
     void chargement(string file);
     void sauvegarde(string file);
-    void verification();
 
     string fichier;
     vector<Noeud_L> logement;

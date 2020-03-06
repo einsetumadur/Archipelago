@@ -2,9 +2,12 @@
 
 CXX = g++
 CXXFLAGS = -Wall -Wextra -g
-OFILES = rendu.o noeud.o tools.o ville.o
+OFILES = rendu.o noeud.o tools.o ville.o error.o
 
 all : Archipelago
+
+error.o : error.cc error.h
+	$(CXX) $(CXXFLAGS) -c error.cc - error.o
 
 tools.o : tools.cc tool.h
 	$(CXX) $(CXXFLAGS) -c tools.cc -o tools.o
@@ -12,7 +15,7 @@ tools.o : tools.cc tool.h
 noeud.o : noeud.cc noeud.h tools.o
 	$(CXX) $(CXXFLAGS) -c noeud.cc -o noeud.o
 
-ville.o : ville.cc ville.h tools.o noeud.o
+ville.o : ville.cc ville.h tools.o noeud.o error.o
 	$(CXX) $(CXXFLAGS) -c ville.cc -o ville.o
 
 rendu.o : rendu.cc ville.o

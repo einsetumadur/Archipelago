@@ -24,13 +24,13 @@ double Ville::ENJ(){
   double sumL(0),sumTP(0);
 
   for(auto noeud : logement){    
-    sumL =+ noeud.capacite();
+    sumL =+ noeud.get_nbp();
   }
   for(auto noeud : production){
-    sumTP =+ noeud.capacite();
+    sumTP =+ noeud.get_nbp();
   }
   for(auto noeud : transport){
-    sumTP =+ noeud.capacite();
+    sumTP =+ noeud.get_nbp();
   }
 
 return (sumL - sumTP)/(sumL + sumTP);

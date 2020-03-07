@@ -3,49 +3,63 @@
 #include<sstream>
 #include<string>
 #include<vector>
-#include"ville.h"
-#include"noeud.h"
-#include"error.h"
-#include"constantes.h"
 using namespace std;
 
+class Noeud{
+    public:
+        Noeud(unsigned int id,double x, double y, unsigned int capacite): uid(id),nbp(capacite),posx(x),posy(y){}
+        unsigned int capacite(){return nbp;}
+        string print(){return to_string(uid)+" "+to_string(posx)+" "+to_string(posy)+" "+to_string(nbp);}
+    private: 
+        unsigned int uid;
+        unsigned int nbp;
+        double posx,posy;
+};  
 
-Ville::Ville(char* file){
-  fichier = file;
-  //besoin de construire les tableaux avant chargement ?
-  chargement(file);
+class Lien{
+    public:
+        Lien(int a,int b)
+        {
+          no1 = a;
+          no2 = b;
+        }
+    private:
+        int no1;
+        int no2;
+};
+
+class Ville{
+  public:
+    Ville(char* file){
+        cout<<"entrée constructeur"<<endl;
+        chargement(file);
+        sauvegarde(file);
+        }
+
+  private:
+    void decodage(string line);
+    void chargement(char * nom_fichier);
+    void sauvegarde(string file);
+    //void verification();
+
+    string fichier;
+    vector<Noeud> logement;
+    vector<Noeud> production;
+    vector<Noeud> transport;
+    vector<Lien> ponts;
+};
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int main(int argc, char* argv[]){
+    cout<<"départ"<<endl;
+    Ville Lausanne(argv[1]);
+    cout<<"fin de programme"<<endl;
+    return 0;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Ville::~Ville(){
-  sauvegarde(fichier);
-}
-
-double Ville::ENJ(){
-  double sumL(0),sumTP(0);
-
-  for(auto noeud : logement){    
-    sumL =+ noeud.capacite();
-  }
-  for(auto noeud : production){
-    sumTP =+ noeud.capacite();
-  }
-  for(auto noeud : transport){
-    sumTP =+ noeud.capacite();
-  }
-
-return (sumL - sumTP)/(sumL + sumTP);
-}
-
-double Ville::CI(){
-
-return -1;
-}
-
-double Ville::MTA(){
-
-return -1;
-}
-
+// traite le fichier ligne par ligne.  
 void Ville::chargement( char * nom_fichier)
 {
     string line;
@@ -58,7 +72,7 @@ void Ville::chargement( char * nom_fichier)
 			// ligne de commentaire à ignorer, on passe à la suivante
 			if(line[0]=='#')  continue;  
        
-			decodage(line);
+			decodage_ligne(line);
         }
         cout << "fin de la lecture" << endl;
 	}
@@ -179,4 +193,3 @@ if(!fichier.is_open()){
 
   fichier.close();
 }
-

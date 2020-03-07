@@ -9,15 +9,16 @@
 
 class Ville{
   public:
-    Ville(string file);
+    Ville(char* file);
     ~Ville();
     double ENJ();
     double CI();
     double MTA();
 
   private:
-    void chargement(string file);
+    void chargement( char * nom_fichier);
     void sauvegarde(string file);
+    void decodage(string line);
 
     string fichier;
     vector<Noeud> logement;

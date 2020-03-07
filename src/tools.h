@@ -3,17 +3,31 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
-typedef double vect[2] ;
+struct Point {
+  double pos_x, pos_y;
+};
 
-struct cercle{
-  double posx,posy;
+struct Cercle {
+  Point centre;
   double rayon;
 }; 
 
-double distance(vect a, vect b);
-double prod_scal(vect a, vect b);
-void projection(vect &res, vect a, vect b);
-double norme(vect a);
-double dist_point_ligne(vect a,vect b, vect c);
+struct Vecteur {
+  double x, y;
+};
 
-#endif TOOLS_H
+struct Seg_droite {
+  Point debut;
+  Vecteur directeur;
+};
+
+double distance(Vecteur a, Vecteur b);
+bool collision_cercle(Cercle c, Cercle e, double dist_min = 0);
+double prod_scal(Vecteur a, Vecteur b);
+Vecteur projection(Vecteur a, Vecteur b);
+double norme(Vecteur a);
+double dist_point_ligne(Point p, Seg_droite d);
+bool collision_droite_cercle(Cercle c, Seg_droite d, double dist_min = 0);
+
+
+#endif 

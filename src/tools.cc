@@ -5,13 +5,14 @@
 double distance(Vecteur a, Vecteur b) {
     double diffx = a.x - b.x;
     double diffy = a.y - b.y;
+    Vecteur res(diffx, diffy);
 	
-    return sqrt(diffx*diffx + diffy*diffy) ;
+    return sqrt(fabs(prod_scal(res, res)));
 }
 
 bool collision_cercle(Cercle c, Cercle e, double dist_min) {
-    Vecteur a_1 = {c.centre.pos_x, e.centre.pos_y};
-    Vecteur b_1 = {c.centre.pos_x, e.centre.pos_y};
+    Vecteur a_1 = {c.centre.pos_x, c.centre.pos_y};
+    Vecteur b_1 = {e.centre.pos_x, e.centre.pos_y};
     double dist = distance(a_1, b_1);
     double somme = (c.rayon + e.rayon);
     
@@ -28,10 +29,6 @@ Vecteur projection(Vecteur a, Vecteur b) {
   Vecteur res = { k*b.x, k*b.y };
 	
   return res;
-}
-
-double norme(Vecteur a) {
-  return sqrt(a.x*a.x + a.y*a.y);
 }
 
 double dist_point_ligne(Point p, Seg_droite d) {

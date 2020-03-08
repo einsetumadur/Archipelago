@@ -166,7 +166,7 @@ bool Noeud::operator==(const Noeud& nd) const  {
 string Noeud::test_duplicite_lien() {
 	
 	for(size_t i(0) ; i < liens.size() ; ++i) {
-		for(size_t j(i+1) ; j <= liens.size()-1 ; ++j) {
+		for(size_t j(i+1) ; j < liens.size() ; ++j) {
 			if(liens[i] == liens[j])
 				return multiple_same_link(getUid(), (*liens[i]).getUid());
 		}

@@ -24,9 +24,9 @@ class Noeud{
 
         int verif_uid_quartier(vector<Noeud> ensemble);
         int verif_capacite(Noeud node);
-		string test_nbp(unsigned int nbp, double rayon);
-		int verif_uid_interquartier(vector<Noeud> logement, vector<Noeud> production, vector<Noeud> transport);
-		string test_duplicite_lien() ;
+	string test_nbp(unsigned int nbp, double rayon);
+	int verif_uid_interquartier(vector<Noeud> logement, vector<Noeud> production, vector<Noeud> transport);
+	string test_duplicite_lien();
 
 
     protected: 
@@ -44,6 +44,7 @@ class Lien {
 		Seg_droite trait;
 	public: 
 		Lien(Noeud* nd1, Noeud* nd2);
+	
 		//getters
 		Seg_droite getTrait();
 };

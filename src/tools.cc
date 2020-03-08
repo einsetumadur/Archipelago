@@ -2,18 +2,16 @@
 #include<math.h>
 #include"tools.h"
 
-double distance(Vecteur a, Vecteur b) {
-    double diffx = a.x - b.x;
-    double diffy = a.y - b.y;
-    Vecteur res(diffx, diffy);
+double distance_vecteurs(Vecteur a, Vecteur b) {
+    Vecteur res(a.x-b.x, a.y-b.y);
 	
-    return sqrt(fabs(prod_scal(res, res)));
+    return norme(res);
 }
 
 bool collision_cercle(Cercle c, Cercle e, double dist_min) {
     Vecteur a_1 = {c.centre.pos_x, c.centre.pos_y};
     Vecteur b_1 = {e.centre.pos_x, e.centre.pos_y};
-    double dist = distance(a_1, b_1);
+    double dist = distance_vecteurs(a_1, b_1);
     double somme = (c.rayon + e.rayon);
     
     return ( dist <= (somme + dist_min) );
@@ -22,6 +20,11 @@ bool collision_cercle(Cercle c, Cercle e, double dist_min) {
 double prod_scal(Vecteur a, Vecteur b) {
 	
   return a.x*b.x + a.y*b.y;
+}
+
+double norme(Vecteur a) {
+	
+  return a.x*a.x + a.y*a.y;
 }
 
 Vecteur projection(Vecteur a, Vecteur b) {

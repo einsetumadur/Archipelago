@@ -30,11 +30,10 @@ class Noeud{
 	/*string test_duplicite_lien(); */
 
 
-    protected: 
+    private:
         Cercle quartier;
         unsigned int uid;
         unsigned int nbp;
-        vector<Noeud*> liens;
         type_quartier type;
 };
 
@@ -51,20 +50,20 @@ class Lien {
 		Seg_droite getTrait();
 };
 
-class Logement : public Noeud {
+/*class Logement : public Noeud {
 	public: 
 		Logement(unsigned int id, double x, double y, unsigned int capacite);
-		/*bool test_max_link(size_t nb_liens); */
+		bool test_max_link(size_t nb_liens); 
 
 };
 
-class Production : public Noeud {
+/*class Production : public Noeud {
 
 };
 
 class Transport : public Noeud {
 	
-};
+}; */
 
 string test_lien_quartier(vector<Lien> ensL, vector<Noeud> ensN);
 string test_coll_quartier(vector<Noeud> ensN);

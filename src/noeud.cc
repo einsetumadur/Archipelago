@@ -127,7 +127,7 @@ Lien::Lien(Noeud* nd1, Noeud* nd2): noeud1(nd1), noeud2(nd2)
 		error::node_link_superposition( (*nd1).getUid());
 	if(collision_droite_cercle( (*nd2).getQuartier(), trait))
 		error::node_link_superposition( (*nd2).getUid());
-}
+} 
 
 Seg_droite Lien::getTrait() {
 	

@@ -93,9 +93,9 @@ string test_nbp(unsigned int nbp, double rayon) {
 		i = 2;
 	
 	switch(i) {
-		case 0 : too_little_capacity(nbp);
+		case 0 : error::too_little_capacity(nbp);
 				break;
-		case 2 : too_much_capacity(nbp);
+		case 2 : error::too_much_capacity(nbp);
 				break;
 	}
 }
@@ -105,7 +105,7 @@ Logement::Logement(unsigned int id, double x, double y, unsigned int capacite, v
 {
 	// test max_link
     if(test_max_link(liens.size()))
-		max_link(id);
+		error::max_link(id);
 }
 
 bool Logement::test_max_link(size_t nb_liens) {
@@ -119,7 +119,7 @@ Lien::Lien(Noeud* nd1, Noeud* nd2): noeud1(nd1), noeud2(nd2)
 {
 	// test self link node
 	if(*nd1 == *nd2)	
-		self_link_node((*nd1).getUid);
+		error::self_link_node((*nd1).getUid);
 
 	// Modelisation geometrique du lien
 	double vx = ((*nd2).getx() - (*nd2).getrayon()) - ((*nd1).getx()-(*nd1).getrayon());
@@ -128,9 +128,9 @@ Lien::Lien(Noeud* nd1, Noeud* nd2): noeud1(nd1), noeud2(nd2)
 	
 	// test node overlap link
 	if(collision_droite_cercle( (*nd1).getQuartier(), trait))
-		node_link_superposition( (*nd1).getUid());
+		error::node_link_superposition( (*nd1).getUid());
 	if(collision_droite_cercle( (*nd2).getQuartier(), trait))
-		node_link_superposition( (*nd2).getUid());
+		error::node_link_superposition( (*nd2).getUid());
 }
 
 Seg_droite Lien::getTrait() {
@@ -144,7 +144,7 @@ string test_lien_quartier(vector<Lien> ensL, vector<Noeud> ensN) {		//collision 
 	for(size_t i(0) ; i < ensL.size() ; ++i) {
 		for(size_t j(0) ; j < ensN.size() ; ++j) {
 			if(collision_droite_cercle( ensN[j].getQuartier(), ensL[i].getTrait() ))
-				node_link_superposition( ensN[j].getUid() );
+				error::node_link_superposition( ensN[j].getUid() );
 		}
 	}
 }
@@ -153,7 +153,7 @@ string test_coll_quartier(vector<Noeud> ensN) {							// collision lien quartier
 	
 	for(size_t i(0) ; i < ensN.size() - 1 ; ++i) {
 		if(collision_cercle(ensN[i].getQuartier(), ensN[i+1].getQuartier()) )
-			node_node_superposition(ensN[i].getUid(), ensN[i+1].getUid() );
+			error::node_node_superposition(ensN[i].getUid(), ensN[i+1].getUid() );
 	}
 }
 
@@ -168,7 +168,7 @@ string Noeud::test_duplicite_lien() {
 	for(size_t i(0) ; i < liens.size() ; ++i) {
 		for(size_t j(i+1) ; j < liens.size() ; ++j) {
 			if(liens[i] == liens[j])
-				return multiple_same_link(getUid(), (*liens[i]).getUid());
+				return error::multiple_same_link(getUid(), (*liens[i]).getUid());
 		}
 	}
 }

@@ -3,7 +3,7 @@
 #include"tools.h"
 
 double distance_vecteurs(Vecteur a, Vecteur b) {
-    Vecteur res(a.x-b.x, a.y-b.y);
+    Vecteur res = {a.x-b.x, a.y-b.y};
 	
     return norme(res);
 }

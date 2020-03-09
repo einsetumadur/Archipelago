@@ -65,6 +65,7 @@ void Ville::decodage(string line)
 	static int i(0), total(0);
 	int numid,popmax;
 	double posx,posy;
+  unsigned int uid1,uid2;
 
 	switch(etat) 
 	{
@@ -121,9 +122,9 @@ void Ville::decodage(string line)
 	  break;
 
 	case LIENS: 
-		if( !(data >> posx >> posy)) cout<<"err liens"<<endl;
+		if( !(data >> uid1 >> uid2)) cout<<"err liens"<<endl;
     else{
-      ponts.push_back(Lien(trouve_lien(posx),trouve_lien(posy))); 
+      ponts.push_back(Lien(trouve_lien(uid1),trouve_lien(uid2))); 
       ++i;
     }
 		if(i == total) etat=FIN ;
@@ -156,11 +157,26 @@ if(!fichier.is_open()){
     std::cout<<"impossible d'enregistrer "<<file<<std::endl;
     //todo: mettre fonction d'erreure.
   }else{
-  
-    // écriture de sauvegarde todo
+  fichier << nb_type(logements) << endl;
+  fichier << print_type(logements) << endl;
 
   }
 
   fichier.close();
 }
 
+void Ville::print_type(type_quartier type)
+{
+  for(auto noeud : quartiers){
+    if(noeud.getType()==type) 
+  }
+}
+
+unsigned int Ville::nb_type(type_quartier type)
+{
+  unsigned int count(0);
+  for(auto noeud : quartiers){
+    if(noeud.getType()==type) count++;
+  }
+  return count;
+}

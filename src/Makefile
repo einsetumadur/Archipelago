@@ -7,7 +7,7 @@ OFILES = rendu.o noeud.o tools.o ville.o error.o
 all : Archipelago
 
 error.o : error.cc error.h
-	$(CXX) $(CXXFLAGS) -c error.cc - error.o
+	$(CXX) $(CXXFLAGS) -c error.cc -o error.o
 
 tools.o : tools.cc tools.h
 	$(CXX) $(CXXFLAGS) -c tools.cc -o tools.o

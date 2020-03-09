@@ -18,10 +18,6 @@ Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, vector<
     test_duplicite_lien();
 	
 }
-
-/*Lien::Lien(Noeud nd1, Noeud nd2): noeud1(&nd1), noeud2(&nd2)
-{
-}*/
     
 unsigned int Noeud::get_nbp()
 {
@@ -119,7 +115,7 @@ Lien::Lien(Noeud* nd1, Noeud* nd2): noeud1(nd1), noeud2(nd2)
 {
 	// test self link node
 	if(*nd1 == *nd2)	
-		error::self_link_node((*nd1).getUid);
+		error::self_link_node(nd1->getUid());
 
 	// Modelisation geometrique du lien
 	double vx = ((*nd2).getx() - (*nd2).getrayon()) - ((*nd1).getx()-(*nd1).getrayon());

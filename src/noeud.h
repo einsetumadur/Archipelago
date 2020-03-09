@@ -8,6 +8,7 @@ using namespace std;
 #ifndef NOEUD_H
 #define NOEUD_H
 
+enum type_quartier {production,transport,logements};
 class Noeud{
     public:
         Noeud(unsigned int id,double x, double y, unsigned int capacite, vector<Noeud*> liens);
@@ -34,6 +35,7 @@ class Noeud{
         unsigned int uid;
         unsigned int nbp;
         vector<Noeud*> liens;
+        type_quartier type;
 };
 
 class Lien {
@@ -48,16 +50,6 @@ class Lien {
 		//getters
 		Seg_droite getTrait();
 };
-
-/*class Lien{
-    public:
-        Lien(Noeud nd1, Noeud nd2);
-    private:
-        Noeud* noeud1;
-        Noeud* noeud2;
-       // Seg_droite d;
-}; */ // J'enleve ça pcq : je peux pas utiliser la class Lien comme attribut de Noeud, vu que c'est déclaré après. Ca fout le bordel pr la suite du projet, donc j'ai juste déclaré un vector de ptr de Noeud comme attribut
-
 
 class Logement : public Noeud {
 	public: 

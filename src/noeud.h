@@ -11,7 +11,7 @@ using namespace std;
 enum type_quartier {production,transport,logements};
 class Noeud{
     public:
-        Noeud(unsigned int id,double x, double y, unsigned int capacite, vector<Noeud*> liens);
+        Noeud(unsigned int id,double x, double y, unsigned int capacite);
         string print();
         // getters
         unsigned int get_nbp();
@@ -27,7 +27,7 @@ class Noeud{
         int verif_capacite(Noeud node);
 	string test_nbp(unsigned int nbp, double rayon);
 	int verif_uid_interquartier(vector<Noeud> logement, vector<Noeud> production, vector<Noeud> transport);
-	string test_duplicite_lien();
+	/*string test_duplicite_lien(); */
 
 
     protected: 
@@ -53,8 +53,8 @@ class Lien {
 
 class Logement : public Noeud {
 	public: 
-		Logement(unsigned int id, double x, double y, unsigned int capacite, vector<Noeud*> liens);
-		bool test_max_link(size_t nb_liens);
+		Logement(unsigned int id, double x, double y, unsigned int capacite);
+		/*bool test_max_link(size_t nb_liens); */
 
 };
 

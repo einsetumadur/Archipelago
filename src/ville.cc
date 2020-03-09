@@ -21,19 +21,9 @@ Ville::~Ville(){
 }
 
 double Ville::ENJ(){
-  double sumL(0),sumTP(0);
 
-  for(auto noeud : logement){    
-    sumL =+ noeud.get_nbp();
-  }
-  for(auto noeud : production){
-    sumTP =+ noeud.get_nbp();
-  }
-  for(auto noeud : transport){
-    sumTP =+ noeud.get_nbp();
-  }
 
-return (sumL - sumTP)/(sumL + sumTP);
+return -1;
 }
 
 double Ville::CI(){
@@ -87,7 +77,7 @@ void Ville::decodage(string line)
 	case LOGEMENT: 
 		if(!(data >> numid >> posx >> posy >> popmax)) cout<<"err logement"<<endl;
     else{
-      logement.push_back(Noeud(numid,posx,posy,popmax)); 
+      quartiers.push_back(Noeud(numid,posx,posy,popmax)); 
       ++i;
     }
 		if(i == total) etat=NBP ;
@@ -102,7 +92,7 @@ void Ville::decodage(string line)
 	case PRODUCTION: 
 		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err production"<<endl;
     else{
-      production.push_back(Noeud(numid,posx,posy,popmax));
+      quartiers.push_back(Noeud(numid,posx,posy,popmax));
        ++i;
     }  
 		if(i == total) etat=NBT ;
@@ -117,7 +107,7 @@ void Ville::decodage(string line)
 	case TRANSPORT: 
 		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err transport"<<endl;
     else{
-      transport.push_back(Noeud(numid,posx,posy,popmax));
+      quartiers.push_back(Noeud(numid,posx,posy,popmax));
        ++i;
     }   
 		if(i == total) etat=NBLI ;
@@ -133,7 +123,7 @@ void Ville::decodage(string line)
 	case LIENS: 
 		if( !(data >> posx >> posy)) cout<<"err liens"<<endl;
     else{
-      //ponts.push_back(Lien(posx,posy)); 
+      ponts.push_back(Lien(trouve_lien(posx),trouve_lien(posy))); 
       ++i;
     }
 		if(i == total) etat=FIN ;
@@ -146,6 +136,18 @@ void Ville::decodage(string line)
 	}	
 }
 
+Noeud* Ville::trouve_lien(unsigned int uid)
+{
+  for(auto noeud : quartiers)
+  {
+    if(uid == noeud.getUid()){
+      return &noeud;
+    }
+  }
+  cout << "noeud non trouvé pour uid# = "<<uid<<endl;
+  exit(0);
+}
+
 void Ville::sauvegarde(string file){
   fstream fichier;
   fichier.open("sauvegarde.txt", ios::out | ios::trunc);
@@ -154,27 +156,9 @@ if(!fichier.is_open()){
     std::cout<<"impossible d'enregistrer "<<file<<std::endl;
     //todo: mettre fonction d'erreure.
   }else{
-    fichier<<"#fichier de sauvegarde Archipelago de "<<file<<endl;
-    fichier<<logement.size()<<endl;
-    for (auto noeud : logement)
-    {
-      fichier<<"\t"<<noeud.print()<<endl;
-    }
-    fichier<<production.size()<<endl;
-    for (auto noeud : production)
-    {
-      fichier<<"\t"<<noeud.print()<<endl;
-    }
-    fichier<<transport.size()<<endl;
-    for (auto noeud : transport)
-    {
-      fichier<<"\t"<<noeud.print()<<endl;
-    }
-  /*fichier<<ponts.size()<<endl;
-    for (auto lien : ponts)
-    {
-      fichier<<lien.print()<<endl;
-    } */
+  
+    // écriture de sauvegarde todo
+
   }
 
   fichier.close();

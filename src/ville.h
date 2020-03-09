@@ -19,11 +19,10 @@ class Ville{
     void chargement( char * nom_fichier);
     void sauvegarde(string file);
     void decodage(string line);
+    Noeud* trouve_lien(unsigned int uid); 
 
     string fichier;
-    vector<Noeud> logement;
-    vector<Noeud> production;
-    vector<Noeud> transport;
+    vector<Noeud> quartiers;
     vector<Lien> ponts;
 };
 

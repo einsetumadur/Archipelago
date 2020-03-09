@@ -14,8 +14,6 @@ Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite):
 {
     test_nbp(uid, getrayon());	// verifie la validite de la capacite
     
-    // test si un lien apparait 2 fois
-   /* test_duplicite_lien(); */
 	
 }
     
@@ -96,20 +94,6 @@ string test_nbp(unsigned int nbp, double rayon) {
 	}
 }
 
-Logement::Logement(unsigned int id, double x, double y, unsigned int capacite):  
-						Noeud(id,x,y,capacite)
-{
-	// test max_link
-   /* if(test_max_link(liens.size()))
-		error::max_link(id); */
-}
-
-/*bool Logement::test_max_link(size_t nb_liens) {
-	if(nb_liens > 3)
-		return 1;
-	else
-		return 0;
-} */
 
 Lien::Lien(Noeud* nd1, Noeud* nd2): noeud1(nd1), noeud2(nd2) 
 {
@@ -158,13 +142,3 @@ bool Noeud::operator==(const Noeud& nd) const  {
 	
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and (getrayon() == nd.getrayon()) ); 
 }
-
-/*string Noeud::test_duplicite_lien() {
-	
-	for(size_t i(0) ; i < liens.size() ; ++i) {
-		for(size_t j(i+1) ; j < liens.size() ; ++j) {
-			if(liens[i] == liens[j])
-				return error::multiple_same_link(getUid(), (*liens[i]).getUid());
-		}
-	}
-} */

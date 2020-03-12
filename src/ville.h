@@ -21,7 +21,7 @@ class Ville{
     void decodage(string line);
     Noeud* trouve_lien(unsigned int uid); 
     unsigned int nb_type(type_quartier type);
-    void print_type(type_quartier type);
+    string print_type(type_quartier type);
 
     string fichier;
     vector<Noeud> quartiers;

@@ -165,11 +165,16 @@ if(!fichier.is_open()){
   fichier.close();
 }
 
-void Ville::print_type(type_quartier type)
+string Ville::print_type(type_quartier type)
 {
+  string bloc(to_string(nb_type(type)));
+
   for(auto noeud : quartiers){
-    if(noeud.getType()==type) 
+    if(noeud.getType()==type){
+      bloc.append("\t" + noeud.print() + "\n");
+    }
   }
+  return bloc;
 }
 
 unsigned int Ville::nb_type(type_quartier type)

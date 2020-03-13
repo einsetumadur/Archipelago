@@ -64,18 +64,6 @@ void Noeud::add_lien(Noeud* B) {
 	liens.push_back(B);
 }
 
-
-
-int Noeud::verif_uid_quartier(vector<Noeud> ensemble) {		// verifie la non-duplicite de l'uid dans un seul type de quartier
-	
-	for(size_t i(0) ; i < ensemble.size() ; ++i) {
-		for(size_t j(i+1) ; j < ensemble.size() ; ++j) {
-			if (ensemble[i].uid == ensemble [j].uid) return ensemble[i].uid;
-		}
-	}
-	return 0;
-}
-
 string test_nbp(unsigned int nbp, double rayon) {
 	unsigned int i(0);
 	if(sqrt(nbp) == rayon)

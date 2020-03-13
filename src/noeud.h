@@ -1,3 +1,4 @@
+
 #include<iostream>
 #include<string>
 #include <vector>
@@ -11,7 +12,7 @@ using namespace std;
 enum type_quartier {production,transport,logements};
 class Noeud{
     public:
-        Noeud(unsigned int id,double x, double y, unsigned int capacite);
+        Noeud(unsigned int id,double x, double y, unsigned int capacite, type_quartier type);
         string print();
         // getters
         unsigned int get_nbp();
@@ -20,13 +21,14 @@ class Noeud{
         double getrayon() const ;
         Cercle getQuartier() const ;
         unsigned int getUid() const ;
+        type_quartier getType() const;
         
         bool operator==(const Noeud& nd) const ;
 
         int verif_uid_quartier(vector<Noeud> ensemble);
         int verif_capacite(Noeud node);
-	string test_nbp(unsigned int nbp, double rayon);
-	int verif_uid_interquartier(vector<Noeud> logement, vector<Noeud> production, vector<Noeud> transport);
+        string test_nbp(unsigned int nbp, double rayon);
+        int verif_uid_interquartier(vector<Noeud> logement, vector<Noeud> production, vector<Noeud> transport);
 
 
     private:
@@ -34,20 +36,9 @@ class Noeud{
         unsigned int uid;
         unsigned int nbp;
         type_quartier type;
+        vector<Noeud*> liens;
 };
 
-class Lien {
-	
-	private:
-		Noeud* noeud1;
-		Noeud* noeud2;
-		Seg_droite trait;
-	public: 
-		Lien(Noeud* nd1, Noeud* nd2);
-	
-		//getters
-		Seg_droite getTrait();
-};
 
 string test_lien_quartier(vector<Lien> ensL, vector<Noeud> ensN);
 string test_coll_quartier(vector<Noeud> ensN);

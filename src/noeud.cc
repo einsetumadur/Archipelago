@@ -9,8 +9,8 @@
 using namespace std;
 
 
-Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite): 
-            uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite)
+Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, type_quartier type): 
+            uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
 {
     test_nbp(uid, getrayon());	// verifie la validite de la capacite
     
@@ -47,6 +47,11 @@ unsigned int Noeud::getUid() const  {
 	
 	return uid;
 }
+type_quartier Noeud::getType() const {
+
+	return type;
+}
+
 
 int Noeud::verif_uid_quartier(vector<Noeud> ensemble) {		// verifie la non-duplicite de l'uid dans un seul type de quartier
 	
@@ -95,31 +100,7 @@ string test_nbp(unsigned int nbp, double rayon) {
 }
 
 
-Lien::Lien(Noeud* nd1, Noeud* nd2): noeud1(nd1), noeud2(nd2) 
-{
-	// test self link node
-	if(*nd1 == *nd2)	
-		error::self_link_node(nd1->getUid());
-
-	// Modelisation geometrique du lien
-	double vx = ((*nd2).getx() - (*nd2).getrayon()) - ((*nd1).getx()-(*nd1).getrayon());
-	double vy = ((*nd2).gety() - (*nd2).getrayon()) - ((*nd1).gety()-(*nd1).getrayon());
-	trait.directeur = {vx, vy};
-	
-	// test node overlap link
-	if(collision_droite_cercle( (*nd1).getQuartier(), trait))
-		error::node_link_superposition( (*nd1).getUid());
-	if(collision_droite_cercle( (*nd2).getQuartier(), trait))
-		error::node_link_superposition( (*nd2).getUid());
-} 
-
-Seg_droite Lien::getTrait() {
-	
-	return trait;
-}
-
-
-string test_lien_quartier(vector<Lien> ensL, vector<Noeud> ensN) {		//collision lien quartier
+/*string test_lien_quartier(vector<Lien> ensL, vector<Noeud> ensN) {		//collision lien quartier
 	
 	for(size_t i(0) ; i < ensL.size() ; ++i) {
 		for(size_t j(0) ; j < ensN.size() ; ++j) {
@@ -127,7 +108,7 @@ string test_lien_quartier(vector<Lien> ensL, vector<Noeud> ensN) {		//collision 
 				error::node_link_superposition( ensN[j].getUid() );
 		}
 	}
-}
+} */
 
 string test_coll_quartier(vector<Noeud> ensN) {							// collision lien quartier
 	

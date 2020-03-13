@@ -22,6 +22,8 @@ class Noeud{
         Cercle getQuartier() const ;
         unsigned int getUid() const ;
         type_quartier getType() const;
+        // setters
+        void add_lien(Noeud* B);
         
         bool operator==(const Noeud& nd) const ;
 
@@ -40,9 +42,10 @@ class Noeud{
 };
 
 
-string test_lien_quartier(vector<Lien> ensL, vector<Noeud> ensN);
+bool test_lien_quartier(Noeud A, Noeud C, Noeud B) {	
 string test_coll_quartier(vector<Noeud> ensN);
 string test_nbp(unsigned int nbp, double rayon);
 
 
 #endif
+

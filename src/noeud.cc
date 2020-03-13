@@ -52,6 +52,11 @@ type_quartier Noeud::getType() const {
 	return type;
 }
 
+void Noeud::add_lien(Noeud* B) {
+
+	liens.push_back(B);
+}
+
 
 int Noeud::verif_uid_quartier(vector<Noeud> ensemble) {		// verifie la non-duplicite de l'uid dans un seul type de quartier
 	
@@ -100,17 +105,13 @@ string test_nbp(unsigned int nbp, double rayon) {
 }
 
 
-/*string test_lien_quartier(vector<Lien> ensL, vector<Noeud> ensN) {		//collision lien quartier
-	
-	for(size_t i(0) ; i < ensL.size() ; ++i) {
-		for(size_t j(0) ; j < ensN.size() ; ++j) {
-			if(collision_droite_cercle( ensN[j].getQuartier(), ensL[i].getTrait() ))
-				error::node_link_superposition( ensN[j].getUid() );
-		}
-	}
-} */
+bool test_lien_quartier(Noeud A, Noeud C, Noeud B) {	
+	Point p = { A.getx(), A.gety()};
+	Seg_droite d = { p, {B.getx() - A.getx(), B.gety() - A.gety() } };
+	return collision_droite_cercle(C, d);
+} 
 
-string test_coll_quartier(vector<Noeud> ensN) {							// collision lien quartier
+string test_coll_quartier(vector<Noeud> ensN) {		
 	
 	for(size_t i(0) ; i < ensN.size() - 1 ; ++i) {
 		if(collision_cercle(ensN[i].getQuartier(), ensN[i+1].getQuartier()) )
@@ -123,3 +124,4 @@ bool Noeud::operator==(const Noeud& nd) const  {
 	
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and (getrayon() == nd.getrayon()) ); 
 }
+

@@ -40,7 +40,7 @@ class Noeud{
 };
 
 
-bool test_lien_quartier(Noeud A, Noeud C, Noeud B);	
+string test_lien_quartier(Noeud A, Noeud C, Noeud B);	
 string test_coll_quartier(vector<Noeud> ensN);
 string test_nbp(unsigned int nbp, double rayon);
 

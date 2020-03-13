@@ -10,13 +10,15 @@ using namespace std;
 
 
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, type_quartier type): 
-            uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
+            uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type_quartier::type)
 {
     test_nbp(uid, getrayon());	// verifie la validite de la capacite
-    
-	
 }
     
+string Noeud::test_max_link() {
+	if(liens.size() > 3)				//MAGIC NUMBER
+		max_link(getUid());
+}
 unsigned int Noeud::get_nbp()
 {
     return nbp;
@@ -54,8 +56,14 @@ type_quartier Noeud::getType() const {
 
 void Noeud::add_lien(Noeud* B) {
 
+	 if(type == 2)
+		test_max_link();
+	 else if (B.getType() == 2) 
+	 	(*B).test_max_link();
+	
 	liens.push_back(B);
 }
+
 
 
 int Noeud::verif_uid_quartier(vector<Noeud> ensemble) {		// verifie la non-duplicite de l'uid dans un seul type de quartier
@@ -65,25 +73,6 @@ int Noeud::verif_uid_quartier(vector<Noeud> ensemble) {		// verifie la non-dupli
 			if (ensemble[i].uid == ensemble [j].uid) return ensemble[i].uid;
 		}
 	}
-	return 0;
-}
-int Noeud::verif_uid_interquartier(vector<Noeud> logement, vector<Noeud> production, vector<Noeud> transport) { // verifie la non-duplicite de l'uid dans tous les types de quartier
-	
-	size_t taille;
-	if(logement.size() <= production.size() and logement.size() <= transport.size())
-		taille = logement.size();
-	else if(production.size()  <= logement.size() and production.size() <= transport.size())
-		taille = production.size();
-	else
-		taille = transport.size();
-		
-	for(size_t i(0) ; i < taille ; ++i) {
-		if(logement[i].uid == production[i].uid or logement[i].uid == transport[i].uid)
-			return logement[i].uid;
-		else if (production[i].uid == transport[i].uid)
-			return production[i].uid;
-	}
-	
 	return 0;
 }
 
@@ -112,7 +101,6 @@ bool test_lien_quartier(Noeud A, Noeud C, Noeud B) {
 } 
 
 string test_coll_quartier(vector<Noeud> ensN) {		
-	
 	for(size_t i(0) ; i < ensN.size() - 1 ; ++i) {
 		if(collision_cercle(ensN[i].getQuartier(), ensN[i+1].getQuartier()) )
 			error::node_node_superposition(ensN[i].getUid(), ensN[i+1].getUid() );
@@ -124,4 +112,3 @@ bool Noeud::operator==(const Noeud& nd) const  {
 	
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and (getrayon() == nd.getrayon()) ); 
 }
-

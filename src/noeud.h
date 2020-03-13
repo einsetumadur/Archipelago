@@ -12,6 +12,7 @@ enum type_quartier {production,transport,logements};
 class Noeud{
     public:
         Noeud(unsigned int id,double x, double y, unsigned int capacite, type_quartier type);
+        //FAIRE UN DESTRUCTEUR
         string print();
         // getters
         unsigned int get_nbp();
@@ -27,6 +28,7 @@ class Noeud{
         bool operator==(const Noeud& nd) const ;
 
         string test_max_link();
+        int verif_uid_quartier(vector<Noeud> ensemble);
         int verif_capacite(Noeud node);
         string test_nbp(unsigned int nbp, double rayon);
 

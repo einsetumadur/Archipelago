@@ -1,4 +1,3 @@
-
 #include<iostream>
 #include<string>
 #include <vector>
@@ -27,11 +26,10 @@ class Noeud{
         
         bool operator==(const Noeud& nd) const ;
 
+        string test_max_link();
         int verif_uid_quartier(vector<Noeud> ensemble);
         int verif_capacite(Noeud node);
         string test_nbp(unsigned int nbp, double rayon);
-        int verif_uid_interquartier(vector<Noeud> logement, vector<Noeud> production, vector<Noeud> transport);
-
 
     private:
         Cercle quartier;
@@ -48,4 +46,3 @@ string test_nbp(unsigned int nbp, double rayon);
 
 
 #endif
-

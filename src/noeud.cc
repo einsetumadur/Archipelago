@@ -56,6 +56,17 @@ type_quartier Noeud::getType() const {
 
 void Noeud::add_lien(Noeud* B) {
 
+	// SELF-NODE
+	if( (*B) == *this )
+	 	error::self_link_node((*B).getUid()); 
+
+	// MULTIPLE NODE
+	for(size_t i(0) ; i < liens.size() ; ++i) {
+		if(liens[i] == B) 
+			error::multiple_same_link(uid, (*B).getUid());
+	}
+
+	// MAX HOUSING LINKS
 	 if(type == 2)
 		test_max_link();
 	 else if ((*B).getType() == 2) 
@@ -100,4 +111,5 @@ bool Noeud::operator==(const Noeud& nd) const  {
 	
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and (getrayon() == nd.getrayon()) ); 
 }
+
 

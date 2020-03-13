@@ -10,14 +10,14 @@ using namespace std;
 
 
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, type_quartier type): 
-            uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type_quartier::type)
+            uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
 {
     test_nbp(uid, getrayon());	// verifie la validite de la capacite
 }
     
 string Noeud::test_max_link() {
 	if(liens.size() > 3)				//MAGIC NUMBER
-		max_link(getUid());
+		error::max_link( getUid() );
 }
 unsigned int Noeud::get_nbp()
 {
@@ -58,7 +58,7 @@ void Noeud::add_lien(Noeud* B) {
 
 	 if(type == 2)
 		test_max_link();
-	 else if (B.getType() == 2) 
+	 else if ((*B).getType() == 2) 
 	 	(*B).test_max_link();
 	
 	liens.push_back(B);
@@ -97,7 +97,7 @@ string test_nbp(unsigned int nbp, double rayon) {
 bool test_lien_quartier(Noeud A, Noeud C, Noeud B) {	
 	Point p = { A.getx(), A.gety()};
 	Seg_droite d = { p, {B.getx() - A.getx(), B.gety() - A.gety() } };
-	return collision_droite_cercle(C, d);
+	return collision_droite_cercle(C.getQuartier(), d);
 } 
 
 string test_coll_quartier(vector<Noeud> ensN) {		
@@ -112,3 +112,4 @@ bool Noeud::operator==(const Noeud& nd) const  {
 	
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and (getrayon() == nd.getrayon()) ); 
 }
+

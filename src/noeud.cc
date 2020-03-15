@@ -108,7 +108,7 @@ string test_lien_quartier(Noeud A, Noeud C, Noeud B)
 	Point p = { A.getx(), A.gety()};
 	Seg_droite d = { p, {B.getx() - A.getx(), B.gety() - A.gety() } };
 	if(collision_droite_cercle(C.getQuartier(), d))
-		error:node_link_superposition(B.getUid());
+		error::node_link_superposition(B.getUid());
 } 
 
 string test_coll_quartier(vector<Noeud> ensN) 

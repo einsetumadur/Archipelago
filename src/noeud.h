@@ -9,7 +9,8 @@ using namespace std;
 #define NOEUD_H
 
 enum type_quartier {production,transport,logements};
-class Noeud{
+class Noeud 
+{
     public:
         Noeud(unsigned int id,double x, double y, unsigned int capacite, type_quartier type);
         //FAIRE UN DESTRUCTEUR

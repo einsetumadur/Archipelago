@@ -9,7 +9,7 @@
 using namespace std;
 
 
-Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, type_quartier type): 
+Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, Type_quartier type): 
             uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
 {
     test_nbp(uid, getrayon());	// verifie la validite de la capacite
@@ -55,7 +55,7 @@ unsigned int Noeud::getUid() const
 	
 	return uid;
 }
-type_quartier Noeud::getType() const 
+Type_quartier Noeud::getType() const 
 {
 
 	return type;
@@ -85,15 +85,15 @@ void Noeud::add_lien(Noeud* B)
 
 string test_nbp(unsigned int nbp, double rayon) 
 {
-	unsigned int i(0);
+	unsigned int tmp(0);
 	if(sqrt(nbp) == rayon)
-		i = 1;
+		tmp = 1;
 	else if(sqrt(nbp) < rayon)
-		i = 0;
+		tmp = 0;
 	else if(sqrt(nbp) > rayon)
-		i = 2;
+		tmp = 2;
 	
-	switch(i) 
+	switch(tmp) 
 	{
 		case 0 : error::too_little_capacity(nbp);
 				break;
@@ -102,11 +102,10 @@ string test_nbp(unsigned int nbp, double rayon)
 	}
 }
 
-
 string test_lien_quartier(Noeud A, Noeud C, Noeud B) 
 {	
-	Point p = { A.getx(), A.gety()};
-	Seg_droite d = { p, {B.getx() - A.getx(), B.gety() - A.gety() } };
+	Point p = { A.getx(), A.gety() };
+	Seg_droite d = { p, {B.getx() - A.getx(), B.gety() - A.gety()} };
 	if(collision_droite_cercle(C.getQuartier(), d))
 		error::node_link_superposition(B.getUid());
 } 
@@ -120,10 +119,8 @@ string test_coll_quartier(vector<Noeud> ensN)
 	}
 }
 
-//Surcharge d'operateur == pour les noeuds 
-bool Noeud::operator==(const Noeud& nd) const  
+bool Noeud::operator==(const Noeud& nd) const  //Surcharge d'operateur == pour les noeuds 
 {
 	
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and (getrayon() == nd.getrayon()) ); 
 }
-

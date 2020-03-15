@@ -15,7 +15,8 @@ Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, type_qu
     test_nbp(uid, getrayon());	// verifie la validite de la capacite
 }
     
-string Noeud::test_max_link() {
+string Noeud::test_max_link() 
+{
 	if(liens.size() > 3)				//MAGIC NUMBER
 		error::max_link( getUid() );
 }
@@ -29,39 +30,46 @@ string Noeud::print()
     return to_string(uid)+" "+to_string(quartier.centre.pos_x)+" "+to_string(quartier.centre.pos_y)+" "+to_string(nbp);
 }
 
-double Noeud::getx() const {
+double Noeud::getx() const 
+{
 	
 	return (getQuartier() ).centre.pos_x;
 }
-double Noeud::gety() const {
+double Noeud::gety() const 
+{
 	
 	return (getQuartier() ).centre.pos_y;
 }
-double Noeud::getrayon() const {
+double Noeud::getrayon() const 
+{
 	
 	return (getQuartier() ).rayon;
 }
-Cercle Noeud::getQuartier() const  {
+Cercle Noeud::getQuartier() const  
+{
 	
 	return quartier;
 }
-unsigned int Noeud::getUid() const  {
+unsigned int Noeud::getUid() const 
+{
 	
 	return uid;
 }
-type_quartier Noeud::getType() const {
+type_quartier Noeud::getType() const 
+{
 
 	return type;
 }
 
-void Noeud::add_lien(Noeud* B) {
-
+void Noeud::add_lien(Noeud* B) 
+{
 	// SELF-NODE
 	if( (*B) == *this )
 	 	error::self_link_node((*B).getUid()); 
 
 	// MULTIPLE NODE
-	for(size_t i(0) ; i < liens.size() ; ++i) {
+	for(size_t i(0) ; i < liens.size() ; ++i) 
+	{
 		if(liens[i] == B) 
 			error::multiple_same_link(uid, (*B).getUid());
 	}
@@ -75,7 +83,8 @@ void Noeud::add_lien(Noeud* B) {
 	liens.push_back(B);
 }
 
-string test_nbp(unsigned int nbp, double rayon) {
+string test_nbp(unsigned int nbp, double rayon) 
+{
 	unsigned int i(0);
 	if(sqrt(nbp) == rayon)
 		i = 1;
@@ -84,7 +93,8 @@ string test_nbp(unsigned int nbp, double rayon) {
 	else if(sqrt(nbp) > rayon)
 		i = 2;
 	
-	switch(i) {
+	switch(i) 
+	{
 		case 0 : error::too_little_capacity(nbp);
 				break;
 		case 2 : error::too_much_capacity(nbp);
@@ -93,24 +103,27 @@ string test_nbp(unsigned int nbp, double rayon) {
 }
 
 
-string test_lien_quartier(Noeud A, Noeud C, Noeud B) {	
+string test_lien_quartier(Noeud A, Noeud C, Noeud B) 
+{	
 	Point p = { A.getx(), A.gety()};
 	Seg_droite d = { p, {B.getx() - A.getx(), B.gety() - A.gety() } };
 	if(collision_droite_cercle(C.getQuartier(), d))
 		error:node_link_superposition(B.getUid());
 } 
 
-string test_coll_quartier(vector<Noeud> ensN) {		
-	for(size_t i(0) ; i < ensN.size() - 1 ; ++i) {
+string test_coll_quartier(vector<Noeud> ensN) 
+{		
+	for(size_t i(0) ; i < ensN.size() - 1 ; ++i) 
+	{
 		if(collision_cercle(ensN[i].getQuartier(), ensN[i+1].getQuartier()) )
 			error::node_node_superposition(ensN[i].getUid(), ensN[i+1].getUid() );
 	}
 }
 
 //Surcharge d'operateur == pour les noeuds 
-bool Noeud::operator==(const Noeud& nd) const  {
+bool Noeud::operator==(const Noeud& nd) const  
+{
 	
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and (getrayon() == nd.getrayon()) ); 
 }
-
 

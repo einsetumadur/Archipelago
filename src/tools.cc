@@ -1,6 +1,14 @@
+/**\
+ * \name   tools.cc
+ * \author Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    march 2020
+ * \version 1.0
+ */
+
 #include<iostream>
 #include<math.h>
 #include"tools.h"
+#include"constantes.h"
 
 double distance_vecteurs(Vecteur a, Vecteur b) 
 {
@@ -9,7 +17,7 @@ double distance_vecteurs(Vecteur a, Vecteur b)
     return norme(v);
 }
 
-bool collision_cercle(Cercle c, Cercle e, double dist_min) 
+bool collision_cercle(Cercle c, Cercle e) 
 {
     Vecteur a = {c.centre.pos_x, c.centre.pos_y};
     Vecteur b = {e.centre.pos_x, e.centre.pos_y};
@@ -39,7 +47,7 @@ Vecteur projection(Vecteur a, Vecteur b)
   return v_proj;
 }
 
-Vecteur vecteur_orthogonal(Point p, Seg_droite d)                     // créé un vecteur v_2 orthogonal à d, passant par p
+Vecteur vecteur_orthogonal(Point p, Seg_droite d) 
 {
 	Vecteur v_point_droite = { p.pos_x - d.debut.pos_x, p.pos_y - d.debut.pos_y };
 	Vecteur v_proj = projection(v_point_droite, d.directeur);
@@ -48,13 +56,15 @@ Vecteur vecteur_orthogonal(Point p, Seg_droite d)                     // créé 
 	return v_orthog;
 }
 
-bool collision_droite_cercle(Cercle c, Seg_droite d, double dist_min) 
+bool collision_droite_cercle(Cercle c, Seg_droite d) 
 {
-  Vecteur v = vecteur_orthogonal(c.centre, d);
-  Vecteur a = { d.debut.pos_x - c.centre.pos_x, d.debut.pos_y - c.centre.pos_y };
-  Vecteur b = { d.debut.pos_x + d.directeur.x - c.centre.pos_x, d.debut.pos_y + d.directeur.y - c.centre.pos_y };
-  double v_a = prod_scal(v,a);
-  double v_b = prod_scal(v,b);
+	Vecteur v = vecteur_orthogonal(c.centre, d);
+	Vecteur a = { d.debut.pos_x - c.centre.pos_x, d.debut.pos_y - c.centre.pos_y };
+	Vecteur b = { d.debut.pos_x + d.directeur.x - c.centre.pos_x, d.debut.pos_y 
+													+ d.directeur.y - c.centre.pos_y };
+	double v_a = prod_scal(v,a);
+	double v_b = prod_scal(v,b);
 
-	return ( norme(v) <= (c.rayon + dist_min) && ( (v_a > 0 && v_b < 0) || (v_a < 0 && v_b > 0) ) );
+	return ( norme(v) <= (c.rayon + dist_min) and ( (v_a > 0 and v_b < 0)
+													or (v_a < 0 and v_b > 0) ) );
 }

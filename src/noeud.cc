@@ -1,3 +1,10 @@
+/**\
+ * \name    noeud.cc
+ * \author  Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    march 2020
+ * \version 1.0
+ */
+
 #include<iostream>
 #include<string>
 #include <vector>
@@ -5,20 +12,24 @@
 #include"noeud.h"
 #include"tools.h"
 #include"error.h"
+#include"constantes.h"
 
 using namespace std;
 
 
-Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, Type_quartier type): 
+Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, 
+													Type_quartier type): 
             uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
 {
-    test_nbp(uid, getrayon());	// verifie la validite de la capacite
+    test_nbp(uid, getrayon());	
 }
     
 string Noeud::test_max_link() 
 {
-	if(liens.size() > 3)				//MAGIC NUMBER
+	if(liens.size() > max_link)			
+	{			
 		error::max_link( getUid() );
+	}
 }
 unsigned int Noeud::get_nbp()
 {
@@ -27,7 +38,8 @@ unsigned int Noeud::get_nbp()
 
 string Noeud::print()
 {
-    return to_string(uid)+" "+to_string(quartier.centre.pos_x)+" "+to_string(quartier.centre.pos_y)+" "+to_string(nbp);
+    return to_string(uid)+" "+to_string(quartier.centre.pos_x)+" "+
+								to_string(quartier.centre.pos_y)+" "+to_string(nbp);
 }
 
 double Noeud::getx() const 
@@ -65,20 +77,28 @@ void Noeud::add_lien(Noeud* B)
 {
 	// SELF-NODE
 	if( (*B) == *this )
+	{
 	 	error::self_link_node((*B).getUid()); 
+	}
 
 	// MULTIPLE NODE
 	for(size_t i(0) ; i < liens.size() ; ++i) 
 	{
 		if(liens[i] == B) 
+		{
 			error::multiple_same_link(uid, (*B).getUid());
+		}
 	}
 
 	// MAX HOUSING LINKS
-	 if(type == 2)
+	if(type == 2)
+	{
 		test_max_link();
-	 else if ((*B).getType() == 2) 
+	}
+	else if ((*B).getType() == 2) 
+	{
 	 	(*B).test_max_link();
+	}
 	
 	liens.push_back(B);
 }
@@ -87,11 +107,17 @@ string test_nbp(unsigned int nbp, double rayon)
 {
 	unsigned int tmp(0);
 	if(sqrt(nbp) == rayon)
+	{
 		tmp = 1;
+	}
 	else if(sqrt(nbp) < rayon)
+	{
 		tmp = 0;
+	}
 	else if(sqrt(nbp) > rayon)
+	{
 		tmp = 2;
+	}
 	
 	switch(tmp) 
 	{
@@ -107,7 +133,9 @@ string test_lien_quartier(Noeud A, Noeud C, Noeud B)
 	Point p = { A.getx(), A.gety() };
 	Seg_droite d = { p, {B.getx() - A.getx(), B.gety() - A.gety()} };
 	if(collision_droite_cercle(C.getQuartier(), d))
+	{
 		error::node_link_superposition(B.getUid());
+	}
 } 
 
 string test_coll_quartier(vector<Noeud> ensN) 
@@ -115,12 +143,16 @@ string test_coll_quartier(vector<Noeud> ensN)
 	for(size_t i(0) ; i < ensN.size() - 1 ; ++i) 
 	{
 		if(collision_cercle(ensN[i].getQuartier(), ensN[i+1].getQuartier()) )
+		{
 			error::node_node_superposition(ensN[i].getUid(), ensN[i+1].getUid() );
+		}
 	}
 }
 
-bool Noeud::operator==(const Noeud& nd) const  //Surcharge d'operateur == pour les noeuds 
+bool Noeud::operator==(const Noeud& nd) const 
 {
 	
-	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and (getrayon() == nd.getrayon()) ); 
+	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and
+													(getrayon() == nd.getrayon()) ); 
 }
+

@@ -11,12 +11,12 @@ double distance_vecteurs(Vecteur a, Vecteur b)
 
 bool collision_cercle(Cercle c, Cercle e, double dist_min) 
 {
-    Vecteur a_1 = {c.centre.pos_x, c.centre.pos_y};
-    Vecteur b_1 = {e.centre.pos_x, e.centre.pos_y};
-    double dist = distance_vecteurs(a_1, b_1);
-    double somme = (c.rayon + e.rayon);
+    Vecteur a = {c.centre.pos_x, c.centre.pos_y};
+    Vecteur b = {e.centre.pos_x, e.centre.pos_y};
+    double dist = distance_vecteurs(a, b);
+    double somme_rayon = (c.rayon + e.rayon);
     
-    return ( dist <= (somme + dist_min) );
+    return ( dist <= (somme_rayon + dist_min) );
 }
 
 double prod_scal(Vecteur a, Vecteur b) 
@@ -25,7 +25,8 @@ double prod_scal(Vecteur a, Vecteur b)
   return a.x*b.x + a.y*b.y;
 }
 
-double norme(Vecteur a) {
+double norme(Vecteur a) 
+{
 	
   return a.x*a.x + a.y*a.y;
 }
@@ -33,18 +34,18 @@ double norme(Vecteur a) {
 Vecteur projection(Vecteur a, Vecteur b) 
 {
   double k = prod_scal(a,b)/prod_scal(b,b);
-  Vecteur v = { k*b.x, k*b.y };
+  Vecteur v_proj = { k*b.x, k*b.y };
 	
-  return v;
+  return v_proj;
 }
 
 Vecteur vecteur_orthogonal(Point p, Seg_droite d)                     // créé un vecteur v_2 orthogonal à d, passant par p
 {
-	Vecteur v_1 = { d.debut.pos_x - p.pos_x, d.debut.pos_y - p.pos_y };
-	Vecteur proj = projection(v_1, d.directeur);
-	Vecteur v_2 = { v_1.x - proj.x, v_1.y - proj.y };
+	Vecteur v_point_droite = { p.pos_x - d.debut.pos_x, p.pos_y - d.debut.pos_y };
+	Vecteur v_proj = projection(v_point_droite, d.directeur);
+	Vecteur v_orthog = { v_point_droite.x - v_proj.x, v_point_droite.y - v_proj.y };
 	
-	return v_2;
+	return v_orthog;
 }
 
 bool collision_droite_cercle(Cercle c, Seg_droite d, double dist_min) 

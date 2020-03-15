@@ -8,11 +8,11 @@ using namespace std;
 #ifndef NOEUD_H
 #define NOEUD_H
 
-enum type_quartier {production,transport,logements};
+enum Type_quartier {PRODUCTION, TRANSPORT, LOGEMENT};
 class Noeud 
 {
     public:
-        Noeud(unsigned int id,double x, double y, unsigned int capacite, type_quartier type);
+        Noeud(unsigned int id,double x, double y, unsigned int capacite, Type_quartier type);
         //FAIRE UN DESTRUCTEUR
         string print();
         // getters
@@ -22,7 +22,7 @@ class Noeud
         double getrayon() const ;
         Cercle getQuartier() const ;
         unsigned int getUid() const ;
-        type_quartier getType() const;
+        Type_quartier getType() const;
         // setters
         void add_lien(Noeud* B);
         
@@ -36,7 +36,7 @@ class Noeud
         Cercle quartier;
         unsigned int uid;
         unsigned int nbp;
-        type_quartier type;
+        Type_quartier type;
         vector<Noeud*> liens;
 };
 
@@ -44,6 +44,5 @@ class Noeud
 string test_lien_quartier(Noeud A, Noeud C, Noeud B);	
 string test_coll_quartier(vector<Noeud> ensN);
 string test_nbp(unsigned int nbp, double rayon);
-
 
 #endif

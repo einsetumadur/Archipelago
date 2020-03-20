@@ -73,7 +73,7 @@ void Ville::decodage(string line)
 	case NBL: 
 		if(!(data >> total)) cout<<"err nblogement"<<endl; 
 		else i=0 ;
-		if(total==0) etat=NBP; else etat=LOGEMENT ; 
+		if(total==0) etat=NBP; else etat=LOGE ; 
 	    break;
 
 	case LOGE: 
@@ -88,7 +88,7 @@ void Ville::decodage(string line)
 	case NBP: 
 		if(!(data >> total)) cout<<"err nbproduction"<<endl; 
 		else i=0 ;
-		if(total==0) etat=NBT; else etat=PRODUCTION ; 
+		if(total==0) etat=NBT; else etat=PROD ; 
 	    break;
 
 	case PROD: 
@@ -103,7 +103,7 @@ void Ville::decodage(string line)
 	case NBT: 
 		if(!(data >> total)) cout<<"err nbTransport"<<endl; 
 		else i=0;
-		if(total==0) etat=NBLI; else etat=TRANSPORT ;
+		if(total==0) etat=NBLI; else etat=TRAN ;
 	     break;
 
 	case TRAN: 

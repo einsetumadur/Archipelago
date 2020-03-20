@@ -2,7 +2,6 @@
 #include<string>
 #include<vector>
 #include"noeud.h"
-#include"error.h"
 
 #ifndef VILLE_H
 #define VILLE_H

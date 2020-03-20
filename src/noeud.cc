@@ -21,7 +21,7 @@ Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite,
 													Type_quartier type): 
             uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
 {
-    test_nbp(uid, getrayon());	
+    test_nbp(uid, 1.0);	
 }
     
 string Noeud::test_max_link() 

@@ -12,12 +12,13 @@ using namespace std;
 
 Ville::Ville(char* file){
   fichier = file;
-  //besoin de construire les tableaux avant chargement ?
   chargement(file);
 }
 
 Ville::~Ville(){
   sauvegarde(fichier);
+  delete &quartiers;
+  delete &fichier;
 }
 
 double Ville::ENJ(){
@@ -134,19 +135,22 @@ void Ville::decodage(string line)
 		if(i == total) etat=FIN ;
 	  break;
 
-	case FIN: cout<<"erreur format"<<endl; 
+	case FIN: cout<<"fin enregistrement"<<endl; 
 		break;
 
 	default: cout<<"err defaultswitch"<<endl;
-	
+    break;
+
+  }
 }
 
 Noeud* Ville::trouve_lien(unsigned int uid)
 {
   for(auto noeud : quartiers)
   {
-    if(uid == noeud->getUid()){
-      return &noeud;
+    if(uid == noeud->getUid())
+    {
+      return noeud;
     }
   }
   error::link_vacuum(uid);
@@ -160,31 +164,31 @@ if(!fichier.is_open()){
     std::cout<<"impossible d'enregistrer "<<file<<std::endl;
     //todo: mettre fonction d'erreure.
   }else{
-  fichier << nb_type(logements) << endl;
-  fichier << print_type(logements) << endl;
+  fichier << nb_type(LOGEMENT) << endl;
+  fichier << print_type(LOGEMENT) << endl;
 
   }
 
   fichier.close();
 }
 
-string Ville::print_type(type_quartier type)
+string Ville::print_type(Type_quartier type)
 {
   string bloc(to_string(nb_type(type)));
 
   for(auto noeud : quartiers){
-    if(noeud.getType()==type){
-      bloc.append("\t" + noeud.print() + "\n");
+    if(noeud->getType()==type){
+      bloc.append("\t" + noeud->print() + "\n");
     }
   }
   return bloc;
 }
 
-unsigned int Ville::nb_type(type_quartier type)
+unsigned int Ville::nb_type(Type_quartier type)
 {
   unsigned int count(0);
   for(auto noeud : quartiers){
-    if(noeud.getType()==type) count++;
+    if(noeud->getType()==type) count++;
   }
   return count;
 }
@@ -196,7 +200,7 @@ int Ville::redondance_uid() {		// verifie la non-duplicite des uids
   {
     for (size_t j = i+1; j < sizetab ; j++) //parcour le reste du tableau
     {
-      if(quartiers[i] == quartiers[j]) error::identical_uid(quartiers[i].getUid());
+      if(quartiers[i] == quartiers[j]) error::identical_uid(quartiers[i]->getUid());
     }
   }
 	return 0;

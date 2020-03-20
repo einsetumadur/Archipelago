@@ -1,3 +1,9 @@
+#include <iostream>
+#include"tools.h"
+#include<string>
+#include<vector>
+
+using namespace std;
 #ifndef NOEUD_H
 #define NOEUD_H
 

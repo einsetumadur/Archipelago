@@ -5,10 +5,10 @@
  * \version 1.0
  */
  
-#include<iostream>
-
 #ifndef TOOLS_H
 #define TOOLS_H
+
+#include<iostream>
 
 struct Point 
 {

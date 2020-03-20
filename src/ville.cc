@@ -12,12 +12,13 @@ using namespace std;
 
 Ville::Ville(char* file){
   fichier = file;
-  //besoin de construire les tableaux avant chargement ?
   chargement(file);
 }
 
 Ville::~Ville(){
   sauvegarde(fichier);
+  delete &quartiers;
+  delete &fichier;
 }
 
 double Ville::ENJ(){
@@ -59,7 +60,7 @@ void Ville::decodage(string line)
 {
 	istringstream data(line);
 				 
-	enum Etat_lecture {NBL,LOGEMENT,NBP,PRODUCTION,NBT,TRANSPORT,NBLI,LIENS,FIN};
+	enum Etat_lecture {NBL,LOGE,NBP,PROD,NBT,TRAN,NBLI,LIENS,FIN};
   
 	static int etat(NBL); // de base
 	static int i(0), total(0);
@@ -75,10 +76,10 @@ void Ville::decodage(string line)
 		if(total==0) etat=NBP; else etat=LOGEMENT ; 
 	    break;
 
-	case LOGEMENT: 
+	case LOGE: 
 		if(!(data >> numid >> posx >> posy >> popmax)) cout<<"err logement"<<endl;
     else{
-      quartiers.push_back(Noeud(numid,posx,posy,popmax)); 
+      quartiers.push_back(new Noeud(numid,posx,posy,popmax,LOGEMENT)); 
       ++i;
     }
 		if(i == total) etat=NBP ;
@@ -90,10 +91,10 @@ void Ville::decodage(string line)
 		if(total==0) etat=NBT; else etat=PRODUCTION ; 
 	    break;
 
-	case PRODUCTION: 
+	case PROD: 
 		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err production"<<endl;
     else{
-      quartiers.push_back(Noeud(numid,posx,posy,popmax));
+      quartiers.push_back(new Noeud(numid,posx,posy,popmax,PRODUCTION));
        ++i;
     }  
 		if(i == total) etat=NBT ;
@@ -105,10 +106,10 @@ void Ville::decodage(string line)
 		if(total==0) etat=NBLI; else etat=TRANSPORT ;
 	     break;
 
-	case TRANSPORT: 
+	case TRAN: 
 		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err transport"<<endl;
     else{
-      quartiers.push_back(Noeud(numid,posx,posy,popmax));
+      quartiers.push_back(new Noeud(numid,posx,posy,popmax,TRANSPORT));
        ++i;
     }   
 		if(i == total) etat=NBLI ;
@@ -118,35 +119,41 @@ void Ville::decodage(string line)
 		if(!(data >> total)) {cout<<"err nbLiens"<<endl;} 
 		else i=0;
 		if(total==0) etat=FIN; else etat=LIENS ; 
-		ponts.resize(total); 
 	  break;
 
 	case LIENS: 
 		if( !(data >> uid1 >> uid2)) cout<<"err liens"<<endl;
     else{
-      ponts.push_back(Lien(trouve_lien(uid1),trouve_lien(uid2))); 
+      Noeud* n1 = trouve_lien(uid1);
+      Noeud* n2 = trouve_lien(uid2);
+
+      n1->add_lien(n2);
+      n2->add_lien(n1);
+
       ++i;
     }
 		if(i == total) etat=FIN ;
 	  break;
 
-	case FIN: cout<<"erreur format"<<endl; 
+	case FIN: cout<<"fin enregistrement"<<endl; 
 		break;
 
 	default: cout<<"err defaultswitch"<<endl;
-	}	
+    break;
+
+  }
 }
 
 Noeud* Ville::trouve_lien(unsigned int uid)
 {
   for(auto noeud : quartiers)
   {
-    if(uid == noeud.getUid()){
-      return &noeud;
+    if(uid == noeud->getUid())
+    {
+      return noeud;
     }
   }
-  cout << "noeud non trouvé pour uid# = "<<uid<<endl;
-  exit(0);
+  error::link_vacuum(uid);
 }
 
 void Ville::sauvegarde(string file){
@@ -157,26 +164,44 @@ if(!fichier.is_open()){
     std::cout<<"impossible d'enregistrer "<<file<<std::endl;
     //todo: mettre fonction d'erreure.
   }else{
-  fichier << nb_type(logements) << endl;
-  fichier << print_type(logements) << endl;
+  fichier << nb_type(LOGEMENT) << endl;
+  fichier << print_type(LOGEMENT) << endl;
 
   }
 
   fichier.close();
 }
 
-void Ville::print_type(type_quartier type)
+string Ville::print_type(Type_quartier type)
 {
+  string bloc(to_string(nb_type(type)));
+
   for(auto noeud : quartiers){
-    if(noeud.getType()==type) 
+    if(noeud->getType()==type){
+      bloc.append("\t" + noeud->print() + "\n");
+    }
   }
+  return bloc;
 }
 
-unsigned int Ville::nb_type(type_quartier type)
+unsigned int Ville::nb_type(Type_quartier type)
 {
   unsigned int count(0);
   for(auto noeud : quartiers){
-    if(noeud.getType()==type) count++;
+    if(noeud->getType()==type) count++;
   }
   return count;
+}
+
+int Ville::redondance_uid() {		// verifie la non-duplicite des uids
+	size_t sizetab = quartiers.size();
+
+  for (size_t i = 0; i < sizetab ; i++) //parcours le tableau
+  {
+    for (size_t j = i+1; j < sizetab ; j++) //parcour le reste du tableau
+    {
+      if(quartiers[i] == quartiers[j]) error::identical_uid(quartiers[i]->getUid());
+    }
+  }
+	return 0;
 }

@@ -1,3 +1,9 @@
+#include <iostream>
+#include"tools.h"
+#include<string>
+#include<vector>
+
+using namespace std;
 #ifndef NOEUD_H
 #define NOEUD_H
 
@@ -20,7 +26,6 @@ public:
 	bool operator==(const Noeud& nd) const;
 	string test_max_link();
 	int verif_capacite(Noeud node);
-	string test_nbp(unsigned int nbp, double rayon);
 private:
 	Cercle quartier;
 	unsigned int uid;

@@ -200,7 +200,10 @@ void Ville::redondance_uid() {		// verifie la non-duplicite des uids
   {
     for (size_t j = i+1; j < sizetab ; j++) //parcour le reste du tableau
     {
-      if(quartiers[i]->getUid() == quartiers[j]->getUid()) error::identical_uid(quartiers[i]->getUid());
+      if(quartiers[i]->getUid() == quartiers[j]->getUid()){
+        cout<<error::identical_uid(quartiers[i]->getUid())<<endl;
+        exit(0);
+      }
     }
   }
 }
@@ -211,6 +214,5 @@ void Ville::ajout_noeud(unsigned int numid,double posx,double posy,unsigned int 
   quartiers.push_back(new Noeud(numid,posx,posy,popmax,type));
   redondance_uid();
   test_coll_quartier(quartiers);
-  cout<<"noeud type "<<type<<" ajouté!"<<endl;
 }
 

@@ -1,12 +1,12 @@
 
-#ifndef NOEUD_H
-#define NOEUD_H
 
 #include <iostream>
+#include "tools.h"
 #include <string>
 #include <vector>
-#include "tools.h"
 
+#ifndef NOEUD_H
+#define NOEUD_H
 
 enum Type_quartier {PRODUCTION, TRANSPORT, LOGEMENT};
 class Noeud 
@@ -23,9 +23,9 @@ public:
 	Cercle getQuartier() const ;
 	unsigned int getUid() const ;
 	Type_quartier getType() const;	
-	void add_lien(Noeud* B);	
+	void add_lien(Noeud* B, std::vector<Noeud*> ensN);	
 	bool operator==(const Noeud& nd) const;
-	std::string test_max_link();
+	void test_max_link();
 	int verif_capacite(Noeud node);
 private:
 	Cercle quartier;
@@ -36,8 +36,9 @@ private:
 };
 
 
-bool test_lien_quartier(Noeud A, Noeud C, Noeud B);	
-bool test_coll_quartier(std::vector<Noeud*> ensN);
-int test_nbp(unsigned int nbp, double rayon);
+void test_lien_quartier(Noeud* A, Noeud* C, Noeud* B);	
+void test_coll_quartier(std::vector<Noeud> ensN);
+void test_nbp(unsigned int nbp, double rayon);
 
 #endif
+

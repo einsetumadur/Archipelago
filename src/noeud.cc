@@ -5,14 +5,14 @@
  * \version 1.0
  */
 
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <string>
 #include <vector>
 #include <cmath>
-#include"noeud.h"
-#include"tools.h"
-#include"error.h"
-#include"constantes.h"
+#include "noeud.h"
+#include "tools.h"
+#include "error.h"
+#include "constantes.h"
 
 using namespace std;
 
@@ -21,7 +21,16 @@ Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite,
 													Type_quartier type): 
             uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
 {
-    test_nbp(uid, getrayon());	
+    if(not(test_nbp(uid, getrayon())) 
+    {
+		switch(tmp) 
+		{
+		case 0 : error::too_little_capacity(nbp);
+				break;
+		case 2 : error::too_much_capacity(nbp);
+				break;
+		}	
+	}
 }
     
 string Noeud::test_max_link() 
@@ -103,49 +112,38 @@ void Noeud::add_lien(Noeud* B)
 	liens.push_back(B);
 }
 
-string test_nbp(unsigned int nbp, double rayon) 
+int test_nbp(unsigned int nbp, double rayon) 
 {
 	unsigned int tmp(0);
 	if(sqrt(nbp) == rayon)
 	{
 		tmp = 1;
+		return tmp;
 	}
 	else if(sqrt(nbp) < rayon)
 	{
 		tmp = 0;
+		return tmp;
 	}
 	else if(sqrt(nbp) > rayon)
 	{
 		tmp = 2;
-	}
-	
-	switch(tmp) 
-	{
-		case 0 : error::too_little_capacity(nbp);
-				break;
-		case 2 : error::too_much_capacity(nbp);
-				break;
+		return tmp;
 	}
 }
 
-string test_lien_quartier(Noeud A, Noeud C, Noeud B) 
+bool test_lien_quartier(Noeud A, Noeud C, Noeud B) 
 {	
 	Point p = { A.getx(), A.gety() };
 	Seg_droite d = { p, {B.getx() - A.getx(), B.gety() - A.gety()} };
-	if(collision_droite_cercle(C.getQuartier(), d))
-	{
-		error::node_link_superposition(B.getUid());
-	}
+	return (collision_droite_cercle(C.getQuartier(), d));
 } 
 
-string test_coll_quartier(vector<Noeud> ensN) 
+bool test_coll_quartier(vector<Noeud*> ensN) 
 {		
 	for(size_t i(0) ; i < ensN.size() - 1 ; ++i) 
 	{
-		if(collision_cercle(ensN[i].getQuartier(), ensN[i+1].getQuartier()) )
-		{
-			error::node_node_superposition(ensN[i].getUid(), ensN[i+1].getUid() );
-		}
+		return (collision_cercle(ensN[i].getQuartier(), ensN[i+1].getQuartier()) );
 	}
 }
 
@@ -155,4 +153,5 @@ bool Noeud::operator==(const Noeud& nd) const
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and
 													(getrayon() == nd.getrayon()) ); 
 }
+
 

@@ -5,14 +5,14 @@
  * \version 1.0
  */
 
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <string>
 #include <vector>
 #include <cmath>
-#include"noeud.h"
-#include"tools.h"
-#include"error.h"
-#include"constantes.h"
+#include "noeud.h"
+#include "tools.h"
+#include "error.h"
+#include "constantes.h"
 
 using namespace std;
 
@@ -105,7 +105,10 @@ void Noeud::add_lien(Noeud* B, vector<Noeud*> ensN)
 	// COLLISION LIENS-QUARTIER
 	for(size_t i(0) ; i < ensN.size() ; ++i) 
 	{
-		test_lien_quartier(this, B, ensN[i]);
+		if( triangle( (*this).getQuartier(), (*B).getQuartier(), (*ensN[i]).getQuartier() ) )
+		{
+			test_lien_quartier(this, B, ensN[i]);
+		}
 	}
 	
 	liens.push_back(B);
@@ -140,16 +143,11 @@ void test_lien_quartier(Noeud* A, Noeud* B, Noeud* C)
 {	
 	Point p = { (*A).getx(), (*A).gety() };
 	Seg_droite d = { p, {(*B).getx() - (*A).getx(), (*B).gety() - (*A).gety()} }; // AB
-	Vecteur ac = { (*C).getx() - (*A).getx(), (*C).gety() - (*A).gety() };
-	Vecteur bc = { (*C).getx() - (*B).getx(), (*C).gety() - (*B).gety() };
-	
-	if(prod_scal(d.directeur, ac) >= 0 and prod_scal(bc, scalaire_vecteur(-1, d.directeur)) >= 0)
+	if(collision_droite_cercle((*C).getQuartier(), d))
 	{
-		if(collision_droite_cercle((*C).getQuartier(), d))
-		{
-			error::node_link_superposition((*B).getUid());
-		}
+		error::node_link_superposition((*B).getUid());
 	}
+
 } 
 
 void test_coll_quartier(vector<Noeud*> ensN) 

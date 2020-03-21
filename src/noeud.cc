@@ -21,7 +21,7 @@ Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite,
 													Type_quartier type): 
             uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
 {
-    test_nbp(uid, getrayon());
+    test_nbp(nbp);
     
 			
 }
@@ -117,30 +117,18 @@ void Noeud::add_lien(Noeud* B, vector<Noeud*> ensN)
 	liens.push_back(B);
 }
 
-void test_nbp(unsigned int nbp, double rayon) 
+void test_nbp(unsigned int nbp) 
 {
-	unsigned tmp(0);
-	if(sqrt(nbp) == rayon)
+ 
+	if(nbp > max_capacity) 
 	{
-		tmp = 1;
+		cout << error::too_little_capacity(nbp);
+		exit(0);
 	}
-	else if(sqrt(nbp) < rayon)
+	else if(nbp < min_capacity)
 	{
-		tmp = 0;
-	}
-	else if(sqrt(nbp) > rayon)
-	{
-		tmp = 2;
-	}
-	
-	switch(tmp) 
-	{
-		case 0 : cout << error::too_little_capacity(nbp);
-				exit(0);
-				break;
-		case 2 : cout << error::too_much_capacity(nbp);
-				exit(0);
-				break;
+		cout << error::too_much_capacity(nbp);
+		exit(0);
 	}
 }
 
@@ -174,3 +162,4 @@ bool Noeud::operator==(const Noeud& nd) const
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and
 													(getrayon() == nd.getrayon()) ); 
 }
+

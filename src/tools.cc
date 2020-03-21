@@ -68,3 +68,10 @@ bool collision_droite_cercle(Cercle c, Seg_droite d)
 	return ( norme(v) <= (c.rayon + dist_min) and ( (v_a > 0 and v_b < 0)
 													or (v_a < 0 and v_b > 0) ) );
 }
+
+Vecteur scalaire_vecteur(int k, Vecteur v) 
+{
+	Vecteur c = {k*v.x, k*v.y};
+	
+	return c;
+}

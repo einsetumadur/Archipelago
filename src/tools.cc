@@ -36,7 +36,7 @@ double prod_scal(Vecteur a, Vecteur b)
 double norme(Vecteur a) 
 {
 	
-  return a.x*a.x + a.y*a.y;
+  return sqrt(prod_scal(a,a));
 }
 
 Vecteur projection(Vecteur a, Vecteur b) 

@@ -75,3 +75,14 @@ Vecteur scalaire_vecteur(int k, Vecteur v)
 	
 	return c;
 }
+
+bool triangle(Cercle A, Cercle B, Cercle C) {
+	
+	Point p = { A.centre.pos_x, A.centre.pos_y };
+	Seg_droite d = { p, {B.centre.pos_x - A.centre.pos_x, B.centre.pos_y - A.centre.pos_y} }; // AB
+	Vecteur ac = { C.centre.pos_x - A.centre.pos_x, C.centre.pos_y - A.centre.pos_y };
+	Vecteur bc = { C.centre.pos_x - B.centre.pos_x, C.centre.pos_y - B.centre.pos_y };
+	
+	return (prod_scal(d.directeur, ac) >= 0 and prod_scal(bc, scalaire_vecteur(-1, d.directeur)) >= 0);
+
+}

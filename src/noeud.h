@@ -1,11 +1,12 @@
 
-#include <iostream>
-#include "tools.h"
-#include <string>
-#include <vector>
-
 #ifndef NOEUD_H
 #define NOEUD_H
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include "tools.h"
+
 
 enum Type_quartier {PRODUCTION, TRANSPORT, LOGEMENT};
 class Noeud 
@@ -35,8 +36,8 @@ private:
 };
 
 
-std::string test_lien_quartier(Noeud A, Noeud C, Noeud B);	
-std::string test_coll_quartier(std::vector<Noeud> ensN);
-std::string test_nbp(unsigned int nbp, double rayon);
+bool test_lien_quartier(Noeud A, Noeud C, Noeud B);	
+bool test_coll_quartier(std::vector<Noeud*> ensN);
+int test_nbp(unsigned int nbp, double rayon);
 
 #endif

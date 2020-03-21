@@ -123,6 +123,10 @@ void Ville::decodage(string line)
 	case LIENS: 
 		if( !(data >> uid1 >> uid2)) cout<<"err liens"<<endl;
     else{
+      if(uid1==uid2){
+        cout<<error::self_link_node(uid1)<<endl;
+        exit(0);
+      }
       Noeud* n1 = trouve_lien(uid1);
       Noeud* n2 = trouve_lien(uid2);
 

@@ -120,12 +120,12 @@ void Noeud::add_lien(Noeud* B, vector<Noeud*> ensN)
 void test_nbp(unsigned int nbp) 
 {
  
-	if(nbp > max_capacity) 
+	if(nbp < min_capacity) 
 	{
 		cout << error::too_little_capacity(nbp);
 		exit(0);
 	}
-	else if(nbp < min_capacity)
+	else if(nbp > max_capacity)
 	{
 		cout << error::too_much_capacity(nbp);
 		exit(0);

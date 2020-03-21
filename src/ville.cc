@@ -39,19 +39,18 @@ return -1;
 
 void Ville::chargement( char * nom_fichier)
 {
-    string line;
-    ifstream fichier(nom_fichier); 
-    if(!fichier.fail()) 
-    {
-        // l’appel de getline filtre aussi les séparateurs
-        while(getline(fichier >> ws,line)) 
-        {
-			// ligne de commentaire à ignorer, on passe à la suivante
-			if(line[0]=='#')  continue;  
-       
-			decodage(line);
-        }
-        cout << "fin de la lecture" << endl;
+  string line;
+  ifstream fichier(nom_fichier); 
+  if(!fichier.fail()) 
+  {
+    // l’appel de getline filtre aussi les séparateurs
+    while(getline(fichier >> ws,line)) 
+      {
+		    // ligne de commentaire à ignorer, on passe à la suivante
+		    if(line[0]=='#')  continue;  
+        decodage(line);
+      }
+    cout << "fin de la lecture" << endl;
 	}
 	else cout<<"erreur lectur fichier"<<endl;
 }
@@ -62,7 +61,7 @@ void Ville::decodage(string line)
 				 
 	enum Etat_lecture {NBL,LOGE,NBP,PROD,NBT,TRAN,NBLI,LIENS,FIN};
   
-	static int etat(NBL); // de base
+	static int etat(NBL); // etat de base
 	static int i(0), total(0);
 	int numid,popmax;
 	double posx,posy;
@@ -135,10 +134,10 @@ void Ville::decodage(string line)
 		if(i == total) etat=FIN ;
 	  break;
 
-	case FIN: cout<<"fin enregistrement"<<endl; 
+	case FIN:  
 		break;
 
-	default: cout<<"err defaultswitch"<<endl;
+	default: cout<<"erreur defaultswitch"<<endl;
     break;
 
   }
@@ -154,6 +153,7 @@ Noeud* Ville::trouve_lien(unsigned int uid)
     }
   }
   error::link_vacuum(uid);
+  return nullptr;               // bonne facon de faire ? 
 }
 
 void Ville::sauvegarde(string file){

@@ -1,11 +1,11 @@
 
-#ifndef VILLE_H
-#define VILLE_H
-
 #include<iostream>
 #include<string>
 #include<vector>
 #include"noeud.h"
+
+#ifndef VILLE_H
+#define VILLE_H
 
 class Ville{
   public:
@@ -18,14 +18,14 @@ class Ville{
   private:
     int redondance_uid();
     void chargement( char * nom_fichier);
-    void sauvegarde(string file);
-    void decodage(string line);
+    void sauvegarde(std::string file);
+    void decodage(std::string line);
     Noeud* trouve_lien(unsigned int uid); 
     unsigned int nb_type(Type_quartier type);
-    string print_type(Type_quartier type);
+    std::string print_type(Type_quartier type);
 
-    string fichier;
-    vector<Noeud*> quartiers;
+    std::string fichier;
+    std::vector<Noeud*> quartiers;
 };
 
 #endif

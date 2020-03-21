@@ -152,8 +152,8 @@ Noeud* Ville::trouve_lien(unsigned int uid)
       return noeud;
     }
   }
-  error::link_vacuum(uid);
-  return nullptr;               // bonne facon de faire ? 
+  cout<<error::link_vacuum(uid)<<endl;
+  exit(0);             // bonne facon de faire ? 
 }
 
 void Ville::sauvegarde(string file){

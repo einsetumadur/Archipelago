@@ -90,7 +90,7 @@ void Noeud::add_lien(Noeud* B, vector<Noeud*> ensN)
 	{
 		if(liens[i] == B) 
 		{
-			error::multiple_same_link(uid, (*B).getUid());
+			cout << error::multiple_same_link(uid, (*B).getUid());
 			exit(0);
 		}
 	}
@@ -135,10 +135,10 @@ void test_nbp(unsigned int nbp, double rayon)
 	
 	switch(tmp) 
 	{
-		case 0 : error::too_little_capacity(nbp);
+		case 0 : cout << error::too_little_capacity(nbp);
 				exit(0);
 				break;
-		case 2 : error::too_much_capacity(nbp);
+		case 2 : cout << error::too_much_capacity(nbp);
 				exit(0);
 				break;
 	}
@@ -150,7 +150,7 @@ void test_lien_quartier(Noeud* A, Noeud* B, Noeud* C)
 	Seg_droite d = { p, {(*B).getx() - (*A).getx(), (*B).gety() - (*A).gety()} }; // AB
 	if(collision_droite_cercle((*C).getQuartier(), d))
 	{
-		error::node_link_superposition((*B).getUid());
+		cout << error::node_link_superposition((*B).getUid());
 		exit(0);
 	}
 
@@ -162,7 +162,7 @@ void test_coll_quartier(vector<Noeud*> ensN)
 	{
 		if(collision_cercle( (*(ensN[i])).getQuartier(), (*(ensN[i+1])).getQuartier()) )
 		{
-			error::node_node_superposition( (*(ensN[i])).getUid(), (*(ensN[i+1])).getUid() );
+			cout << error::node_node_superposition( (*(ensN[i])).getUid(), (*(ensN[i+1])).getUid() );
 			exit(0);
 		}
 	}
@@ -174,4 +174,3 @@ bool Noeud::operator==(const Noeud& nd) const
 	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and
 													(getrayon() == nd.getrayon()) ); 
 }
-

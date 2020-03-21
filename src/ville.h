@@ -16,10 +16,11 @@ class Ville{
     double MTA();
 
   private:
-    int redondance_uid();
+    void redondance_uid();
     void chargement( char * nom_fichier);
     void sauvegarde(std::string file);
     void decodage(std::string line);
+    void ajout_noeud(unsigned int numid,double posx,double posy,unsigned int popmax,Type_quartier type);
     Noeud* trouve_lien(unsigned int uid); 
     unsigned int nb_type(Type_quartier type);
     std::string print_type(Type_quartier type);

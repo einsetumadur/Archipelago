@@ -41,7 +41,6 @@ void Ville::chargement( char * nom_fichier)
 {
   string line;
   ifstream fichier(nom_fichier); 
-  cout<<"not here"<<endl;
   if(!fichier.fail()) 
   {
     // l’appel de getline filtre aussi les séparateurs
@@ -73,46 +72,46 @@ void Ville::decodage(string line)
 	case NBL: 
 		if(!(data >> total)) cout<<"err nblogement"<<endl; 
 		else i=0 ;
-		if(total==0) etat=NBP; else etat=LOGE ; 
+		if(total==0) etat=NBT; else etat=LOGE ; 
 	    break;
 
 	case LOGE: 
 		if(!(data >> numid >> posx >> posy >> popmax)) cout<<"err logement"<<endl;
     else{
-      quartiers.push_back(new Noeud(numid,posx,posy,popmax,LOGEMENT)); 
+      ajout_noeud(numid,posx,posy,popmax,LOGEMENT); 
       ++i;
     }
-		if(i == total) etat=NBP ;
+		if(i == total) etat=NBT ;
 	  break;
 
 	case NBP: 
 		if(!(data >> total)) cout<<"err nbproduction"<<endl; 
 		else i=0 ;
-		if(total==0) etat=NBT; else etat=PROD ; 
+		if(total==0) etat=NBLI; else etat=PROD ; 
 	    break;
 
 	case PROD: 
 		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err production"<<endl;
     else{
-      quartiers.push_back(new Noeud(numid,posx,posy,popmax,PRODUCTION));
+      ajout_noeud(numid,posx,posy,popmax,PRODUCTION);
        ++i;
     }  
-		if(i == total) etat=NBT ;
+		if(i == total) etat=NBLI ;
 	  break;
 
 	case NBT: 
 		if(!(data >> total)) cout<<"err nbTransport"<<endl; 
 		else i=0;
-		if(total==0) etat=NBLI; else etat=TRAN ;
+		if(total==0) etat=NBP; else etat=TRAN ;
 	     break;
 
 	case TRAN: 
 		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err transport"<<endl;
     else{
-      quartiers.push_back(new Noeud(numid,posx,posy,popmax,TRANSPORT));
+      ajout_noeud(numid,posx,posy,popmax,TRANSPORT);
        ++i;
     }   
-		if(i == total) etat=NBLI ;
+		if(i == total) etat=NBP ;
 	  break;
 
 	case NBLI: 
@@ -127,8 +126,8 @@ void Ville::decodage(string line)
       Noeud* n1 = trouve_lien(uid1);
       Noeud* n2 = trouve_lien(uid2);
 
-      n1->add_lien(n2);
-      n2->add_lien(n1);
+      n1->add_lien(n2,quartiers);
+      n2->add_lien(n1,quartiers);
 
       ++i;
     }
@@ -194,15 +193,23 @@ unsigned int Ville::nb_type(Type_quartier type)
   return count;
 }
 
-int Ville::redondance_uid() {		// verifie la non-duplicite des uids
+void Ville::redondance_uid() {		// verifie la non-duplicite des uids
 	size_t sizetab = quartiers.size();
 
   for (size_t i = 0; i < sizetab ; i++) //parcours le tableau
   {
     for (size_t j = i+1; j < sizetab ; j++) //parcour le reste du tableau
     {
-      if(quartiers[i] == quartiers[j]) error::identical_uid(quartiers[i]->getUid());
+      if(quartiers[i]->getUid() == quartiers[j]->getUid()) error::identical_uid(quartiers[i]->getUid());
     }
   }
-	return 0;
 }
+
+void Ville::ajout_noeud(unsigned int numid,double posx,double posy,unsigned int popmax,Type_quartier type)
+{
+  quartiers.push_back(new Noeud(numid,posx,posy,popmax,type));
+  redondance_uid();
+  test_coll_quartier(quartiers);
+  cout<<"noeud type "<<type<<" ajouté!"<<endl;
+}
+

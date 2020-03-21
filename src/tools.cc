@@ -5,10 +5,10 @@
  * \version 1.0
  */
 
-#include<iostream>
-#include<math.h>
-#include"tools.h"
-#include"constantes.h"
+#include <iostream>
+#include <math.h>
+#include "tools.h"
+#include "constantes.h"
 
 double distance_vecteurs(Vecteur a, Vecteur b) 
 {

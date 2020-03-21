@@ -1,11 +1,10 @@
+#ifndef VILLE_H
+#define VILLE_H
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include "noeud.h"
-
-#ifndef VILLE_H
-#define VILLE_H
 
 class Ville{
   public:
@@ -28,5 +27,6 @@ class Ville{
     std::string fichier;
     std::vector<Noeud*> quartiers;
 };
+
 
 #endif

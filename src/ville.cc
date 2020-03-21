@@ -1,12 +1,12 @@
-#include<iostream>
-#include<fstream>
-#include<sstream>
-#include<string>
-#include<vector>
-#include"ville.h"
-#include"noeud.h"
-#include"error.h"
-#include"constantes.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include "ville.h"
+#include "noeud.h"
+#include "error.h"
+#include "constantes.h"
 using namespace std;
 
 
@@ -204,6 +204,7 @@ void Ville::redondance_uid() {		// verifie la non-duplicite des uids
     }
   }
 }
+
 
 void Ville::ajout_noeud(unsigned int numid,double posx,double posy,unsigned int popmax,Type_quartier type)
 {

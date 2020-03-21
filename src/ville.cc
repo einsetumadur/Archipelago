@@ -41,6 +41,7 @@ void Ville::chargement( char * nom_fichier)
 {
   string line;
   ifstream fichier(nom_fichier); 
+  cout<<"not here"<<endl;
   if(!fichier.fail()) 
   {
     // l’appel de getline filtre aussi les séparateurs
@@ -72,11 +73,7 @@ void Ville::decodage(string line)
 	case NBL: 
 		if(!(data >> total)) cout<<"err nblogement"<<endl; 
 		else i=0 ;
-		if(total==0) etat=NBP; 
-    else{ 
-      etat=LOGE ; 
-      quartiers.reserve(quartiers.size()+total);
-    }
+		if(total==0) etat=NBP; else etat=LOGE ; 
 	    break;
 
 	case LOGE: 
@@ -91,12 +88,8 @@ void Ville::decodage(string line)
 	case NBP: 
 		if(!(data >> total)) cout<<"err nbproduction"<<endl; 
 		else i=0 ;
-		if(total==0) etat=NBT; 
-    else{
-      etat=PROD ; 
-      quartiers.reserve(quartiers.size()+total);
-    }
-	  break;
+		if(total==0) etat=NBT; else etat=PROD ; 
+	    break;
 
 	case PROD: 
 		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err production"<<endl;
@@ -110,12 +103,8 @@ void Ville::decodage(string line)
 	case NBT: 
 		if(!(data >> total)) cout<<"err nbTransport"<<endl; 
 		else i=0;
-		if(total==0) etat=NBLI; 
-    else{
-      etat=TRAN ; 
-      quartiers.reserve(quartiers.size()+total);
-    }
-	  break;
+		if(total==0) etat=NBLI; else etat=TRAN ;
+	     break;
 
 	case TRAN: 
 		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err transport"<<endl;

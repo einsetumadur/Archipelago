@@ -1,8 +1,8 @@
 
-#include<iostream>
-#include<string>
-#include<vector>
-#include"noeud.h"
+#include <iostream>
+#include <string>
+#include <vector>
+#include "noeud.h"
 
 #ifndef VILLE_H
 #define VILLE_H

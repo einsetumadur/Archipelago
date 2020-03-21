@@ -1,8 +1,8 @@
 
 #include <iostream>
-#include"tools.h"
-#include<string>
-#include<vector>
+#include "tools.h"
+#include <string>
+#include <vector>
 
 #ifndef NOEUD_H
 #define NOEUD_H

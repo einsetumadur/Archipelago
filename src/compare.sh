@@ -1,5 +1,7 @@
 #!/bin/sh
 echo "comparaison des programmes"
+cp Archipelago ../Comparaison/
+cd ../Comparaison
 if [ $# != 0 ]
 then
   echo "---test sur e$1 -----------------------------------------"

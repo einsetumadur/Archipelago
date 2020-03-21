@@ -36,7 +36,7 @@ private:
 
 void test_lien_quartier(Noeud* A, Noeud* C, Noeud* B);	
 void test_coll_quartier(std::vector<Noeud*> ensN);
-void test_nbp(unsigned int nbp, double rayon);
+void test_nbp(unsigned int nbp);
 
 #endif
 

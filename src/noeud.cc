@@ -19,16 +19,14 @@ using namespace std;
 
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, 
 													Type_quartier type): 
-            uid(id), quartier{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
+            uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
 {
     test_nbp(nbp);
     if(uid == no_link)
     {
 		cout << error::reserved_uid();
-		exit(0);
-	}
-    
-			
+		exit(-1);
+	}		
 }
     
 void Noeud::test_max_link() 
@@ -36,39 +34,39 @@ void Noeud::test_max_link()
 	if(liens.size() == max_link)			
 	{			
 		cout << error::max_link( getUid() );
-		exit(0);
+		exit(-1);
 	}
 }
-unsigned int Noeud::get_nbp()
+unsigned int Noeud::getNbp()
 {
     return nbp;
 }
 
 string Noeud::print()
 {
-    return to_string(uid)+" "+to_string(quartier.centre.pos_x)+" "+
-								to_string(quartier.centre.pos_y)+" "+to_string(nbp);
+    return to_string(uid)+" "+to_string(getX())+" "+
+								to_string(getY())+" "+to_string(nbp);
 }
 
-double Noeud::getx() const 
+double Noeud::getX() const 
 {
 	
-	return (getQuartier() ).centre.pos_x;
+	return batiment.centre.pos_x;
 }
-double Noeud::gety() const 
+double Noeud::getY() const 
 {
 	
-	return (getQuartier() ).centre.pos_y;
+	return batiment.centre.pos_y;
 }
-double Noeud::getrayon() const 
+double Noeud::getRayon() const 
 {
 	
-	return (getQuartier() ).rayon;
+	return batiment.rayon;
 }
-Cercle Noeud::getQuartier() const  
+Cercle Noeud::getBatiment() const  
 {
 	
-	return quartier;
+	return batiment;
 }
 unsigned int Noeud::getUid() const 
 {
@@ -81,73 +79,56 @@ Type_quartier Noeud::getType() const
 	return type;
 }
 
-void Noeud::add_lien(Noeud* B, vector<Noeud*> ensN) 
+void Noeud::add_lien(Noeud* b, vector<Noeud*> ensN) 
 {
-	// SELF-NODE
-	if( (*B) == *this )
-	{
-	 	cout << error::self_link_node((*B).getUid()); 
-	 	exit(0);
-	}
-
 	// MULTIPLE NODE
 	for(size_t i(0) ; i < liens.size() ; ++i) 
 	{
-		if(liens[i] == B) 
+		if(liens[i] == b) 
 		{
-			cout << error::multiple_same_link(uid, (*B).getUid());
-			exit(0);
+			cout << error::multiple_same_link(uid, b->uid);
+			exit(-1);
 		}
 	}
 
 	// MAX HOUSING LINKS
-	if(type == LOGEMENT)
-	{
-		test_max_link();
-	}
-	/*if ((*B).getType() == LOGEMENT) 
-	{
-	 	(*B).test_max_link();
-	}*/
+	if(type == LOGEMENT)	test_max_link();
 	
-	// COLLISION LIENS-QUARTIER
+	// COLLISION LIENS-BATIMENT
 	for(size_t i(0) ; i < ensN.size() ; ++i) 
 	{
-		if( not(ensN[i] == this) and not(ensN[i] == B) ) 
+		if( not(ensN[i] == this) and not(ensN[i] == b) ) 
 		{
-			if( triangle( (*this).getQuartier(), (*B).getQuartier(), (*ensN[i]).getQuartier() ) )
-			{
-				test_lien_quartier(this, B, ensN[i]);
-			}
+			if(triangle(this->batiment, b->batiment, ensN[i]->batiment))	
+											test_lien_quartier(this, b, ensN[i]);
 		}
 	}
-	
-	liens.push_back(B);
+	liens.push_back(b);
 }
 
 void test_nbp(unsigned int nbp) 
 {
- 
 	if(nbp < min_capacity) 
 	{
 		cout << error::too_little_capacity(nbp);
-		exit(0);
+		exit(-1);
 	}
 	else if(nbp > max_capacity)
 	{
 		cout << error::too_much_capacity(nbp);
-		exit(0);
+		exit(-1);
 	}
 }
 
-void test_lien_quartier(Noeud* A, Noeud* B, Noeud* C) 
+void test_lien_quartier(Noeud* lien_a, Noeud* lien_b, Noeud* nd) 
 {	
-	Point p = { (*A).getx(), (*A).gety() };
-	Seg_droite d = { p, {(*B).getx() - (*A).getx(), (*B).gety() - (*A).gety()} }; // AB
-	if(collision_droite_cercle((*C).getQuartier(), d))
+	Point p = { lien_a->getX(), lien_a->getY() };
+	Seg_droite d = { p, {lien_b->getX() - lien_a->getX(), 
+						lien_b->getY() - lien_a->getY()}};
+	if(collision_droite_cercle(nd->getBatiment(), d))
 	{
-		cout << error::node_link_superposition((*C).getUid());
-		exit(0);
+		cout << error::node_link_superposition(nd->getUid());
+		exit(-1);
 	}
 
 } 
@@ -158,10 +139,11 @@ void test_coll_quartier(vector<Noeud*> ensN)
 	{
 		for(size_t j(i+1) ; j < ensN.size() ; ++j) 
 		{
-			if(collision_cercle( (*(ensN[i])).getQuartier(), (*(ensN[j])).getQuartier()) )
+			if(collision_cercle(ensN[i]->getBatiment(), ensN[j]->getBatiment()))
 			{
-				cout << error::node_node_superposition( (*(ensN[i])).getUid(), (*(ensN[j])).getUid() );
-				exit(0);
+				cout << error::node_node_superposition(ensN[i]->getUid(), 
+														ensN[j]->getUid());
+				exit(-1);
 			}
 		}
 	}
@@ -169,7 +151,7 @@ void test_coll_quartier(vector<Noeud*> ensN)
 
 bool Noeud::operator==(const Noeud& nd) const 
 {
-	
-	return ( (getx() == nd.getx()) and (gety() == nd.gety()) and
-													(getrayon() == nd.getrayon()) ); 
+	return (getX() == nd.getX() and getY() == nd.getY() and
+			getRayon() == nd.getRayon() and uid == nd.uid and type == nd.type); 
 }
+

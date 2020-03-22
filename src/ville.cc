@@ -134,6 +134,8 @@ void Ville::decodage(string line)
       n2->add_lien(n1,quartiers);
 
       ++i;
+      
+     // n1 = nullptr; n2 = nullptr;
     }
 		if(i == total) etat=FIN ;
 	  break;
@@ -219,4 +221,5 @@ void Ville::ajout_noeud(unsigned int numid,double posx,double posy,unsigned int 
   redondance_uid();
   test_coll_quartier(quartiers);
 }
+
 

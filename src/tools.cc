@@ -70,15 +70,15 @@ Vecteur scalaire_vecteur(int k, Vecteur v)
 	return c;
 }
 
-bool triangle(Cercle A, Cercle B, Cercle C) 
+bool triangle(Cercle a, Cercle b, Cercle c) 
 {
-	Point p = { A.centre.pos_x, A.centre.pos_y };
-	Seg_droite d = { p, {B.centre.pos_x - A.centre.pos_x, 
-						B.centre.pos_y - A.centre.pos_y} }; 
-	Vecteur ac = { C.centre.pos_x - A.centre.pos_x, 
-					C.centre.pos_y - A.centre.pos_y };
-	Vecteur bc = { C.centre.pos_x - B.centre.pos_x, 
-					C.centre.pos_y - B.centre.pos_y };
+	Point p = { a.centre.pos_x, a.centre.pos_y };
+	Seg_droite d = { p, {b.centre.pos_x - a.centre.pos_x, 
+						b.centre.pos_y - a.centre.pos_y} }; 
+	Vecteur ac = { c.centre.pos_x - a.centre.pos_x, 
+					c.centre.pos_y - a.centre.pos_y };
+	Vecteur bc = { c.centre.pos_x - b.centre.pos_x, 
+					c.centre.pos_y - b.centre.pos_y };
 	
 	return (prod_scal(d.directeur, ac) >= 0 and 
 			prod_scal(bc, scalaire_vecteur(-1, d.directeur)) >= 0);

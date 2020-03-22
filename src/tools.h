@@ -45,3 +45,4 @@ Vecteur scalaire_vecteur(int k, Vecteur v);
 bool triangle(Cercle A, Cercle B, Cercle C);
 
 #endif
+

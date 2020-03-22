@@ -1,3 +1,10 @@
+/**\
+ * \name    ville.cc
+ * \author  Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    march 2020
+ * \version 1.0
+ */
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -6,35 +13,14 @@
 #include "ville.h"
 #include "noeud.h"
 #include "error.h"
-#include "constantes.h"
+
 using namespace std;
 
 
-Ville::Ville(char* file){
-  fichier = file;
+Ville::Ville(char* file)
+{
+  nom = file;
   chargement(file);
-}
-
-Ville::~Ville(){
-  sauvegarde(fichier);
-  delete &quartiers;
-  delete &fichier;
-}
-
-double Ville::ENJ(){
-
-
-return -1;
-}
-
-double Ville::CI(){
-
-return -1;
-}
-
-double Ville::MTA(){
-
-return -1;
 }
 
 void Ville::chargement( char * nom_fichier)
@@ -50,9 +36,9 @@ void Ville::chargement( char * nom_fichier)
 		    if(line[0]=='#')  continue;  
         decodage(line);
       }
-    cout << "fin de la lecture" << endl;
+    cout<<error::success()<<endl;
 	}
-	else cout<<"erreur lectur fichier"<<endl;
+	else cout<<"unable to open file."<<endl;
 }
 
 void Ville::decodage(string line)
@@ -63,20 +49,21 @@ void Ville::decodage(string line)
   
 	static int etat(NBL); // etat de base
 	static int i(0), total(0);
-	int numid,popmax;
+	unsigned int numid,popmax;
 	double posx,posy;
   unsigned int uid1,uid2;
-
+  
 	switch(etat) 
 	{
 	case NBL: 
-		if(!(data >> total)) cout<<"err nblogement"<<endl; 
+		if(!(data >> total)) cout<<"wrong input format"<<endl; 
 		else i=0 ;
-		if(total==0) etat=NBT; else etat=LOGE ; 
-	    break;
+		if(total==0) etat=NBT; 
+    else etat=LOGE ; 
+	  break;
 
 	case LOGE: 
-		if(!(data >> numid >> posx >> posy >> popmax)) cout<<"err logement"<<endl;
+		if(!(data >> numid >> posx >> posy >> popmax)) cout<<"wrong input format"<<endl;
     else{
       ajout_noeud(numid,posx,posy,popmax,LOGEMENT); 
       ++i;
@@ -85,13 +72,14 @@ void Ville::decodage(string line)
 	  break;
 
 	case NBP: 
-		if(!(data >> total)) cout<<"err nbproduction"<<endl; 
+		if(!(data >> total)) cout<<"wrong input format"<<endl; 
 		else i=0 ;
-		if(total==0) etat=NBLI; else etat=PROD ; 
-	    break;
+		if(total==0) etat=NBLI; 
+    else etat=PROD ; 
+	  break;
 
 	case PROD: 
-		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err production"<<endl;
+		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"wrong input format"<<endl;
     else{
       ajout_noeud(numid,posx,posy,popmax,PRODUCTION);
        ++i;
@@ -100,13 +88,14 @@ void Ville::decodage(string line)
 	  break;
 
 	case NBT: 
-		if(!(data >> total)) cout<<"err nbTransport"<<endl; 
+		if(!(data >> total)) cout<<"wrong input format"<<endl; 
 		else i=0;
-		if(total==0) etat=NBP; else etat=TRAN ;
-	     break;
+		if(total==0) etat=NBP; 
+    else etat=TRAN ;
+	  break;
 
 	case TRAN: 
-		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"err transport"<<endl;
+		if( !(data >> numid >> posx >> posy >> popmax)) cout<<"wrong input format"<<endl;
     else{
       ajout_noeud(numid,posx,posy,popmax,TRANSPORT);
        ++i;
@@ -115,37 +104,35 @@ void Ville::decodage(string line)
 	  break;
 
 	case NBLI: 
-		if(!(data >> total)) {cout<<"err nbLiens"<<endl;} 
+		if(!(data >> total)) cout<<"wrong input format"<<endl;
 		else i=0;
-		if(total==0) etat=FIN; else etat=LIENS ; 
+		if(total==0) etat=FIN; 
+    else etat=LIENS ; 
 	  break;
 
 	case LIENS: 
-		if( !(data >> uid1 >> uid2)) cout<<"err liens"<<endl;
+		if( !(data >> uid1 >> uid2)) cout<<"wrong input format"<<endl;
     else{
-      if(uid1==uid2){
+      if(uid1==uid2)
+      {
         cout<<error::self_link_node(uid1)<<endl;
-        exit(0);
+        exit(-1);
       }
+
       Noeud* n1 = trouve_lien(uid1);
       Noeud* n2 = trouve_lien(uid2);
-
       n1->add_lien(n2,quartiers);
       n2->add_lien(n1,quartiers);
-
       ++i;
-      
-     // n1 = nullptr; n2 = nullptr;
     }
 		if(i == total) etat=FIN ;
 	  break;
 
 	case FIN:  
-		break;
+	break;
 
 	default: cout<<"erreur defaultswitch"<<endl;
-    break;
-
+  break;
   }
 }
 
@@ -153,28 +140,24 @@ Noeud* Ville::trouve_lien(unsigned int uid)
 {
   for(auto noeud : quartiers)
   {
-    if(uid == noeud->getUid())
-    {
-      return noeud;
-    }
+    if(uid == noeud->getUid()) return noeud;
   }
   cout<<error::link_vacuum(uid)<<endl;
-  exit(0);             // bonne facon de faire ? 
+  exit(-1);             
 }
 
-void Ville::sauvegarde(string file){
+void Ville::sauvegarde(string file)
+{
   fstream fichier;
-  fichier.open("sauvegarde.txt", ios::out | ios::trunc);
+  fichier.open(file, ios::out | ios::trunc);
 
-if(!fichier.is_open()){
-    std::cout<<"impossible d'enregistrer "<<file<<std::endl;
-    //todo: mettre fonction d'erreure.
+  if(!fichier.is_open())
+  {
+    std::cout<<"unable to save file"<<file<<std::endl;
   }else{
-  fichier << nb_type(LOGEMENT) << endl;
-  fichier << print_type(LOGEMENT) << endl;
-
+    fichier << nb_type(LOGEMENT) << endl;
+    fichier << print_type(LOGEMENT) << endl;
   }
-
   fichier.close();
 }
 
@@ -199,14 +182,16 @@ unsigned int Ville::nb_type(Type_quartier type)
   return count;
 }
 
-void Ville::redondance_uid() {		// verifie la non-duplicite des uids
+void Ville::redondance_uid() // verifie la non-duplicite des uids
+{		
 	size_t sizetab = quartiers.size();
 
   for (size_t i = 0; i < sizetab ; i++) //parcours le tableau
   {
     for (size_t j = i+1; j < sizetab ; j++) //parcour le reste du tableau
     {
-      if(quartiers[i]->getUid() == quartiers[j]->getUid()){
+      if(quartiers[i]->getUid() == quartiers[j]->getUid())
+      {
         cout<<error::identical_uid(quartiers[i]->getUid())<<endl;
         exit(0);
       }
@@ -215,7 +200,8 @@ void Ville::redondance_uid() {		// verifie la non-duplicite des uids
 }
 
 
-void Ville::ajout_noeud(unsigned int numid,double posx,double posy,unsigned int popmax,Type_quartier type)
+void Ville::ajout_noeud
+  (u_int numid,double posx,double posy,u_int popmax,Type_quartier type)
 {
   quartiers.push_back(new Noeud(numid,posx,posy,popmax,type));
   redondance_uid();

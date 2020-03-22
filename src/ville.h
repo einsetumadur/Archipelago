@@ -1,3 +1,10 @@
+/**\
+ * \name    ville.h
+ * \author  Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    march 2020
+ * \version 1.0
+ */
+
 #ifndef VILLE_H
 #define VILLE_H
 
@@ -7,25 +14,22 @@
 #include "noeud.h"
 
 class Ville{
-  public:
-    Ville(char* file);
-    ~Ville();
-    double ENJ();
-    double CI();
-    double MTA();
+public:
+  Ville(char* file);
+  void sauvegarde(std::string file);
 
-  private:
-    void redondance_uid();
-    void chargement( char * nom_fichier);
-    void sauvegarde(std::string file);
-    void decodage(std::string line);
-    void ajout_noeud(unsigned int numid,double posx,double posy,unsigned int popmax,Type_quartier type);
-    Noeud* trouve_lien(unsigned int uid); 
-    unsigned int nb_type(Type_quartier type);
-    std::string print_type(Type_quartier type);
+private:
+  void redondance_uid();
+  void chargement( char * nom_fichier);
+  void decodage(std::string line);
+  void ajout_noeud(u_int numid,double posx,double posy,
+                   u_int popmax,Type_quartier type);
+  Noeud* trouve_lien(unsigned int uid); 
+  unsigned int nb_type(Type_quartier type);
+  std::string print_type(Type_quartier type);
 
-    std::string fichier;
-    std::vector<Noeud*> quartiers;
+  std::string nom;
+  std::vector<Noeud*> quartiers;
 };
 
 

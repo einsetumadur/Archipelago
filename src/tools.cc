@@ -24,7 +24,7 @@ bool collision_cercle(Cercle c, Cercle e)
     double dist = distance_vecteurs(a, b);
     double somme_rayon = (c.rayon + e.rayon);
     
-    return ( dist <= (somme_rayon + dist_min) );
+    return ( dist <= (somme_rayon) );
 }
 
 double prod_scal(Vecteur a, Vecteur b) 
@@ -59,14 +59,9 @@ Vecteur vecteur_orthogonal(Point p, Seg_droite d)
 bool collision_droite_cercle(Cercle c, Seg_droite d) 
 {
 	Vecteur v = vecteur_orthogonal(c.centre, d);
-	Vecteur a = { d.debut.pos_x - c.centre.pos_x, d.debut.pos_y - c.centre.pos_y };
-	Vecteur b = { d.debut.pos_x + d.directeur.x - c.centre.pos_x, d.debut.pos_y 
-													+ d.directeur.y - c.centre.pos_y };
-	double v_a = prod_scal(v,a);
-	double v_b = prod_scal(v,b);
+	Vecteur a = { c.centre.pos_x - d.debut.pos_x, c.centre.pos_y - d.debut.pos_y };
 
-	return ( norme(v) <= (c.rayon + dist_min) and ( (v_a > 0 and v_b < 0)
-													or (v_a < 0 and v_b > 0) ) );
+	return ( norme(v) <= (c.rayon)); // and ( norme(projection(a, d.directeur)) <= norme(d.directeur) ) );
 }
 
 Vecteur scalaire_vecteur(int k, Vecteur v) 

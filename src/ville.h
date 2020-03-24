@@ -9,6 +9,7 @@
 #define VILLE_H
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include "noeud.h"
@@ -22,8 +23,7 @@ private:
   void redondance_uid();
   void chargement( char * nom_fichier);
   void decodage(std::string line);
-  void ajout_noeud(u_int numid,double posx,double posy,
-                   u_int popmax,Type_quartier type);
+  void ajout_noeud(std::istringstream &param,int &counter,Type_quartier type);
   Noeud* trouve_lien(unsigned int uid); 
   unsigned int nb_type(Type_quartier type);
   std::string print_type(Type_quartier type);

@@ -70,7 +70,7 @@ Vecteur scalaire_vecteur(int k, Vecteur v)
 	return c;
 }
 
-bool triangle(Cercle a, Cercle b, Cercle c) 
+bool champ(Cercle a, Cercle b, Cercle c) 
 {
 	Point p = { a.centre.pos_x, a.centre.pos_y };
 	Seg_droite d = { p, {b.centre.pos_x - a.centre.pos_x, 

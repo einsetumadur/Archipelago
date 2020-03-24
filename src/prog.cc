@@ -1,16 +1,18 @@
-/*
-  ICC semestre 2 2020
-  rendu premier
-  Gilles Regamey
-  Sufyan Zakeeruddin
-*/
+/**\
+ * \name   prog.cc
+ * \author Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    march 2020
+ * \version 1.0
+ */
 
-#include<iostream>
-#include"ville.h"
+#include <iostream>
+#include "ville.h"
 
-int main(int argc, char** argv){
+int main(int argc, char** argv)
+{
 
-Ville Lausanne(argv[1]);
+	Ville Lausanne(argv[1]);
 
-return 0;
+	return 0;
 }
+

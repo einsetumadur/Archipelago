@@ -1,3 +1,10 @@
+/**\
+ * \name   noeud.h
+ * \author Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    march 2020
+ * \version 1.0
+ */
+ 
 #ifndef NOEUD_H
 #define NOEUD_H
 
@@ -11,7 +18,7 @@ class Noeud
 {
 public:
 	Noeud(unsigned int id,double x, double y, unsigned int capacite, 
-												Type_quartier type);
+			Type_quartier type);
 	std::string print();
 	unsigned int getNbp();
 	double getX() const ;
@@ -20,9 +27,13 @@ public:
 	Cercle getBatiment() const ;
 	unsigned int getUid() const ;
 	Type_quartier getType() const;	
-	void add_lien(Noeud* b, std::vector<Noeud*> ensN);	
+	void test_nbp();
+	void ajout_lien(Noeud* b);
+	bool multiple_link(Noeud* b);	
+	bool test_max_link();
+	bool test_lien_quartier(Noeud* lien_a, Noeud* lien_b); 
 	bool operator==(const Noeud& nd) const;
-	void test_max_link();
+
 private:
 	Cercle batiment;
 	unsigned int uid;
@@ -31,9 +42,8 @@ private:
 	std::vector<Noeud*> liens;
 };
 
-void test_lien_quartier(Noeud* lien_a, Noeud* lien_b, Noeud* nd);
-void test_coll_quartier(std::vector<Noeud*> ensN);
-void test_nbp(unsigned int nbp);
 
 #endif
+
+
 

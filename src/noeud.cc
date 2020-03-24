@@ -18,34 +18,27 @@ using namespace std;
 
 
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, 
-													Type_quartier type): 
+				Type_quartier type): 
             uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
 {
-    test_nbp(nbp);
+    test_nbp();
     if(uid == no_link)
     {
 		cout << error::reserved_uid();
 		exit(-1);
 	}		
 }
-    
-void Noeud::test_max_link() 
-{
-	if(liens.size() == max_link)			
-	{			
-		cout << error::max_link( getUid() );
-		exit(-1);
-	}
-}
-unsigned int Noeud::getNbp()
-{
-    return nbp;
-}
 
 string Noeud::print()
 {
     return to_string(uid)+" "+to_string(getX())+" "+
-								to_string(getY())+" "+to_string(nbp);
+			to_string(getY())+" "+to_string(nbp);
+}
+    
+unsigned int Noeud::getNbp()
+{
+	
+    return nbp;
 }
 
 double Noeud::getX() const 
@@ -79,34 +72,7 @@ Type_quartier Noeud::getType() const
 	return type;
 }
 
-void Noeud::add_lien(Noeud* b, vector<Noeud*> ensN) 
-{
-	// MULTIPLE NODE
-	for(size_t i(0) ; i < liens.size() ; ++i) 
-	{
-		if(liens[i] == b) 
-		{
-			cout << error::multiple_same_link(uid, b->uid);
-			exit(-1);
-		}
-	}
-
-	// MAX HOUSING LINKS
-	if(type == LOGEMENT)	test_max_link();
-	
-	// COLLISION LIENS-BATIMENT
-	for(size_t i(0) ; i < ensN.size() ; ++i) 
-	{
-		if( not(ensN[i] == this) and not(ensN[i] == b) ) 
-		{
-			if(triangle(this->batiment, b->batiment, ensN[i]->batiment))	
-											test_lien_quartier(this, b, ensN[i]);
-		}
-	}
-	liens.push_back(b);
-}
-
-void test_nbp(unsigned int nbp) 
+void Noeud::test_nbp() 
 {
 	if(nbp < min_capacity) 
 	{
@@ -120,38 +86,46 @@ void test_nbp(unsigned int nbp)
 	}
 }
 
-void test_lien_quartier(Noeud* lien_a, Noeud* lien_b, Noeud* nd) 
-{	
-	Point p = { lien_a->getX(), lien_a->getY() };
-	Seg_droite d = { p, {lien_b->getX() - lien_a->getX(), 
-						lien_b->getY() - lien_a->getY()}};
-	if(collision_droite_cercle(nd->getBatiment(), d))
+void Noeud::ajout_lien(Noeud* b) 
+{
+	liens.push_back(b);
+}
+
+bool Noeud::multiple_link(Noeud* b) 
+{
+	for(size_t i(0) ; i < liens.size() ; ++i) 
 	{
-		cout << error::node_link_superposition(nd->getUid());
-		exit(-1);
+		if(liens[i] == b)	return true;
 	}
+	
+	return false;
 
-} 
+}
 
-void test_coll_quartier(vector<Noeud*> ensN) 
-{		
-	for(size_t i(0) ; i < ensN.size() ; ++i) 
+bool Noeud::test_max_link() 
+{
+	if(type == LOGEMENT and liens.size() == max_link)		return true;
+	else 													return false;
+}
+
+bool Noeud::test_lien_quartier(Noeud* lien_a, Noeud* lien_b) 
+{	
+	if( not(this == lien_a) and not(this == lien_b) ) 
 	{
-		for(size_t j(i+1) ; j < ensN.size() ; ++j) 
+		if(champ(lien_a->batiment, lien_b->batiment, this->batiment)) 
 		{
-			if(collision_cercle(ensN[i]->getBatiment(), ensN[j]->getBatiment()))
-			{
-				cout << error::node_node_superposition(ensN[i]->getUid(), 
-														ensN[j]->getUid());
-				exit(-1);
-			}
+			Point p = { lien_a->getX(), lien_a->getY() };
+			Seg_droite d = { p, {lien_b->getX() - lien_a->getX(), 
+								lien_b->getY() - lien_a->getY()}};
+			if(collision_droite_cercle(this->batiment, d))	return true;
 		}
 	}
-}
+	
+	return false;
+} 
 
 bool Noeud::operator==(const Noeud& nd) const 
 {
 	return (getX() == nd.getX() and getY() == nd.getY() and
 			getRayon() == nd.getRayon() and uid == nd.uid and type == nd.type); 
 }
-

@@ -42,6 +42,6 @@ Vecteur projection(Vecteur a, Vecteur b);
 Vecteur vecteur_orthogonal(Point p, Seg_droite d);
 bool collision_droite_cercle(Cercle c, Seg_droite d);
 Vecteur scalaire_vecteur(int k, Vecteur v);
-bool triangle(Cercle A, Cercle B, Cercle C);
+bool champ(Cercle A, Cercle B, Cercle C);
 
 #endif

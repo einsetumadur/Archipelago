@@ -31,7 +31,7 @@ public:
 	void ajout_lien(Noeud* b);
 	bool multiple_link(Noeud* b);	
 	bool test_max_link();
-	bool test_lien_quartier(Noeud* lien_a, Noeud* lien_b); 
+	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b); 
 	bool operator==(const Noeud& nd) const;
 
 private:
@@ -44,6 +44,3 @@ private:
 
 
 #endif
-
-
-

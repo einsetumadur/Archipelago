@@ -10,9 +10,7 @@
 
 int main(int argc, char** argv)
 {
-
-	Ville Lausanne(argv[1]);
+	main_ville(argv[1]);
 
 	return 0;
 }
-

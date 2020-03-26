@@ -34,14 +34,14 @@ struct Seg_droite
 	Vecteur directeur;
 };
 
-double distance_vecteurs(Vecteur a, Vecteur b);
-bool collision_cercle(Cercle c, Cercle e);
 double prod_scal(Vecteur a, Vecteur b);
 double norme(Vecteur a);
+Vecteur scalaire_vecteur(double k, Vecteur v);
 Vecteur projection(Vecteur a, Vecteur b);
 Vecteur vecteur_orthogonal(Point p, Seg_droite d);
+double distance_vecteurs(Vecteur a, Vecteur b);
+bool collision_cercle(Cercle c, Cercle e);
 bool collision_droite_cercle(Cercle c, Seg_droite d);
-Vecteur scalaire_vecteur(int k, Vecteur v);
-bool champ(Cercle A, Cercle B, Cercle C);
+bool champ(Cercle a, Cercle b, Cercle c);
 
 #endif

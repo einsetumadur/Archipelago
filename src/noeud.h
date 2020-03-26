@@ -42,5 +42,4 @@ private:
 	std::vector<Noeud*> liens;
 };
 
-
 #endif

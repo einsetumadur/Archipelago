@@ -16,7 +16,6 @@
 
 using namespace std;
 
-
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, 
 				Type_quartier type): 
             uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
@@ -108,7 +107,7 @@ bool Noeud::test_max_link()
 	else 													return false;
 }
 
-bool Noeud::test_lien_quartier(Noeud* lien_a, Noeud* lien_b) 
+bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) 
 {	
 	if( not(this == lien_a) and not(this == lien_b) ) 
 	{

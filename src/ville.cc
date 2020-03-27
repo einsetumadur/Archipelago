@@ -21,6 +21,10 @@ namespace
 	Ville ville;
 }
 
+Ville::Ville()
+{
+}
+
 void main_ville(char* nom_fichier) 
 {
 	ville.chargement(nom_fichier);
@@ -222,7 +226,7 @@ void Ville::redondance_uid(unsigned int numid)
 {
 	size_t sizetab(quartiers.size());
 
-	for (size_t i = 0; i < sizetab - 1 ; i++) 
+	for (size_t i(0); i < sizetab - 1 ; i++) 
 	{
 		if(quartiers[i]->getUid() == numid)
 		{

@@ -1,4 +1,4 @@
-/**\
+**\
  * \name    ville.h
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    march 2020
@@ -17,6 +17,7 @@
 class Ville
 {
 public:
+	Ville();
 	void chargement(char* nom_fichier);
 
 private:

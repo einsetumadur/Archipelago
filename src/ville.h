@@ -27,7 +27,7 @@ private:
 	void creation_lien(unsigned int uid_a, unsigned int uid_b);
 	void error_lien(Noeud* a, Noeud* b);
 	Noeud* trouve_lien(unsigned int uid); 
-	void redondance_uid();
+	void redondance_uid(unsigned int numid);
 	void collis_noeuds();
 
 	std::string nom;

@@ -37,7 +37,7 @@ void Ville::chargement(char* nom_fichier)
 		if(line[0]=='#')  continue;  
 		decodage(line);
 		}
-	cout << error::success() << endl;
+	cout << error::success();
 	}
 	else cout << "unable to open file." << endl;
 }
@@ -129,7 +129,7 @@ void Ville::ajout_noeud(istringstream& param,int& counter,Type_quartier type)
 	else
 	{
 		quartiers.push_back(new Noeud(numid,posx,posy,popmax,type));
-		redondance_uid();
+		redondance_uid(numid);
 		collis_noeuds();
 		++counter;
 	}
@@ -160,7 +160,7 @@ void Ville::creation_lien(unsigned int uid_a, unsigned int uid_b)
 {
 	if(uid_a == uid_b)
 	{
-		cout << error::self_link_node(uid_a) << endl;
+		cout << error::self_link_node(uid_a);
 		exit(-1);
 	}
 	
@@ -214,24 +214,21 @@ Noeud* Ville::trouve_lien(unsigned int uid)
 		if(uid == quartiers[i]->getUid()) return quartiers[i];
 	}
 
-	cout << error::link_vacuum(uid) << endl;
+	cout << error::link_vacuum(uid);
 	exit(-1);
 }
 
-void Ville::redondance_uid()
+void Ville::redondance_uid(unsigned int numid)
 {
 	size_t sizetab(quartiers.size());
 
-	for (size_t i = 0; i < sizetab ; i++) 
+	for (size_t i = 0; i < sizetab - 1 ; i++) 
 	{
-		for (size_t j = i+1; j < sizetab ; j++)
+		if(quartiers[i]->getUid() == numid)
 		{
-			if(quartiers[i]->getUid() == quartiers[j]->getUid())
-			{
-				cout << error::identical_uid(quartiers[i]->getUid()) << endl;
-				exit(0);
-			}
-		}
+			cout << error::identical_uid(numid);
+			exit(0);
+		}	
 	}
 }
 

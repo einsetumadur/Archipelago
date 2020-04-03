@@ -1,6 +1,6 @@
 /**\
- * \name    ville.cc
+ * \name    gui.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
+ * \date    april 2020
  * \version 2.0
  */

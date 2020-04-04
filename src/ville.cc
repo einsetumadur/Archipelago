@@ -50,8 +50,6 @@ void Ville::decodage(string line)
 {
 	istringstream data(line);
 
-	enum Etat_lecture {NBL,LOGE,NBP,PROD,NBT,TRAN,NBLI,LIENS,FIN};
-
 	static int etat(NBL); 
 	static int i(0);
 	static int total(0);
@@ -68,7 +66,7 @@ void Ville::decodage(string line)
 			break;
 
 		case LOGE: 	
-			ajout_noeud(data,i,LOGEMENT);
+			ajout_noeud(data,i, LOGE);
 			if(i == total) etat = NBT ;
 			break;
 
@@ -80,7 +78,7 @@ void Ville::decodage(string line)
 			break;
 
 		case PROD: 
-			ajout_noeud(data, i, PRODUCTION);
+			ajout_noeud(data, i, PROD);
 			if(i == total) etat = NBLI ; 
 			break;
 
@@ -92,7 +90,7 @@ void Ville::decodage(string line)
 			break;
 
 		case TRAN: 
-			ajout_noeud(data, i, TRANSPORT);
+			ajout_noeud(data, i, TRAN);
 			if(i == total) etat = NBP ; 
 			break;
 
@@ -121,7 +119,7 @@ void Ville::decodage(string line)
 	}
 }
 
-void Ville::ajout_noeud(istringstream& param,int& counter,Type_quartier type)
+void Ville::ajout_noeud(istringstream& param,int& counter, Etat_lecture type)
 {
 	unsigned int numid;
 	unsigned int popmax;
@@ -132,34 +130,30 @@ void Ville::ajout_noeud(istringstream& param,int& counter,Type_quartier type)
 		cout << "wrong input format" << endl;
 	else
 	{
-		quartiers.push_back(new Noeud(numid,posx,posy,popmax,type));
-		redondance_uid(numid);
-		collis_noeuds();
-		++counter;
+		switch(type)
+		{
+			case(LOGE):
+				quartiers.push_back(new Logement(numid,posx,posy,popmax));
+				redondance_uid(numid);
+				collis_noeuds();
+				++counter;
+				break;
+			case(PROD):
+				quartiers.push_back(new Transport(numid,posx,posy,popmax));
+				redondance_uid(numid);
+				collis_noeuds();				
+				++counter;
+				break;
+			case(TRAN):
+				quartiers.push_back(new Production(numid,posx,posy,popmax));
+				redondance_uid(numid);
+				collis_noeuds();
+				++counter;
+				break;
+		}
 	}
 }
-
-string Ville::print_type(Type_quartier type)
-{
-	string bloc(to_string(nb_type(type)));
-	bloc[0] = nb_type(type);
-	for(auto noeud : quartiers)
-	{
-		if(noeud->getType()==type) bloc.append("\t" + noeud->print() + "\n");
-	}
-	return bloc;
-}
-
-unsigned int Ville::nb_type(Type_quartier type)
-{
-	unsigned int count(0);
-	for(auto noeud : quartiers)
-	{
-		if(noeud->getType()==type) count++;
-	}
-	return count;
-}
-
+	
 void Ville::creation_lien(unsigned int uid_a, unsigned int uid_b) 
 {
 	if(uid_a == uid_b)
@@ -188,12 +182,13 @@ void Ville::error_lien(Noeud* a, Noeud* b)
 		exit(-1);
 	}
 
-	if (a->test_max_link())
+	// Pour les noeuds LOGE :
+	if (a->maxi_link())
 	{
 		cout << error::max_link(uid_a);
 		exit(-1);
 	}
-	if (b->test_max_link())
+	if (b->maxi_link())
 	{
 		cout << error::max_link(uid_b);
 		exit(-1);

@@ -1,4 +1,4 @@
-**\
+/**\
  * \name    ville.h
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    march 2020
@@ -14,6 +14,8 @@
 #include <vector>
 #include "noeud.h"
 
+enum Etat_lecture {NBL,LOGE,NBP,PROD,NBT,TRAN,NBLI,LIENS,FIN};
+
 class Ville
 {
 public:
@@ -22,9 +24,7 @@ public:
 
 private:
 	void decodage(std::string line);
-	unsigned int nb_type(Type_quartier type);
-	std::string print_type(Type_quartier type);
-	void ajout_noeud(std::istringstream& param,int& counter,Type_quartier type);
+	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);
 	void creation_lien(unsigned int uid_a, unsigned int uid_b);
 	void error_lien(Noeud* a, Noeud* b);
 	Noeud* trouve_lien(unsigned int uid); 

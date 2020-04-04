@@ -16,9 +16,8 @@
 
 using namespace std;
 
-Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite, 
-				Type_quartier type): 
-            uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite), type(type)
+Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite): 
+            uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite)
 {
     test_nbp();
     if(uid == no_link)
@@ -28,10 +27,19 @@ Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite,
 	}		
 }
 
-string Noeud::print()
+Logement::Logement(unsigned int id,double x, double y, unsigned int capacite):
+			Noeud(id, x, y, capacite) 
 {
-    return to_string(uid)+" "+to_string(getX())+" "+
-			to_string(getY())+" "+to_string(nbp);
+}
+			
+Transport::Transport(unsigned int id,double x, double y, unsigned int capacite):
+			Noeud(id, x, y, capacite) 
+{
+}
+
+Production::Production(unsigned int id,double x, double y, unsigned int capacite):
+			Noeud(id, x, y, capacite) 
+{
 }
     
 unsigned int Noeud::getNbp()
@@ -65,11 +73,6 @@ unsigned int Noeud::getUid() const
 	
 	return uid;
 }
-Type_quartier Noeud::getType() const 
-{
-
-	return type;
-}
 
 void Noeud::test_nbp() 
 {
@@ -98,13 +101,17 @@ bool Noeud::multiple_link(Noeud* b)
 	}
 	
 	return false;
-
 }
 
-bool Noeud::test_max_link() 
+bool Noeud::maxi_link()
 {
-	if(type == LOGEMENT and liens.size() == max_link)		return true;
-	else 													return false;
+	return false;
+}
+
+bool Logement::maxi_link()
+{
+	if(liens.size() == max_link)		return true;
+	else 								return false;
 }
 
 bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) 
@@ -126,5 +133,5 @@ bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b)
 bool Noeud::operator==(const Noeud& nd) const 
 {
 	return (getX() == nd.getX() and getY() == nd.getY() and
-			getRayon() == nd.getRayon() and uid == nd.uid and type == nd.type); 
+			getRayon() == nd.getRayon() and uid == nd.uid); 
 }

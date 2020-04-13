@@ -2,7 +2,9 @@
 
 CXX = g++
 CXXFLAGS = -Wall -Wextra -g
-OFILES = prog.o noeud.o tools.o ville.o error.o
+LINKING = `pkg-config --cflags gtkmm-3.0`
+LDLIBS = `pkg-config --libs gtkmm-3.0`
+OFILES = prog.o noeud.o tools.o ville.o error.o gui.o
 
 all : Archipelago
 
@@ -15,11 +17,19 @@ tools.o : tools.cc tools.h constantes.h
 noeud.o : noeud.cc noeud.h tools.h error.h constantes.h
 	$(CXX) $(CXXFLAGS) -c noeud.cc -o noeud.o
 
-ville.o : ville.cc ville.h noeud.h error.h constantes.h
+ville.o : ville.cc ville.h noeud.h 
 	$(CXX) $(CXXFLAGS) -c ville.cc -o ville.o
 
-prog.o : prog.cc ville.h
-	$(CXX) $(CXXFLAGS) -c prog.cc -o prog.o
+gui.o : gui.cc gui.h
+	$(CXX) $(CXXFLAGS) $(LINKING) -c gui.cc -o gui.o
+
+prog.o : prog.cc ville.h gui.h
+	$(CXX) $(CXXFLAGS) $(LINKING) -c prog.cc -o prog.o 
 
 Archipelago : $(OFILES)
-	$(CXX) $(CXXFLAGS) $(OFILES) -o Archipelago
+	$(CXX) $(CXXFLAGS) $(LINKING) $(OFILES) -o Archipelago $(LDLIBS)
+
+
+clean:
+	@echo "Nettoyage des fichiers de compilation"
+	@rm *.o

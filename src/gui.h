@@ -6,6 +6,7 @@
  */
 
 #include <gtkmm.h>
+#include "ville.h"
 
 #ifndef GUI_H
 #define GUI_H
@@ -15,6 +16,7 @@ public:
     Dessin();
     virtual ~Dessin();
     void affiche();
+    void clear();
 
 protected: 
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
@@ -31,11 +33,24 @@ public :
     virtual ~MaFenetre();
 
 protected:
-    void on_button_clicked_test();
+    void on_button_clicked_exit();
+    void on_button_clicked_new();
+    void on_button_clicked_open();
+    void on_button_clicked_save();
+    void on_button_clicked_shortestPath();
+    void on_button_clicked_zoomIn();
+    void on_button_clicked_zoomOut();
+    void on_button_clicked_zoomReset();
+    void on_button_clicked_edit();
 
-    Gtk::Box mainWindow,leftPanel,rightPanel;
+    Gtk::Box mainWindow,leftPanel,rightPanel,general,display,editor,information;
     Dessin graph;
-    Gtk::Button testbutton;
+    Gtk::Button exitButton,newButton,openButton,saveButton;
+    Gtk::Button shortPathButton,zoominButton,zoomoutButton,zoomresetButton;
+    Gtk::ToggleButton editButton;
+    Gtk::CheckButton housing,transport,production;
+    Gtk::Frame generalFrame,displayFrame,editorFrame,infoFrame;
+    Gtk::Label ENJ,CI,MTA;
 
 private:
     void affiche();

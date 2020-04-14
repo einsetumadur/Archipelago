@@ -19,7 +19,11 @@ enum Etat_lecture {NBL,LOGE,NBP,PROD,NBT,TRAN,NBLI,LIENS,FIN};
 class Ville
 {
 public:
-	Ville();
+	Ville(unsigned int nbL, unsigned int nbT, unsigned int nbP);
+	~Ville();
+	double mta();
+	double enj();
+	double ci();
 	void chargement(char* nom_fichier);
 
 private:
@@ -27,12 +31,20 @@ private:
 	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);
 	void creation_lien(unsigned int uid_a, unsigned int uid_b);
 	void error_lien(Noeud* a, Noeud* b);
-	Noeud* trouve_lien(unsigned int uid); 
-	void redondance_uid(unsigned int numid);
+	Noeud* trouve_lien(unsigned int uid) const; 
+	void redondance_uid(unsigned int numid) const;
 	void collis_noeuds();
 
 	std::string nom;
 	std::vector<Noeud*> quartiers;
+	unsigned int nbL;
+	unsigned int nbT;
+	unsigned int nbP;
+	
+	double nbp_nbL;
+	double nbp_nbT;
+	double nbp_nbP;
+	
 };
 
 void main_ville(char* nom_fichier);

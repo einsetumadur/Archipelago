@@ -18,17 +18,27 @@ using namespace std;
 
 namespace
 {
-	Ville ville;
+	Ville ville(0,0,0);
 }
 
-Ville::Ville()
+Ville::Ville(unsigned int nbL, unsigned int nbT, unsigned int nbP): 
+			 nbL(nbL), nbT(nbT), nbP(nbP), nbp_nbL(0), nbp_nbP(0),
+			 nbp_nbT(0)
 {
+}
+
+Ville::~Ville()
+{
+	for(auto noeud : quartiers) {
+		delete noeud;
+	}
 }
 
 void main_ville(char* nom_fichier) 
 {
 	ville.chargement(nom_fichier);
 }
+
 
 void Ville::chargement(char* nom_fichier)
 {
@@ -38,12 +48,34 @@ void Ville::chargement(char* nom_fichier)
 	{
 		while(getline(fichier >> ws,line)) 
 		{
-		if(line[0]=='#')  continue;  
-		decodage(line);
+			if(line[0]=='#')  continue;  
+			decodage(line);
 		}
-	cout << error::success();
+		cout << mta() << endl;
+		cout << enj() << endl;
+		cout << ci() << endl;
+		cout << error::success();
 	}
 	else cout << "unable to open file." << endl;
+}
+
+
+double Ville::mta()
+{
+	if(quartiers.size() == 0 or nbL == 0)		return 0;
+	else 										return short_path(quartiers)/nbL;
+}
+
+double Ville::enj()
+{
+	if(quartiers.size() == 0)	return 0;
+	else 						return (nbp_nbL - (nbp_nbT + nbp_nbP))/ 
+									   (nbp_nbL + nbp_nbP + nbp_nbT);
+}
+
+double Ville::ci()
+{
+	return cout_infra(quartiers);
 }
 
 void Ville::decodage(string line)
@@ -59,63 +91,63 @@ void Ville::decodage(string line)
 	switch(etat) 
 	{
 		case NBL: 
-			if(!(data >> total)) cout << "wrong input format" << endl; 
+			if(!(data >> total))	cout << "wrong input format" << endl; 
 			else i = 0 ;
-			if(total==0) etat=NBT; 
+			if(total==0)	etat = NBT; 
 			else etat = LOGE ; 
 			break;
 
 		case LOGE: 	
 			ajout_noeud(data,i, LOGE);
-			if(i == total) etat = NBT ;
+			if(i == total)	etat = NBT ;
 			break;
 
 		case NBP: 
-			if(!(data >> total)) cout << "wrong input format" << endl; 
+			if(!(data >> total))	cout << "wrong input format" << endl; 
 			else i = 0;
-			if(total == 0) etat = NBLI; 
+			if(total == 0)	etat = NBLI; 
 			else etat = PROD ; 
 			break;
 
 		case PROD: 
 			ajout_noeud(data, i, PROD);
-			if(i == total) etat = NBLI ; 
+			if(i == total)	etat = NBLI ; 
 			break;
 
 		case NBT: 
-			if(!(data >> total)) cout << "wrong input format" << endl; 
+			if(!(data >> total))	cout << "wrong input format" << endl; 
 			else i = 0;
-			if(total==0) etat=NBP; 
+			if(total==0)	etat = NBP; 
 			else etat = TRAN ; 
 			break;
 
 		case TRAN: 
 			ajout_noeud(data, i, TRAN);
-			if(i == total) etat = NBP ; 
+			if(i == total)	etat = NBP; 
 			break;
 
 		case NBLI: 
-			if(!(data >> total)) cout << "wrong input format" << endl; 
+			if(!(data >> total))	cout << "wrong input format" << endl; 
 			else i = 0;
-			if(total == 0) etat = FIN; 
+			if(total == 0)	etat = FIN; 
 			else etat = LIENS ; 
 			break;
 
 		case LIENS: 
-			if( !(data >> uid1 >> uid2)) cout << "wrong input format" << endl; 
+			if(!(data >> uid1 >> uid2)) 	cout << "wrong input format" << endl; 
 			else
 			{
 				creation_lien(uid1, uid2);
 				++i;
 			}
-			if(i == total) etat = FIN ; 
+			if(i == total)	etat = FIN ; 
 			break;
 
 		case FIN:  
-		break;
+			break;
 
-		default: cout << "defaultswitch error." << endl;
-		break;
+		default:	cout << "defaultswitch error." << endl;
+			break;
 	}
 }
 
@@ -126,8 +158,8 @@ void Ville::ajout_noeud(istringstream& param,int& counter, Etat_lecture type)
 	double posx;
 	double posy;
 
-	if( !(param >> numid >> posx >> posy >> popmax))	
-		cout << "wrong input format" << endl;
+	if( !(param >> numid >> posx >> posy >> popmax))	cout << "wrong input format" 
+															 << endl;
 	else
 	{
 		switch(type)
@@ -136,18 +168,24 @@ void Ville::ajout_noeud(istringstream& param,int& counter, Etat_lecture type)
 				quartiers.push_back(new Logement(numid,posx,posy,popmax));
 				redondance_uid(numid);
 				collis_noeuds();
-				++counter;
-				break;
-			case(PROD):
-				quartiers.push_back(new Transport(numid,posx,posy,popmax));
-				redondance_uid(numid);
-				collis_noeuds();				
+				++nbL;
+				nbp_nbL += popmax;
 				++counter;
 				break;
 			case(TRAN):
-				quartiers.push_back(new Production(numid,posx,posy,popmax));
+				quartiers.push_back(new Transport(numid,posx,posy,popmax));
 				redondance_uid(numid);
 				collis_noeuds();
+				++nbT;
+				nbp_nbT += popmax;
+				++counter;
+				break;
+			case(PROD):
+				quartiers.push_back(new Production(numid,posx,posy,popmax));
+				redondance_uid(numid);
+				collis_noeuds();	
+				++nbP;		
+				nbp_nbP += popmax;	
 				++counter;
 				break;
 		}
@@ -204,20 +242,20 @@ void Ville::error_lien(Noeud* a, Noeud* b)
 	}
 }
 
-Noeud* Ville::trouve_lien(unsigned int uid)
+Noeud* Ville::trouve_lien(unsigned int uid) const
 {
 	size_t sizetab(quartiers.size());
 
 	for(size_t i(0) ; i <  sizetab ; ++i)
 	{
-		if(uid == quartiers[i]->getUid()) return quartiers[i];
+		if(uid == quartiers[i]->getUid())	return quartiers[i];
 	}
 
 	cout << error::link_vacuum(uid);
 	exit(-1);
 }
 
-void Ville::redondance_uid(unsigned int numid)
+void Ville::redondance_uid(unsigned int numid) const
 {
 	size_t sizetab(quartiers.size());
 
@@ -242,9 +280,9 @@ void Ville::collis_noeuds()
 			if(collision_cercle(quartiers[i]->getBatiment(), 
 								quartiers[j]->getBatiment()))
 			{
-			cout << error::node_node_superposition(quartiers[i]->getUid(), 
+				cout << error::node_node_superposition(quartiers[i]->getUid(), 
 													quartiers[j]->getUid());
-			exit(-1);
+				exit(-1);
 			}
 		}
 	}

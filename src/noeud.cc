@@ -2,7 +2,7 @@
  * \name    noeud.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    march 2020
- * \version 1.0
+ * \version Rendu 2
  */
 
 #include <iostream>
@@ -17,7 +17,7 @@
 using namespace std;
 
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite): 
-            uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite)
+             uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite)
 {
     test_nbp();
     if(uid == no_link)
@@ -32,9 +32,8 @@ Noeud::~Noeud()
 }
 
 Logement::Logement(unsigned int id,double x, double y, unsigned int capacite):
-			Noeud(id,x,y,capacite), speed(default_speed)
+				   Noeud(id,x,y,capacite), speed(default_speed)
 {
-	
 }
 
 Logement::~Logement()
@@ -42,9 +41,8 @@ Logement::~Logement()
 }
 			
 Transport::Transport(unsigned int id,double x, double y, unsigned int capacite):
-			  Noeud(id,x,y,capacite), speed(fast_speed)
+					 Noeud(id,x,y,capacite), speed(fast_speed)
 {
-	
 }
 
 Transport::~Transport()
@@ -52,63 +50,56 @@ Transport::~Transport()
 }
 
 Production::Production(unsigned int id,double x, double y, unsigned int capacite):
-			 Noeud(id,x,y,capacite), speed(default_speed)
+					   Noeud(id,x,y,capacite), speed(default_speed)
 {
-	
 }
 
 Production::~Production()
 {
 }
     
-string Logement::getType() const {
-	
-	return "LOGE";
+string Logement::getType() const 
+{
+	return logement;
 }
-string Production::getType() const {
-	
-	return "PROD";
+string Production::getType() const 
+{
+	return production;
 }
-string Transport::getType() const {
-	
-	return "TRAN";
+string Transport::getType() const 
+{
+	return transport;
 }
 
-unsigned int Noeud::getNbp()
+unsigned int Noeud::getNbp() const
 {
-	
     return nbp;
 }
 
 double Noeud::getX() const 
 {
-	
 	return batiment.centre.pos_x;
 }
 double Noeud::getY() const 
 {
-	
 	return batiment.centre.pos_y;
 }
 double Noeud::getRayon() const 
 {
-	
 	return batiment.rayon;
 }
 Cercle Noeud::getBatiment() const  
 {
-	
 	return batiment;
 }
 unsigned int Noeud::getUid() const 
 {
-	
 	return uid;
 }
 
 vector<Noeud*> Noeud::getLiens() const
 {
-	return liens;
+	return tab_liens;
 }
 
 double Noeud::getAccess() const 
@@ -124,31 +115,6 @@ unsigned int Noeud::getParent() const
 bool Noeud::getIn() const
 {
 	return in;
-}
-	
-void Noeud::updateAccess(double a)
-{
-	access = a;
-}
-
-void Noeud::updateIn(bool b)
-{
-	in = b;
-}
-
-void Noeud::updateParent(unsigned int p)
-{
-	parent = p;
-}
-
-void Logement::setShort_path_prod(Noeud* nd)
-{
-	short_path_prod.push_back(nd);
-}
-
-void Logement::setShort_path_tran(Noeud* nd)
-{
-	short_path_tran.push_back(nd);
 }
 
 double Production::getSpeed() const
@@ -166,7 +132,18 @@ double Transport::getSpeed() const
 	return speed;
 }
 
-void Noeud::test_nbp() 
+void Noeud::updateIn(bool b)
+{
+	in = b;
+}
+
+
+void Noeud::ajout_lien(Noeud* b) 
+{
+	tab_liens.push_back(b);
+}
+
+void Noeud::test_nbp() const
 {
 	if(nbp < min_capacity) 
 	{
@@ -180,40 +157,35 @@ void Noeud::test_nbp()
 	}
 }
 
-void Noeud::ajout_lien(Noeud* b) 
+bool Noeud::multiple_link(Noeud* b) const
 {
-	liens.push_back(b);
-}
-
-bool Noeud::multiple_link(Noeud* b) 
-{
-	for(size_t i(0) ; i < liens.size() ; ++i) 
+	for(size_t i(0) ; i < tab_liens.size() ; ++i) 
 	{
-		if(liens[i] == b)	return true;
+		if(tab_liens[i] == b)	return true;
 	}
 	
 	return false;
 }
 
-bool Noeud::maxi_link()
+bool Noeud::maxi_link() const
 {
 	return false;
 }
 
-bool Logement::maxi_link()
+bool Logement::maxi_link() const
 {
-	if(liens.size() == max_link)		return true;
-	else 								return false;
+	if(tab_liens.size() == max_link)		return true;
+	else 									return false;
 }
 
-bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) 
+bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const
 {	
-	if( not(this == lien_a) and not(this == lien_b) ) 
+	if(not(this == lien_a) and not(this == lien_b)) 
 	{
 		if(champ(lien_a->batiment, lien_b->batiment, this->batiment)) 
 		{
-			Point p = { lien_a->getX(), lien_a->getY() };
-			Seg_droite d = { p, {lien_b->getX() - lien_a->getX(), 
+			Point p = {lien_a->getX(), lien_a->getY()};
+			Seg_droite d = {p, {lien_b->getX() - lien_a->getX(), 
 								lien_b->getY() - lien_a->getY()}};
 			if(collision_droite_cercle(this->batiment, d))	return true;
 		}
@@ -221,6 +193,8 @@ bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b)
 	
 	return false;
 } 
+
+// CI
 
 double cout_infra(const vector<Noeud*>& tn)
 {
@@ -234,7 +208,7 @@ double cout_infra(const vector<Noeud*>& tn)
 	
 	for(auto nd : tn) {
 		for(auto nd_lien : nd->getLiens()) {
-			if(nd_lien->getIn() == true) 	nd->calcul(nd_lien, cmt);
+			if(nd_lien->getIn() == true) 	nd->calcul_ci(nd_lien, cmt);
 		}
 		nd->updateIn(false);
 	}
@@ -242,142 +216,151 @@ double cout_infra(const vector<Noeud*>& tn)
 	return cmt;	
 }
 
-void Noeud::calcul(Noeud* nd_lien, double& cmt)
+void Noeud::calcul_ci(Noeud* nd_lien, double& cmt)	const
 {
-	double dist = norme({this->getX() - nd_lien->getX(), this->getY() - nd_lien->getY()});
+	double dist = norme({this->getX() - nd_lien->getX(), 
+						 this->getY() - nd_lien->getY()});
 
-				if(this->nbp < nd_lien->nbp)
-				{
-					if(this->getSpeed() == fast_speed and nd_lien->getSpeed() == fast_speed)	cmt += dist*fast_speed*this->nbp;
-					else 	cmt += dist*default_speed*(this->nbp);
-				}
-				else if (this->nbp > nd_lien->nbp)
-				{
-					if(this->getSpeed() == fast_speed and nd_lien->getSpeed() == fast_speed)	cmt += dist*fast_speed*nd_lien->nbp;
-					else 	cmt += dist*default_speed*(nd_lien->nbp);
-				}
-				else
-				{
-					if(this->getSpeed() == fast_speed and nd_lien->getSpeed() == fast_speed)	cmt += dist*fast_speed*this->nbp;
-					else 	cmt += dist*default_speed*(this->nbp);
-				}
-}
-
-void Transport::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,  
-						int& typ, size_t i, int& compteur, double& cmt) 
-{
-}
-
-void Production::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,  
-						int& typ, size_t i, int& compteur, double& cmt) 
-{
-}
-
-void Logement::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,  
-						int& typ, size_t i, int& compteur, double& cmt) 
-{
-	init_queue(queue, tn, i);
-	sort_queue(queue, tn);
-
-	unsigned int nd(0);
-	nd = djikstra(queue, tn, typ, compteur);
-
-	if( nd != no_link and tn[nd]->getType() == "TRAN")
+	if(this->nbp < nd_lien->nbp)
 	{
-		cmt += tn[nd]->getAccess();
-		compute_t(tn, nd);
-		
-		typ = 1;
-		nd = djikstra(queue, tn, typ, compteur);
-		if(not(nd == no_link))	
-		{ 
-			cmt += tn[nd]->getAccess(); 
-			compute_p(tn, nd);
-		}
-		
+		if(this->getSpeed() == fast_speed and 
+		   nd_lien->getSpeed() == fast_speed)	cmt += dist*fast_speed*this->nbp;
+		else 	cmt += dist*default_speed*(this->nbp);
 	}
-	else if(nd != no_link and tn[nd]->getType() == "PROD")
+	else if (this->nbp > nd_lien->nbp)
 	{
-		cmt +=  tn[nd]->getAccess();
-		compute_p(tn, nd);
-		
-		typ = 2;
-		nd = djikstra(queue, tn, typ, compteur);
-		if(not(nd == no_link))	
-		{
-			cmt+= tn[nd]->getAccess(); 
-			compute_t(tn, nd);
-		}
-			
-	}							
+		if(this->getSpeed() == fast_speed and 
+		   nd_lien->getSpeed() == fast_speed)	cmt += dist*fast_speed*nd_lien->nbp;
+		else 	cmt += dist*default_speed*(nd_lien->nbp);
+	}
+	else
+	{
+		if(this->getSpeed() == fast_speed and 
+		   nd_lien->getSpeed() == fast_speed)	cmt += dist*fast_speed*this->nbp;
+		else 	cmt += dist*default_speed*(this->nbp);
+	}
 }
+
+// MTA
 
 double short_path(const vector<Noeud*>& tn)
 {
 	double cmt(0);
-	int typ(0);
+	int scenario(scen_aleatoire);
 	int compteur(0);
 	vector<int> queue(tn.size());
 	
 	for(size_t i(0) ; i < tn.size() ; ++i) {
-		typ = 0;
+		scenario = scen_aleatoire;
 		compteur = 0;
-		if(tn[i]->getType() == "LOGE") 		tn[i]->diff_cas(queue, tn, typ, i, compteur, cmt);		
+		if(tn[i]->getType() == logement) 		tn[i]->diff_cas(queue, tn, scenario, 
+																i, compteur, cmt);		
 	}
 	
 	return (cmt);
 }
 
-unsigned int Logement::djikstra(vector<int>& queue, const vector<Noeud*>& tn, int& typ, int& compteur)
+void Noeud::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,  
+					 int& scenario, size_t i, int& compteur, double& cmt) 
+{
+}
+
+// distingue les cas selon le type du noeud renvoyé par Djikstra
+// la variable int scenario impose quel type de noeud on cherche dans Djikstra
+void Logement::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,  
+						int& scenario, size_t i, int& compteur, double& cmt) 
+{
+	init_queue(queue, tn, i);
+	sort_queue(queue, tn);
+
+	unsigned int nd(0);
+	nd = djikstra(queue, tn, scenario, compteur);
+
+	if(nd != no_link and tn[nd]->getType() == transport)
+	{
+		cmt += tn[nd]->getAccess();
+		path_tran(tn, nd);
+		
+		scenario = scen_production;
+		nd = djikstra(queue, tn, scenario, compteur);
+		if(not(nd == no_link))	
+		{ 
+			cmt += tn[nd]->getAccess(); 
+			path_prod(tn, nd);
+		}
+	}
+	else if(nd != no_link and tn[nd]->getType() == production)
+	{
+		cmt +=  tn[nd]->getAccess();
+		path_prod(tn, nd);
+		
+		scenario = scen_transport;
+		nd = djikstra(queue, tn, scenario, compteur);
+		if(not(nd == no_link))	
+		{
+			cmt+= tn[nd]->getAccess(); 
+			path_tran(tn, nd);
+		}
+	}							
+}
+
+// applique l'algorithme de Djikstra : noeud le plus proche
+unsigned int Noeud::djikstra(vector<int>& queue, const vector<Noeud*>& tn, 
+							 int& scenario, int& compteur)
 {
 	unsigned int nd_min(0);
 	while(compteur < tn.size())
 	{
 		nd_min = find_min_access(queue, tn);
-		if(tn[nd_min]->getType() != "LOGE")
+		if(tn[nd_min]->getType() != logement)
 		{
-			if(not(typ))
+			if(not(scenario))
 			{
-				tn[nd_min]->updateIn(false);
-				if(tn[nd_min]->getType() != "PROD")		tn[nd_min]->voisins(queue, tn, nd_min);
+				tn[nd_min]->in = false;
+				if(tn[nd_min]->getType() != production)		tn[nd_min]->
+															recherche_voisins
+															(queue, tn, nd_min);
 				return nd_min;
 			}
-			switch(typ)
+			switch(scenario)
 			{
-				case 1: if(tn[nd_min]->getType() == "PROD")
+				case scen_production: if(tn[nd_min]->getType() == production)
 						{
-							tn[nd_min]->updateIn(false);
+							tn[nd_min]->in = false;
 							return nd_min;
 						}
 						break;
-				case 2: if(tn[nd_min]->getType() == "TRAN")
+				case scen_transport: if(tn[nd_min]->getType() == transport)
 						{
-							tn[nd_min]->updateIn(false);
+							tn[nd_min]->in = false;
 							return nd_min;
 						}
 						break;
 			}
 		}
-		tn[nd_min]->updateIn(false);
+		tn[nd_min]->in = false;
 		compteur++;
 
-		if(tn[nd_min]->getType() != "PROD")		tn[nd_min]->voisins(queue, tn, nd_min);
+		if(tn[nd_min]->getType() != production)		tn[nd_min]->recherche_voisins
+																(queue, tn, nd_min);
 	}
 	
 	return no_link;
 }
 
-void Noeud::voisins(vector<int>& queue, const vector<Noeud*>& tn, unsigned int nd_min)
+// update les valeurs des voisins du noeud, s'ils sont plus proches
+void Noeud::recherche_voisins(vector<int>& queue, const vector<Noeud*>& tn, 
+							  unsigned int nd_min)
 {
 	double alt(0);
-	for(auto lien : getLiens()) {
-		if(lien->getIn()) 
+	for(auto lien : tab_liens) {
+		if(lien->in) 
 		{
 			alt = getAccess() + temps_lien(lien);					
-			if(lien->getAccess() > alt) 
+			if(lien->access > alt) 
 			{
-				lien->updateAccess(alt);
-				lien->updateParent(nd_min);
+				lien->access = alt;
+				lien->parent = nd_min;
 				sort_queue(queue, tn);
 			}
 		}
@@ -387,41 +370,40 @@ void Noeud::voisins(vector<int>& queue, const vector<Noeud*>& tn, unsigned int n
 void Noeud::init_queue(vector<int>& queue, const vector<Noeud*>& tn, size_t i)
 {
 	for(size_t j(0) ; j < tn.size(); ++j) {
-		if(j == i)	continue;
-		tn[j]->updateAccess(infinite_time);
-		tn[j]->updateParent(no_link);
-		tn[j]->updateIn(true);
+		tn[j]->access = infinite_time;
+		tn[j]->parent = no_link;
+		tn[j]->in = true;
 		queue[j] = j;
 	}
 	
-	tn[i]->updateAccess(0);							
-	tn[i]->updateIn(true);
-	tn[i]->updateParent(no_link);
+	tn[i]->access = 0;							
+	tn[i]->in = true;
+	tn[i]->parent = no_link;
 	queue[i] = i;	
 }
 
-void sort_queue(vector<int>& queue, const vector<Noeud*>& tn)
+void Noeud::sort_queue(vector<int>& queue, const vector<Noeud*>& tn)
 {
-	vector<double> accesses;
+	vector<double> tab_access;
 
 	for(size_t k(0) ; k < tn.size() ; ++k) {
-		accesses.push_back(tn[queue[k]]->getAccess());
+		tab_access.push_back(tn[queue[k]]->access);
 	}
 
 	bool swap(true);
 	double tmp(0);
 	double mem(0);
-	for(size_t k(0) ; k < accesses.size() - 1 and swap; ++k) {
-		if(accesses[k+1] < accesses[k])
+	for(size_t k(0) ; k < tab_access.size() - 1 and swap; ++k) {
+		if(tab_access[k+1] < tab_access[k])
 		{
-			while(accesses[k+1] < accesses[k]) {
-				tmp = accesses[k+1];
+			while(tab_access[k+1] < tab_access[k]) {
+				tmp = tab_access[k+1];
 				mem = queue[k+1];
 				
-				accesses[k+1] = accesses[k];
+				tab_access[k+1] = tab_access[k];
 				queue[k+1] = queue[k];
 				
-				accesses[k] = tmp;
+				tab_access[k] = tmp;
 				queue[k] = mem;
 				if(k != 0 )		--k;
 			}
@@ -430,41 +412,43 @@ void sort_queue(vector<int>& queue, const vector<Noeud*>& tn)
 	}
 }
 
-unsigned int find_min_access(const vector<int>& queue, const vector<Noeud*>& tn)
+// trouve le nd le plus proche à true
+unsigned int Noeud::find_min_access(const vector<int>& queue, 
+									const vector<Noeud*>& tn)
 {
 	for(size_t k(0) ; k < tn.size() ; ++k) {
-		if(tn[queue[k]]->getIn())	return queue[k];
+		if(tn[queue[k]]->in)	return queue[k];
 	}
 }
 
-void Logement::compute_p(const vector<Noeud*>& tn, unsigned int nd)
+/* ajoute les noeuds du chemin le plus court
+ 		vers un noeud production*/
+void Logement::path_prod(const vector<Noeud*>& tn, unsigned int nd)
 {
 	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) {
-		setShort_path_prod(p);
-	}
-		
+		short_path_prod.push_back(p);
+	}	
 }
-
-void Logement::compute_t(const vector<Noeud*>& tn, unsigned int nd)
+// 		vers un noeud transport
+void Logement::path_tran(const vector<Noeud*>& tn, unsigned int nd)
 {
 	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) {
-		setShort_path_tran(p);
+		short_path_tran.push_back(p);
 	}
-	
 }
 
+// temps de connexion d'un lien
 double Noeud::temps_lien(Noeud* b) const
 {
-	double dist = norme({getX() - b->getX(),
-							getY() - b->getY()});
+	double dist = norme({getX() - b->getX(), getY() - b->getY()});
 							
-	if ((getSpeed() == fast_speed) and (b->getSpeed() == fast_speed))	return dist/fast_speed;
-	else 	return dist/default_speed;
+	if ((getSpeed() == fast_speed) and 
+		(b->getSpeed() == fast_speed))	return dist/fast_speed;
+	else 								return dist/default_speed;
 		
 }
 
 bool Noeud::operator==(const Noeud& nd) const 
 {
-	return (getX() == nd.getX() and getY() == nd.getY() and
-			getRayon() == nd.getRayon() and uid == nd.uid); 
+	return (uid == nd.uid); 
 }

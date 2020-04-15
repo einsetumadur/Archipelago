@@ -2,7 +2,7 @@
  * \name    ville.h
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    march 2020
- * \version 1.0
+ * \version Rendu 2
  */
 
 #ifndef VILLE_H
@@ -33,7 +33,7 @@ private:
 	void error_lien(Noeud* a, Noeud* b);
 	Noeud* trouve_lien(unsigned int uid) const; 
 	void redondance_uid(unsigned int numid) const;
-	void collis_noeuds();
+	void collis_noeuds() const;
 
 	std::string nom;
 	std::vector<Noeud*> quartiers;

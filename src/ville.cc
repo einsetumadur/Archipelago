@@ -2,7 +2,7 @@
  * \name    ville.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    march 2020
- * \version 1.0
+ * \version Rendu 2
  */
 
 #include <iostream>
@@ -51,12 +51,12 @@ void Ville::chargement(char* nom_fichier)
 			if(line[0]=='#')  continue;  
 			decodage(line);
 		}
-		cout << mta() << endl;
-		cout << enj() << endl;
-		cout << ci() << endl;
+		cout << "MTA : " << mta() << endl;
+		cout << "ENJ : " << enj() << endl;
+		cout << "CI : " << ci() << endl;
 		cout << error::success();
 	}
-	else cout << "unable to open file." << endl;
+	else 	cout << "unable to open file." << endl;
 }
 
 
@@ -92,9 +92,9 @@ void Ville::decodage(string line)
 	{
 		case NBL: 
 			if(!(data >> total))	cout << "wrong input format" << endl; 
-			else i = 0 ;
+			else 	i = 0 ;
 			if(total==0)	etat = NBT; 
-			else etat = LOGE ; 
+			else 	etat = LOGE ; 
 			break;
 
 		case LOGE: 	
@@ -104,21 +104,21 @@ void Ville::decodage(string line)
 
 		case NBP: 
 			if(!(data >> total))	cout << "wrong input format" << endl; 
-			else i = 0;
+			else 	i = 0;
 			if(total == 0)	etat = NBLI; 
-			else etat = PROD ; 
+			else 	etat = PROD ; 
 			break;
 
 		case PROD: 
 			ajout_noeud(data, i, PROD);
-			if(i == total)	etat = NBLI ; 
+			if(i == total) 	etat = NBLI ; 
 			break;
 
 		case NBT: 
 			if(!(data >> total))	cout << "wrong input format" << endl; 
 			else i = 0;
 			if(total==0)	etat = NBP; 
-			else etat = TRAN ; 
+			else 	etat = TRAN ; 
 			break;
 
 		case TRAN: 
@@ -146,7 +146,8 @@ void Ville::decodage(string line)
 		case FIN:  
 			break;
 
-		default:	cout << "defaultswitch error." << endl;
+		default:	
+			cout << "defaultswitch error." << endl;
 			break;
 	}
 }
@@ -269,7 +270,7 @@ void Ville::redondance_uid(unsigned int numid) const
 	}
 }
 
-void Ville::collis_noeuds() 
+void Ville::collis_noeuds() const
 {		
 	size_t sizetab(quartiers.size());
 	
@@ -281,7 +282,7 @@ void Ville::collis_noeuds()
 								quartiers[j]->getBatiment()))
 			{
 				cout << error::node_node_superposition(quartiers[i]->getUid(), 
-													quartiers[j]->getUid());
+													   quartiers[j]->getUid());
 				exit(-1);
 			}
 		}

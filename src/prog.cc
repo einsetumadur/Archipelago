@@ -11,9 +11,9 @@
 
 int main(int argc, char** argv)
 {
-	main_ville(argv[1]);
+	if(argc > 1) main_ville(argv[1]);
 
-	auto app = Gtk::Application::create(argc,argv,"Archipelago");
+	auto app = Gtk::Application::create();
 
 	MaFenetre eventWindow;
 	eventWindow.set_default_size(400,400);

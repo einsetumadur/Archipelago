@@ -50,6 +50,7 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     return true;
 }
 
+//initialisation de la fenetre 
 MaFenetre::MaFenetre():
     mainWindow(Gtk::ORIENTATION_HORIZONTAL,10),
     leftPanel(Gtk::ORIENTATION_VERTICAL,10),

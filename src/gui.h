@@ -10,6 +10,17 @@
 
 #ifndef GUI_H
 #define GUI_H
+
+struct Cadre
+{
+    double xMin; 
+	double xMax;
+	double yMin;
+	double yMax;
+	double asp; 
+	int height;  
+	int width;   
+};
 class Dessin : public Gtk::DrawingArea
 {
 public:
@@ -17,6 +28,11 @@ public:
     virtual ~Dessin();
     void affiche();
     void clear();
+    void ligne(double x1, double x2, double y1, double y2);
+    void encadre(Cadre x);
+    void encadre(double xMin, double xMax, double yMin, 
+                 double yMax, int height, int width);
+    double getAsp();
 
 protected: 
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
@@ -24,6 +40,7 @@ protected:
 private:
     bool empty;
     void refresh();
+    Cadre cadre;
 };
 
 class MaFenetre : public Gtk::Window
@@ -54,6 +71,7 @@ protected:
 
 private:
     void affiche();
+    Ville *maVille;
 };
 
 #endif

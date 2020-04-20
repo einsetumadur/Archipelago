@@ -20,6 +20,9 @@ noeud.o : noeud.cc noeud.h tools.h error.h constantes.h
 ville.o : ville.cc ville.h noeud.h 
 	$(CXX) $(CXXFLAGS) -c ville.cc -o ville.o
 
+graphics.o : graphics.cc graphics.h
+	$(CXX) $(CXXFLAGS) -c graphics.cc -o graphics.o
+
 gui.o : gui.cc gui.h ville.h
 	$(CXX) $(CXXFLAGS) $(LINKING) -c gui.cc -o gui.o
 

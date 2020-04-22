@@ -25,6 +25,7 @@ class Noeud
 public:
 	Noeud(unsigned int id,double x, double y, unsigned int capacite);
 	virtual ~Noeud() = 0;
+	std::string print();
 	// getters & setters 
 	unsigned int getNbp() const;
 	double getX() const ;
@@ -41,7 +42,8 @@ public:
 	void updateIn(bool b);	
 	void ajout_lien(Noeud* b);
 	// fonctions de tests
-	void test_nbp() const;
+	bool test_uid() const;
+	bool test_nbp() const;
 	bool multiple_link(Noeud* b)const;
 	virtual bool maxi_link() const;
 	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const; 
@@ -74,7 +76,6 @@ protected:
 	unsigned int find_min_access(const std::vector<int>& queue, 
 							     const std::vector<Noeud*>& tn);
 };
-
 
 class Logement : public Noeud 
 {
@@ -123,6 +124,6 @@ private:
 };
 
 double short_path(const std::vector<Noeud*>& tn); // MTA pour être appelé par ville
-double cout_infra(const std::vector<Noeud*>& tn); // CI pour être appelé par ville 
+double cout_infra(const std::vector<Noeud*>& tn); // CI pour être appelé par ville
 
 #endif

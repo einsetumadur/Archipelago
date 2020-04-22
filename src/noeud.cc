@@ -19,12 +19,6 @@ using namespace std;
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite): 
              uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite)
 {
-    test_nbp();
-    if(uid == no_link)
-    {
-		cout << error::reserved_uid();
-		exit(-1);
-	}		
 } 
 
 Noeud::~Noeud()
@@ -56,6 +50,12 @@ Production::Production(unsigned int id,double x, double y, unsigned int capacite
 
 Production::~Production()
 {
+}
+
+string Noeud::print()
+{
+	return to_string(uid)+" "+to_string(getX())+" "+to_string(getY())+" "+
+		   to_string(nbp);
 }
     
 string Logement::getType() const 
@@ -137,24 +137,36 @@ void Noeud::updateIn(bool b)
 	in = b;
 }
 
-
 void Noeud::ajout_lien(Noeud* b) 
 {
 	tab_liens.push_back(b);
 }
 
-void Noeud::test_nbp() const
+/* fonctions errors */
+bool Noeud::test_uid() const
+{
+	if(uid == no_link)
+    {
+		cout << error::reserved_uid();
+		return true;
+	}	
+	else 	return false;
+}
+
+bool Noeud::test_nbp() const
 {
 	if(nbp < min_capacity) 
 	{
 		cout << error::too_little_capacity(nbp);
-		exit(-1);
+		return true;
 	}
 	else if(nbp > max_capacity)
 	{
 		cout << error::too_much_capacity(nbp);
-		exit(-1);
+		return true;
 	}
+	
+	return false;
 }
 
 bool Noeud::multiple_link(Noeud* b) const
@@ -194,8 +206,7 @@ bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const
 	return false;
 } 
 
-// CI
-
+/* CI */
 double cout_infra(const vector<Noeud*>& tn)
 {
 	double cmt(0);
@@ -241,8 +252,7 @@ void Noeud::calcul_ci(Noeud* nd_lien, double& cmt)	const
 	}
 }
 
-// MTA
-
+/* MTA */
 double short_path(const vector<Noeud*>& tn)
 {
 	double cmt(0);
@@ -324,18 +334,20 @@ unsigned int Noeud::djikstra(vector<int>& queue, const vector<Noeud*>& tn,
 			}
 			switch(scenario)
 			{
-				case scen_production: if(tn[nd_min]->getType() == production)
-						{
-							tn[nd_min]->in = false;
-							return nd_min;
-						}
-						break;
-				case scen_transport: if(tn[nd_min]->getType() == transport)
-						{
-							tn[nd_min]->in = false;
-							return nd_min;
-						}
-						break;
+				case scen_production: 
+					if(tn[nd_min]->getType() == production)
+					{
+						tn[nd_min]->in = false;
+						return nd_min;
+					}
+					break;
+				case scen_transport: 
+					if(tn[nd_min]->getType() == transport)
+					{
+						tn[nd_min]->in = false;
+						return nd_min;
+					}
+					break;
 			}
 		}
 		tn[nd_min]->in = false;
@@ -421,15 +433,15 @@ unsigned int Noeud::find_min_access(const vector<int>& queue,
 	}
 }
 
-/* ajoute les noeuds du chemin le plus court
- 		vers un noeud production*/
+//	ajoute les noeuds du chemin le plus court
+		// vers un noeud production
 void Logement::path_prod(const vector<Noeud*>& tn, unsigned int nd)
 {
 	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) {
 		short_path_prod.push_back(p);
 	}	
 }
-// 		vers un noeud transport
+		// vers un noeud transport
 void Logement::path_tran(const vector<Noeud*>& tn, unsigned int nd)
 {
 	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) {

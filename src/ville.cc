@@ -22,7 +22,8 @@ namespace
 }
 
 Ville::Ville(bool val): 
-			 chargement_verif(val), nbp_nbL(0), nbp_nbP(0), nbp_nbT(0)
+			 chargement_verif(val), msg_error(NO_ERROR), error_param_un(0), 
+			 error_param_deux(0), nbp_nbL(0), nbp_nbP(0), nbp_nbT(0)
 {
 }
 
@@ -51,7 +52,7 @@ void Ville::chargement(char* nom_fichier)
 	ifstream fichier(nom_fichier); 
 	if(!fichier.fail()) 
 	{
-		while(getline(fichier >> ws,line)) 
+		while(getline(fichier >> ws,line) and chargement_verif) 
 		{
 			if(line[0] == '#')  continue;  
 			decodage(line);
@@ -112,11 +113,25 @@ bool Ville::get_chargement_verif()
 	return chargement_verif;
 }
 
+unsigned int Ville::get_error_param_un()
+{
+	return error_param_un;
+}
+
+unsigned int Ville::get_error_param_deux()
+{
+	return error_param_deux;
+}
+
 double Ville::mta()
 {
-	unsigned int nbL = nb_type(logement);
-	if(quartiers.size() == 0 or nbL == 0)		return 0;
-	else 										return short_path(quartiers)/nbL;
+	unsigned int nb_l = nb_type(logement);
+	unsigned int nb_p = nb_type(production);
+	unsigned int nb_t = nb_type(transport);
+
+	if(quartiers.size() == 0 or nb_l == 0)		return 0;
+	else 										return short_path(quartiers, nb_p,
+																  nb_t)/nb_l;
 }
 
 double Ville::enj()
@@ -207,11 +222,6 @@ void Ville::decodage(string line)
 	}
 }
 
-void Ville::update_chargement(bool val)
-{
-	chargement_verif = val;
-}
-
 void Ville::ajout_noeud(istringstream& param,int& counter, Etat_lecture type)
 {
 	unsigned int numid;
@@ -252,67 +262,102 @@ void Ville::ajout_noeud(istringstream& param,int& counter, Etat_lecture type)
 
 void Ville::error_noeud(Noeud* const nd)
 {
-	if(nd->test_uid())	update_chargement(false);
-	if(nd->test_nbp())	update_chargement(false);
-	redondance_uid(nd->getUid());
+	if(nd->test_uid() and chargement_verif)
+	{
+		chargement_verif = false;
+		msg_error = RES_U;
+		error_param_un = nd->getUid();
+	}
+	
+	Type_error val = nd->test_nbp();
+	if(val and chargement_verif)	
+	{
+		chargement_verif = false;
+		msg_error = val;
+		error_param_un = nd->getNbp();
+	}
+	
+	if(chargement_verif)	redondance_uid(nd->getUid());
 }
 	
 void Ville::creation_lien(unsigned int uid_a, unsigned int uid_b) 
 {
-	if(uid_a == uid_b)
+	if(chargement_verif and uid_a == uid_b)
 	{
 		cout << error::self_link_node(uid_a);
-		update_chargement(false);
+		chargement_verif = false;
+		msg_error = SELF_L_N;
+		error_param_un = uid_a;
 	}
 	
 	Noeud* a = trouve_lien(uid_a); 
-	if(a == nullptr)
+	Noeud* b = trouve_lien(uid_b);
+
+	if(a == nullptr and chargement_verif)
 	{
 		cout << error::link_vacuum(uid_a);
-		update_chargement(false);
+		chargement_verif = false;
+		msg_error = L_VAC;
+		error_param_un = uid_a;
 	}
-	Noeud* b = trouve_lien(uid_b);
-	if(b == nullptr)
+	if(b == nullptr and chargement_verif)
 	{
-		cout << error::link_vacuum(uid_b);
-		update_chargement(false);
+		if(chargement_verif)
+		{
+			cout << error::link_vacuum(uid_b);
+			chargement_verif = false;
+			msg_error = L_VAC;
+			error_param_un = uid_b;
+		}
 	}
 	
-	error_lien(a, b);
-		
-	a->ajout_lien(b); 
-	b->ajout_lien(a);
+	if(a != nullptr and b != nullptr and chargement_verif)
+	{
+		error_lien(a, b);
+			
+		a->ajout_lien(b); 
+		b->ajout_lien(a);
+	}
 }
 
 void Ville::error_lien(Noeud* const a, Noeud* const b)
 {
 	unsigned int uid_a = a->getUid();
 	unsigned int uid_b = b->getUid();
-	
 	if (a->multiple_link(b))
 	{
-		cout << error::multiple_same_link(uid_a, uid_b);
-		update_chargement(false);
+			cout << error::multiple_same_link(uid_a, uid_b);
+			chargement_verif = false;
+			msg_error = MULT_S_L;
+			error_param_un = uid_a;
+			error_param_deux = uid_b;
 	}
-
 	// Pour les noeuds LOGE :
-	if (a->maxi_link())
+	if (a->maxi_link() and chargement_verif)
 	{
 		cout << error::max_link(uid_a);
-		update_chargement(false);
+		chargement_verif = false;
+		msg_error = MAX_L;
+		error_param_un = uid_a;
 	}
-	if (b->maxi_link())
+	if (b->maxi_link() and chargement_verif)
 	{
 		cout << error::max_link(uid_b);
-		update_chargement(false);
+		chargement_verif = false;
+		msg_error = MAX_L;
+		error_param_un = uid_b;
 	}
-	
 	for(size_t i(0) ; i < quartiers.size() ; ++i) 
 	{
 		if(quartiers[i]->collis_lien_quartier(a, b))
 		{
-			cout << error::node_link_superposition(quartiers[i]->getUid());
-			update_chargement(false);
+			if(chargement_verif)
+			{
+				cout << error::node_link_superposition(quartiers[i]->getUid());
+				chargement_verif = false;
+				msg_error = N_L_SUP;
+				error_param_un = quartiers[i]->getUid();
+			}
 		}	
 	}
 }
@@ -334,23 +379,31 @@ void Ville::redondance_uid(unsigned int numid)
 		if(quartiers[i]->getUid() == numid)
 		{
 			cout << error::identical_uid(numid);
-			update_chargement(false);
+			chargement_verif = false;
+			msg_error = ID_U;
+			error_param_un = numid;
 		}	
 	}
 }
 
 void Ville::collis_noeuds()
-{		
-	for(size_t i(0) ; i < quartiers.size() ; ++i) 
-	{
-		for(size_t j(i+1) ; j < quartiers.size() ; ++j) 
+{	
+	if(chargement_verif)
+	{	
+		for(size_t i(0) ; i < quartiers.size() ; ++i) 
 		{
-			if(collision_cercle(quartiers[i]->getBatiment(), 
-								quartiers[j]->getBatiment()))
+			for(size_t j(i+1) ; j < quartiers.size() ; ++j) 
 			{
-				cout << error::node_node_superposition(quartiers[i]->getUid(), 
-													   quartiers[j]->getUid());
-				update_chargement(false);
+				if(collision_cercle(quartiers[i]->getBatiment(), 
+									quartiers[j]->getBatiment()))
+				{										   
+						chargement_verif = false;
+						cout << error::node_node_superposition
+								(quartiers[i]->getUid(), quartiers[j]->getUid());
+						msg_error = N_N_SUP;
+						error_param_un = quartiers[i]->getUid();
+						error_param_deux =  quartiers[j]->getUid();
+				}
 			}
 		}
 	}

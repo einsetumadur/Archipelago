@@ -25,16 +25,17 @@ public:
 	double enj();
 	double ci();
 	void chargement(char* nom_fichier);
-	void update_chargement(bool val);
 	bool get_chargement_verif();
-
-private:
-	void decodage(std::string line);
-	static Ville* getVille();
+	unsigned int get_error_param_un();
+	unsigned int get_error_param_deux();
 	// sauvegarde du fichier :
 	void sauvegarde(std::string file) const;
 	std::string print_type(std::string type) const;
 	unsigned int nb_type(std::string type) const;
+
+private:
+	void decodage(std::string line);
+	static Ville* getVille();
 	// creation de la ville & fonctions errors
 	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);
 	void error_noeud(Noeud* const nd);
@@ -45,9 +46,11 @@ private:
 	void collis_noeuds();
 
 	std::string nom;
-	std::vector<Noeud*> quartiers;
 	bool chargement_verif;
-	
+	Type_error msg_error;
+	unsigned int error_param_un;
+	unsigned int error_param_deux;
+	std::vector<Noeud*> quartiers;	
 	double nbp_nbL;
 	double nbp_nbT;
 	double nbp_nbP;

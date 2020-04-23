@@ -153,20 +153,20 @@ bool Noeud::test_uid() const
 	else 	return false;
 }
 
-bool Noeud::test_nbp() const
+Type_error Noeud::test_nbp() const
 {
 	if(nbp < min_capacity) 
 	{
 		cout << error::too_little_capacity(nbp);
-		return true;
+		return LITTLE_NBP;
 	}
 	else if(nbp > max_capacity)
 	{
 		cout << error::too_much_capacity(nbp);
-		return true;
+		return BIG_NBP;
 	}
 	
-	return false;
+	return NO_ERROR;
 }
 
 bool Noeud::multiple_link(Noeud* b) const
@@ -253,73 +253,95 @@ void Noeud::calcul_ci(Noeud* nd_lien, double& cmt)	const
 }
 
 /* MTA */
-double short_path(const vector<Noeud*>& tn)
+double short_path(const vector<Noeud*>& tn, unsigned int nb_p, unsigned int nb_t)
 {
-	double cmt(0);
+	double cmt_mta(0);
 	int scenario(scen_aleatoire);
-	int compteur(0);
+	int cmt_tab(0);
 	vector<int> queue(tn.size());
 	
 	for(size_t i(0) ; i < tn.size() ; ++i) {
 		scenario = scen_aleatoire;
-		compteur = 0;
+		cmt_tab = 0;
 		if(tn[i]->getType() == logement) 		tn[i]->diff_cas(queue, tn, scenario, 
-																i, compteur, cmt);		
+																i, cmt_tab, cmt_mta, 
+																nb_p, nb_t);		
 	}
 	
-	return (cmt);
+	return (cmt_mta);
 }
 
 void Noeud::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,  
-					 int& scenario, size_t i, int& compteur, double& cmt) 
+					 int& scenario, size_t i, int& cmt_tab, double& cmt_mta, 
+					  unsigned int nb_p, unsigned int nb_t) 
 {
 }
 
 // distingue les cas selon le type du noeud renvoyé par Djikstra
 // la variable int scenario impose quel type de noeud on cherche dans Djikstra
 void Logement::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,  
-						int& scenario, size_t i, int& compteur, double& cmt) 
+						int& scenario, size_t i, int& cmt_tab, double& cmt_mta,
+						unsigned int nb_p, unsigned int nb_t) 
 {
 	init_queue(queue, tn, i);
 	sort_queue(queue, tn);
 
 	unsigned int nd(0);
-	nd = djikstra(queue, tn, scenario, compteur);
-
-	if(nd != no_link and tn[nd]->getType() == transport)
-	{
-		cmt += tn[nd]->getAccess();
-		path_tran(tn, nd);
-		
-		scenario = scen_production;
-		nd = djikstra(queue, tn, scenario, compteur);
-		if(not(nd == no_link))	
-		{ 
-			cmt += tn[nd]->getAccess(); 
-			path_prod(tn, nd);
-		}
-	}
-	else if(nd != no_link and tn[nd]->getType() == production)
-	{
-		cmt +=  tn[nd]->getAccess();
-		path_prod(tn, nd);
-		
-		scenario = scen_transport;
-		nd = djikstra(queue, tn, scenario, compteur);
-		if(not(nd == no_link))	
+	
+	if(nb_p == 0 and nb_t == 0)		cmt_mta += infinite_time + infinite_time;
+	else
+	{		
+		nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
+		if(tn[nd]->getType() == transport)
 		{
-			cmt+= tn[nd]->getAccess(); 
+			cmt_mta += tn[nd]->getAccess();
 			path_tran(tn, nd);
+			
+			scenario = scen_production;
+			nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
+
+			if(not(nd == no_link))	
+			{ 
+				cmt_mta += tn[nd]->getAccess(); 
+				path_prod(tn, nd);
+			}
+			else 	cmt_mta += infinite_time;
 		}
+		else if(tn[nd]->getType() == production)
+		{
+			cmt_mta +=  tn[nd]->getAccess();
+			path_prod(tn, nd);
+			
+			scenario = scen_transport;
+			nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
+			if(not(nd == no_link))	
+			{
+				cmt_mta += tn[nd]->getAccess(); 
+				path_tran(tn, nd);
+			}
+			else 	cmt_mta += infinite_time;
+		}
+		else 	cmt_mta += infinite_time + infinite_time;
 	}							
 }
 
 // applique l'algorithme de Djikstra : noeud le plus proche
 unsigned int Noeud::djikstra(vector<int>& queue, const vector<Noeud*>& tn, 
-							 int& scenario, int& compteur)
+							 int& scenario, int& cmt_tab, unsigned int nb_p,
+							 unsigned int nb_t)
 {
+	switch(scenario)
+	{
+		case scen_production: 
+			if(nb_p == 0)	return no_link;
+			break;
+		case scen_transport: 
+			if(nb_t == 0)	return no_link;
+			break;
+	}
+	
 	unsigned int nd_min(0);
-	while(compteur < tn.size())
+	while(cmt_tab < tn.size())
 	{
 		nd_min = find_min_access(queue, tn);
 		if(tn[nd_min]->getType() != logement)
@@ -351,7 +373,7 @@ unsigned int Noeud::djikstra(vector<int>& queue, const vector<Noeud*>& tn,
 			}
 		}
 		tn[nd_min]->in = false;
-		compteur++;
+		cmt_tab++;
 
 		if(tn[nd_min]->getType() != production)		tn[nd_min]->recherche_voisins
 																(queue, tn, nd_min);

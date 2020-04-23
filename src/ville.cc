@@ -18,12 +18,12 @@ using namespace std;
 
 namespace
 {
-	Ville ville(0,0,0);
+	Ville ville(true);
 }
 
-Ville::Ville(unsigned int nbL, unsigned int nbT, unsigned int nbP): 
-			 nbL(nbL), nbT(nbT), nbP(nbP), nbp_nbL(0), nbp_nbP(0),
-			 nbp_nbT(0)
+Ville::Ville(bool val): 
+			 chargement_verif(val), msg_error(NO_ERROR), error_param_un(0), 
+			 error_param_deux(0), nbp_nbL(0), nbp_nbP(0), nbp_nbT(0)
 {
 }
 
@@ -34,11 +34,17 @@ Ville::~Ville()
 	}
 }
 
+Ville* Ville::getVille()
+{
+	return &ville;
+}
+
+// chargement du fichier :
+
 void main_ville(char* nom_fichier) 
 {
 	ville.chargement(nom_fichier);
 }
-
 
 void Ville::chargement(char* nom_fichier)
 {
@@ -46,9 +52,9 @@ void Ville::chargement(char* nom_fichier)
 	ifstream fichier(nom_fichier); 
 	if(!fichier.fail()) 
 	{
-		while(getline(fichier >> ws,line)) 
+		while(getline(fichier >> ws,line) and chargement_verif) 
 		{
-			if(line[0]=='#')  continue;  
+			if(line[0] == '#')  continue;  
 			decodage(line);
 		}
 		cout << "MTA : " << mta() << endl;
@@ -56,14 +62,76 @@ void Ville::chargement(char* nom_fichier)
 		cout << "CI : " << ci() << endl;
 		cout << error::success();
 	}
-	else 	cout << "unable to open file." << endl;
+	else 	
+	{
+		cout << "unable to open file." << endl;
+		chargement_verif = false;
+	}
 }
 
+// sauvegarde du fichier : 
+void Ville::sauvegarde(string file) const
+{
+	fstream fichier;
+	fichier.open(file, ios::out | ios::trunc);
+	
+	if(!fichier.is_open())	cout << "unable to save file" << file << endl;
+	else
+	{
+		fichier << print_type(logement) << endl;
+		fichier << print_type(transport) << endl;
+		fichier << print_type(production) << endl;
+	}
+	fichier.close();
+}
+
+string Ville::print_type(string type) const
+{
+	string bloc(to_string(nb_type(type)));
+	bloc[0] = nb_type(type);
+	for(auto noeud : quartiers)
+	{
+		if(noeud->getType()==type) bloc.append("\t" + noeud->print() + "\n");
+	}
+	
+	return bloc;
+}
+
+unsigned int Ville::nb_type(string type) const
+{
+	unsigned int count(0);
+	for(auto noeud : quartiers)
+	{
+		if(noeud->getType() == type)	count++;
+	}
+	
+	return count;
+}
+
+bool Ville::get_chargement_verif()
+{
+	return chargement_verif;
+}
+
+unsigned int Ville::get_error_param_un()
+{
+	return error_param_un;
+}
+
+unsigned int Ville::get_error_param_deux()
+{
+	return error_param_deux;
+}
 
 double Ville::mta()
 {
-	if(quartiers.size() == 0 or nbL == 0)		return 0;
-	else 										return short_path(quartiers)/nbL;
+	unsigned int nb_l = nb_type(logement);
+	unsigned int nb_p = nb_type(production);
+	unsigned int nb_t = nb_type(transport);
+
+	if(quartiers.size() == 0 or nb_l == 0)		return 0;
+	else 										return short_path(quartiers, nb_p,
+																  nb_t)/nb_l;
 }
 
 double Ville::enj()
@@ -77,6 +145,8 @@ double Ville::ci()
 {
 	return cout_infra(quartiers);
 }
+
+// lecture du fichier : 
 
 void Ville::decodage(string line)
 {
@@ -92,44 +162,44 @@ void Ville::decodage(string line)
 	{
 		case NBL: 
 			if(!(data >> total))	cout << "wrong input format" << endl; 
-			else 	i = 0 ;
-			if(total==0)	etat = NBT; 
-			else 	etat = LOGE ; 
+			else 					i = 0 ;
+			if(total == 0)			etat = NBT; 
+			else 					etat = LOGE ; 
 			break;
 
 		case LOGE: 	
 			ajout_noeud(data,i, LOGE);
-			if(i == total)	etat = NBT ;
+			if(i == total)			etat = NBT ;
 			break;
 
 		case NBP: 
 			if(!(data >> total))	cout << "wrong input format" << endl; 
 			else 	i = 0;
-			if(total == 0)	etat = NBLI; 
-			else 	etat = PROD ; 
+			if(total == 0)			etat = NBLI; 
+			else 					etat = PROD ; 
 			break;
 
 		case PROD: 
 			ajout_noeud(data, i, PROD);
-			if(i == total) 	etat = NBLI ; 
+			if(i == total) 			etat = NBLI ; 
 			break;
 
 		case NBT: 
 			if(!(data >> total))	cout << "wrong input format" << endl; 
 			else i = 0;
-			if(total==0)	etat = NBP; 
-			else 	etat = TRAN ; 
+			if(total==0)			etat = NBP; 
+			else 					etat = TRAN ; 
 			break;
 
 		case TRAN: 
 			ajout_noeud(data, i, TRAN);
-			if(i == total)	etat = NBP; 
+			if(i == total)			etat = NBP; 
 			break;
 
 		case NBLI: 
 			if(!(data >> total))	cout << "wrong input format" << endl; 
 			else i = 0;
-			if(total == 0)	etat = FIN; 
+			if(total == 0)			etat = FIN; 
 			else etat = LIENS ; 
 			break;
 
@@ -140,7 +210,7 @@ void Ville::decodage(string line)
 				creation_lien(uid1, uid2);
 				++i;
 			}
-			if(i == total)	etat = FIN ; 
+			if(i == total)			etat = FIN ; 
 			break;
 
 		case FIN:  
@@ -167,123 +237,173 @@ void Ville::ajout_noeud(istringstream& param,int& counter, Etat_lecture type)
 		{
 			case(LOGE):
 				quartiers.push_back(new Logement(numid,posx,posy,popmax));
-				redondance_uid(numid);
+				error_noeud(quartiers.back());
 				collis_noeuds();
-				++nbL;
 				nbp_nbL += popmax;
 				++counter;
 				break;
 			case(TRAN):
 				quartiers.push_back(new Transport(numid,posx,posy,popmax));
-				redondance_uid(numid);
+				error_noeud(quartiers.back());
 				collis_noeuds();
-				++nbT;
 				nbp_nbT += popmax;
 				++counter;
 				break;
 			case(PROD):
 				quartiers.push_back(new Production(numid,posx,posy,popmax));
-				redondance_uid(numid);
+				error_noeud(quartiers.back());
 				collis_noeuds();	
-				++nbP;		
 				nbp_nbP += popmax;	
 				++counter;
 				break;
 		}
 	}
 }
+
+void Ville::error_noeud(Noeud* const nd)
+{
+	if(nd->test_uid() and chargement_verif)
+	{
+		chargement_verif = false;
+		msg_error = RES_U;
+		error_param_un = nd->getUid();
+	}
+	
+	Type_error val = nd->test_nbp();
+	if(val and chargement_verif)	
+	{
+		chargement_verif = false;
+		msg_error = val;
+		error_param_un = nd->getNbp();
+	}
+	
+	if(chargement_verif)	redondance_uid(nd->getUid());
+}
 	
 void Ville::creation_lien(unsigned int uid_a, unsigned int uid_b) 
 {
-	if(uid_a == uid_b)
+	if(chargement_verif and uid_a == uid_b)
 	{
 		cout << error::self_link_node(uid_a);
-		exit(-1);
+		chargement_verif = false;
+		msg_error = SELF_L_N;
+		error_param_un = uid_a;
 	}
 	
 	Noeud* a = trouve_lien(uid_a); 
 	Noeud* b = trouve_lien(uid_b);
+
+	if(a == nullptr and chargement_verif)
+	{
+		cout << error::link_vacuum(uid_a);
+		chargement_verif = false;
+		msg_error = L_VAC;
+		error_param_un = uid_a;
+	}
+	if(b == nullptr and chargement_verif)
+	{
+		if(chargement_verif)
+		{
+			cout << error::link_vacuum(uid_b);
+			chargement_verif = false;
+			msg_error = L_VAC;
+			error_param_un = uid_b;
+		}
+	}
 	
-	error_lien(a, b);
-		
-	a->ajout_lien(b); 
-	b->ajout_lien(a);
+	if(a != nullptr and b != nullptr and chargement_verif)
+	{
+		error_lien(a, b);
+			
+		a->ajout_lien(b); 
+		b->ajout_lien(a);
+	}
 }
 
-void Ville::error_lien(Noeud* a, Noeud* b)
+void Ville::error_lien(Noeud* const a, Noeud* const b)
 {
 	unsigned int uid_a = a->getUid();
 	unsigned int uid_b = b->getUid();
-	
 	if (a->multiple_link(b))
 	{
-		cout << error::multiple_same_link(uid_a, uid_b);
-		exit(-1);
+			cout << error::multiple_same_link(uid_a, uid_b);
+			chargement_verif = false;
+			msg_error = MULT_S_L;
+			error_param_un = uid_a;
+			error_param_deux = uid_b;
 	}
-
 	// Pour les noeuds LOGE :
-	if (a->maxi_link())
+	if (a->maxi_link() and chargement_verif)
 	{
 		cout << error::max_link(uid_a);
-		exit(-1);
+		chargement_verif = false;
+		msg_error = MAX_L;
+		error_param_un = uid_a;
 	}
-	if (b->maxi_link())
+	if (b->maxi_link() and chargement_verif)
 	{
 		cout << error::max_link(uid_b);
-		exit(-1);
+		chargement_verif = false;
+		msg_error = MAX_L;
+		error_param_un = uid_b;
 	}
-	
 	for(size_t i(0) ; i < quartiers.size() ; ++i) 
 	{
 		if(quartiers[i]->collis_lien_quartier(a, b))
 		{
-			cout << error::node_link_superposition(quartiers[i]->getUid());
-			exit(-1);
+			if(chargement_verif)
+			{
+				cout << error::node_link_superposition(quartiers[i]->getUid());
+				chargement_verif = false;
+				msg_error = N_L_SUP;
+				error_param_un = quartiers[i]->getUid();
+			}
 		}	
 	}
 }
 
 Noeud* Ville::trouve_lien(unsigned int uid) const
 {
-	size_t sizetab(quartiers.size());
-
-	for(size_t i(0) ; i <  sizetab ; ++i)
+	for(size_t i(0) ; i <  quartiers.size() ; ++i)
 	{
 		if(uid == quartiers[i]->getUid())	return quartiers[i];
 	}
 
-	cout << error::link_vacuum(uid);
-	exit(-1);
+	return nullptr;
 }
 
-void Ville::redondance_uid(unsigned int numid) const
+void Ville::redondance_uid(unsigned int numid)
 {
-	size_t sizetab(quartiers.size());
-
-	for (size_t i(0); i < sizetab - 1 ; i++) 
+	for (size_t i(0); i < quartiers.size() - 1 ; i++) 
 	{
 		if(quartiers[i]->getUid() == numid)
 		{
 			cout << error::identical_uid(numid);
-			exit(0);
+			chargement_verif = false;
+			msg_error = ID_U;
+			error_param_un = numid;
 		}	
 	}
 }
 
-void Ville::collis_noeuds() const
-{		
-	size_t sizetab(quartiers.size());
-	
-	for(size_t i(0) ; i < sizetab ; ++i) 
-	{
-		for(size_t j(i+1) ; j < sizetab ; ++j) 
+void Ville::collis_noeuds()
+{	
+	if(chargement_verif)
+	{	
+		for(size_t i(0) ; i < quartiers.size() ; ++i) 
 		{
-			if(collision_cercle(quartiers[i]->getBatiment(), 
-								quartiers[j]->getBatiment()))
+			for(size_t j(i+1) ; j < quartiers.size() ; ++j) 
 			{
-				cout << error::node_node_superposition(quartiers[i]->getUid(), 
-													   quartiers[j]->getUid());
-				exit(-1);
+				if(collision_cercle(quartiers[i]->getBatiment(), 
+									quartiers[j]->getBatiment()))
+				{										   
+						chargement_verif = false;
+						cout << error::node_node_superposition
+								(quartiers[i]->getUid(), quartiers[j]->getUid());
+						msg_error = N_N_SUP;
+						error_param_un = quartiers[i]->getUid();
+						error_param_deux =  quartiers[j]->getUid();
+				}
 			}
 		}
 	}

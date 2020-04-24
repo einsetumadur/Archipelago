@@ -126,9 +126,9 @@ MaFenetre::MaFenetre():
     housing("housing"),
     transport("transport"),
     production("production"),
-    ENJ("ENJ :" + to_string(maVille->enj())),
-    CI("CI : "/*+ to_string(maVille->ci())*/),
-    MTA("MTA : " /* + to_string(maVille->mta())*/),
+    ENJ("ENJ : !"),
+    CI("CI : !"),
+    MTA("MTA : !"),
     generalFrame("General"),
     displayFrame("Display"),
     editorFrame("Editor"),
@@ -198,8 +198,8 @@ MaFenetre::MaFenetre():
 
     editButton.signal_clicked().connect(sigc::mem_fun(*this,
                 &MaFenetre::on_button_clicked_edit));
-    //housing.signal_toggled().connect(sigc::mem_fun(*this,
-      //          &MaFenetre::on_button_clicked_housing));
+   /* housing.signal_toggled().connect(sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_housing)); */
 
 
     graph.set_size_request(800,800);
@@ -209,11 +209,119 @@ MaFenetre::MaFenetre():
     show_all_children();
 }
 
-MaFenetre::MaFenetre(char* fichier)
+MaFenetre::MaFenetre(char* fichier):
+    mainWindow(Gtk::ORIENTATION_HORIZONTAL,10),
+    leftPanel(Gtk::ORIENTATION_VERTICAL,10),
+    rightPanel(Gtk::ORIENTATION_VERTICAL,10),
+    general(Gtk::ORIENTATION_VERTICAL,10),
+    display(Gtk::ORIENTATION_VERTICAL,10),
+    editor(Gtk::ORIENTATION_VERTICAL,10),
+    information(Gtk::ORIENTATION_VERTICAL,10),
+    exitButton("exit"),
+    newButton("new"),
+    openButton("open"),
+    saveButton("save"),
+    shortPathButton("shortest path"),
+    zoominButton("zoom in"),
+    zoomoutButton("zoom out"),
+    zoomresetButton("zoom reset"),
+    editButton("edit"),
+    housing("housing"),
+    transport("transport"),
+    production("production"),
+    generalFrame("General"),
+    displayFrame("Display"),
+    editorFrame("Editor"),
+    infoFrame("Information")
 {
     maVille = new Ville(true);
     maVille->chargement(fichier);
-    MaFenetre();
+
+    if(maVille->get_chargement_verif()) 
+    {
+        ENJ.set_label("ENJ :" + d_to_sci(maVille->enj()));
+        CI.set_label("CI : "+ d_to_sci(maVille->ci()));
+        MTA.set_label("MTA : "  + d_to_sci(maVille->mta()));
+    } else {
+        ENJ.set_label("ENJ : no file");
+        CI.set_label("CI : no file");
+        MTA.set_label("MTA : no file");
+    }
+    maVille = nullptr;
+
+    set_title("Archipelago");
+    set_icon_from_file("Archicon.png"); //haha
+    set_border_width(5);
+
+    add(mainWindow);
+
+    mainWindow.pack_start(leftPanel);
+    mainWindow.pack_start(rightPanel);
+
+    general.set_border_width(10);
+    general.pack_start(exitButton,false,false);
+    general.pack_start(newButton,false,false);
+    general.pack_start(openButton,false,false);
+    general.pack_start(saveButton,false,false);
+
+    display.set_border_width(10);
+    display.pack_start(shortPathButton,false,false);
+    display.pack_start(zoominButton,false,false);
+    display.pack_start(zoomoutButton,false,false);
+    display.pack_start(zoomresetButton,false,false);
+
+    editor.set_border_width(10);
+    editor.pack_start(editButton,false,false);
+    editor.pack_start(housing,false,false);
+    editor.pack_start(transport,false,false);
+    editor.pack_start(production,false,false);
+
+    information.set_border_width(10);
+    information.pack_start(ENJ);
+    information.pack_start(CI);
+    information.pack_start(MTA);
+
+    leftPanel.set_border_width(10);
+    leftPanel.pack_start(generalFrame);
+    leftPanel.pack_start(displayFrame);
+    leftPanel.pack_start(editorFrame);
+    leftPanel.pack_start(infoFrame);
+
+    generalFrame.add(general);
+    displayFrame.add(display);
+    editorFrame.add(editor);
+    infoFrame.add(information);
+
+    //signal Handlers
+    exitButton.signal_clicked().connect( sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_exit));
+    openButton.signal_clicked().connect(sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_open));
+    newButton.signal_clicked().connect( sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_new));
+    saveButton.signal_clicked().connect(sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_save));
+
+    shortPathButton.signal_clicked().connect( sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_shortestPath));
+    zoominButton.signal_clicked().connect(sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_zoomIn));
+    zoomoutButton.signal_clicked().connect( sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_zoomOut));
+    zoomresetButton.signal_clicked().connect(sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_zoomReset));
+
+    editButton.signal_clicked().connect(sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_edit));
+    housing.signal_toggled().connect(sigc::mem_fun(*this,
+                &MaFenetre::on_button_clicked_housing)); 
+
+
+    graph.set_size_request(800,800);
+    graph.encadre(0,800,0,800,800,800);
+    rightPanel.pack_start(graph);
+
+    show_all_children();
 }
 
 MaFenetre::~MaFenetre()
@@ -221,7 +329,7 @@ MaFenetre::~MaFenetre()
 
 void MaFenetre::on_button_clicked_exit()
 {
-    cout<<"EXIT"<<endl;
+    close();
 }
 
 void MaFenetre::on_button_clicked_new()
@@ -301,9 +409,9 @@ void MaFenetre::on_button_clicked_edit()
     else cout<<"*no type selected*"<<endl;
 }
 
-void on_button_clicked_housing()
+void MaFenetre::on_button_clicked_housing()
 {
-    
+    cout<<"housing"<<endl;
 }
 
 void on_button_clicked_transport()
@@ -319,4 +427,11 @@ void on_button_clicked_production()
 void MaFenetre::update()
 {
     
+}
+
+string d_to_sci(double num)
+{
+    ostringstream strstream;
+    strstream << num;
+    return strstream.str();
 }

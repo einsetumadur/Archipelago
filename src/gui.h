@@ -7,6 +7,8 @@
 
 #include <gtkmm.h>
 #include "ville.h"
+#include <string>
+#include <sstream>
 
 #ifndef GUI_H
 #define GUI_H
@@ -79,5 +81,7 @@ private:
     void affiche();
     Ville *maVille;
 };
+
+std::string d_to_sci(double num);
 
 #endif

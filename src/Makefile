@@ -4,7 +4,7 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -g
 LINKING = `pkg-config --cflags gtkmm-3.0`
 LDLIBS = `pkg-config --libs gtkmm-3.0`
-OFILES = prog.o noeud.o tools.o ville.o error.o gui.o
+OFILES = prog.o noeud.o tools.o ville.o error.o graphics.o gui.o
 
 all : Archipelago
 
@@ -23,7 +23,7 @@ ville.o : ville.cc ville.h noeud.h
 graphics.o : graphics.cc graphics.h
 	$(CXX) $(CXXFLAGS) -c graphics.cc -o graphics.o
 
-gui.o : gui.cc gui.h ville.h
+gui.o : gui.cc gui.h ville.h graphics.h
 	$(CXX) $(CXXFLAGS) $(LINKING) -c gui.cc -o gui.o
 
 prog.o : prog.cc ville.h gui.h

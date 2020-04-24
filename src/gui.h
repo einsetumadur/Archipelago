@@ -38,6 +38,7 @@ protected:
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
 private:
+    void projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr,Cadre cadre);
     bool empty;
     void refresh();
     Cadre cadre;
@@ -47,7 +48,9 @@ class MaFenetre : public Gtk::Window
 {
 public :
     MaFenetre();
+    MaFenetre(char* fichier);
     virtual ~MaFenetre();
+    void update();
 
 protected:
     void on_button_clicked_exit();
@@ -59,6 +62,9 @@ protected:
     void on_button_clicked_zoomOut();
     void on_button_clicked_zoomReset();
     void on_button_clicked_edit();
+    void on_button_clicked_housing();
+    void on_button_clicked_transport();
+    void on_button_clicked_production();
 
     Gtk::Box mainWindow,leftPanel,rightPanel,general,display,editor,information;
     Dessin graph;

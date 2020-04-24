@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <string>
 #include "gui.h"
 #include "ville.h"
 #include <cairomm/context.h>
@@ -28,19 +29,21 @@ void Dessin::refresh()
     }
 }
 
-void projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr,Cadre cadre)
-{
+void Dessin::projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr,Cadre cadre)
+{   
+    //double[2] graphPos = {,};
     cr->set_identity_matrix();
 	// déplace l'origine au centre de la fenêtre
-	cr->translate(cadre.width/2, cadre.height/2);
-  
-	// normalise la largeur et hauteur aux valeurs fournies par le cadrage
-	// ET inverse la direction de l'axe Y
+	cr->translate(cadre.width/2 + get_allocation().get_x(),
+                  cadre.height/2 + get_allocation().get_y()); //origine au centre fenetre 
 
-	//cr->scale(cadre.width/(cadre.xMax - cadre.xMin),-cadre.height/(cadre.yMax - cadre.yMin));
+	//cr->scale(cadre.width/(cadre.xMax - cadre.xMin),
+             //-cadre.height/(cadre.yMax - cadre.yMin));
+    cr->scale(cadre.width/(cadre.xMax-cadre.xMin),-1);
+    //cr->scale(1,cadre.height/(cadre.yMax-cadre.yMin));
   
 	// décalage au centre du cadrage
-	cr->translate(-(cadre.xMin + cadre.xMax)/2, -(cadre.yMin + cadre.yMax)/2);
+	//cr->translate(-(cadre.xMin + cadre.xMax)/2, -(cadre.yMin + cadre.yMax)/2);
 }
 
 bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
@@ -60,7 +63,16 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         cr->line_to(10,10);
         cr->move_to(-10,10);
         cr->line_to(10,-10);
+        cr->stroke();
 
+        cr->set_source_rgb(1,0,0);
+        cr->move_to(0,0);
+        cr->line_to(20,0);
+        cr->stroke();
+
+        cr->set_source_rgb(0,0,1);
+        cr->move_to(0,0);
+        cr->line_to(0,20);
         cr->stroke();
     }
     return true;
@@ -94,6 +106,7 @@ double Dessin::getAsp()
 }
 //initialisation de la fenetre 
 MaFenetre::MaFenetre():
+    maVille(nullptr),
     mainWindow(Gtk::ORIENTATION_HORIZONTAL,10),
     leftPanel(Gtk::ORIENTATION_VERTICAL,10),
     rightPanel(Gtk::ORIENTATION_VERTICAL,10),
@@ -113,9 +126,9 @@ MaFenetre::MaFenetre():
     housing("housing"),
     transport("transport"),
     production("production"),
-    ENJ("ENJ : !"),
-    CI("CI : !"),
-    MTA("MTA : !"),
+    ENJ("ENJ :" + to_string(maVille->enj())),
+    CI("CI : "/*+ to_string(maVille->ci())*/),
+    MTA("MTA : " /* + to_string(maVille->mta())*/),
     generalFrame("General"),
     displayFrame("Display"),
     editorFrame("Editor"),
@@ -185,12 +198,22 @@ MaFenetre::MaFenetre():
 
     editButton.signal_clicked().connect(sigc::mem_fun(*this,
                 &MaFenetre::on_button_clicked_edit));
+    //housing.signal_toggled().connect(sigc::mem_fun(*this,
+      //          &MaFenetre::on_button_clicked_housing));
+
 
     graph.set_size_request(800,800);
-    graph.encadre(-10,10,-10,10,800,800);
+    graph.encadre(0,800,0,800,800,800);
     rightPanel.pack_start(graph);
 
     show_all_children();
+}
+
+MaFenetre::MaFenetre(char* fichier)
+{
+    maVille = new Ville(true);
+    maVille->chargement(fichier);
+    MaFenetre();
 }
 
 MaFenetre::~MaFenetre()
@@ -225,7 +248,6 @@ void MaFenetre::on_button_clicked_open()
         {
             std::cout << "Open clicked." << std::endl;
             std::string filename = dialog.get_filename();
-            //maVille->checkdata();
             std::cout << "File selected: " <<  filename << std::endl;
             break;
         }
@@ -255,6 +277,7 @@ void MaFenetre::on_button_clicked_shortestPath()
 void MaFenetre::on_button_clicked_zoomIn()
 {
     cout<<"zoom in"<<endl;
+    //graph.cadre
 }
 
 void MaFenetre::on_button_clicked_zoomOut()
@@ -265,9 +288,35 @@ void MaFenetre::on_button_clicked_zoomOut()
 void MaFenetre::on_button_clicked_zoomReset()
 {
     cout<<"zoom reset"<<endl;
+    update();
 }
 
 void MaFenetre::on_button_clicked_edit()
 {
-    cout<<"edit link"<<endl;
+    cout<<"edit link ";
+
+    if(housing.get_active())          cout<<"for housing"<<endl;
+    else if(transport.get_active())   cout<<"for transport"<<endl;
+    else if(production.get_active())  cout<<"for production"<<endl;
+    else cout<<"*no type selected*"<<endl;
+}
+
+void on_button_clicked_housing()
+{
+    
+}
+
+void on_button_clicked_transport()
+{
+
+}
+
+void on_button_clicked_production()
+{
+
+}
+
+void MaFenetre::update()
+{
+    
 }

@@ -11,11 +11,11 @@
 
 int main(int argc, char** argv)
 {
-	if(argc > 1) main_ville(argv[1]);
-
 	auto app = Gtk::Application::create();
 
+	if(argc > 1) MaFenetre eventWindow(argv[1]);
 	MaFenetre eventWindow;
+
 	eventWindow.set_default_size(400,400);
 	eventWindow.set_resizable(false);
 

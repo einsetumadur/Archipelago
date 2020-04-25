@@ -54,7 +54,7 @@ void Ville::chargement(char* nom_fichier)
 		cout << "MTA : " << mta() << endl;
 		cout << "ENJ : " << enj() << endl;
 		cout << "CI : " << ci() << endl;
-		cout << error::success();
+		if(chargement_verif) 	cout << error::success();
 	}
 	else 	
 	{

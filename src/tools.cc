@@ -8,6 +8,7 @@
 #include <iostream>
 #include <math.h>
 #include "tools.h"
+#include "graphics.h"
 #include "constantes.h"
 
 double prod_scal(Vecteur a, Vecteur b) 
@@ -81,4 +82,19 @@ bool champ(Cercle a, Cercle b, Cercle c)
 	
 	return (prod_scal(d.directeur, ac) >= 0 and 
 			prod_scal(bc, scalaire_vecteur(-1, d.directeur)) >= 0);
+}
+
+void draw_ligne(Point c_a, Point c_b, Couleur paint)
+{
+	ligne(c_a.pos_x, c_a.pos_y, c_b.pos_x, c_b.pos_y, paint);
+}
+
+void draw_cercle(Point c, int rayon, Couleur paint)
+{
+	cercle(c.pos_x, c.pos_y, rayon, paint);
+}
+
+void draw_rectangle(Point c, double rayon, Couleur paint)
+{
+	rectangle(c.pos_x, c.pos_y, rayon, paint);
 }

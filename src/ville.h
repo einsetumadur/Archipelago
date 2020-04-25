@@ -32,6 +32,12 @@ public:
 	void sauvegarde(std::string file) const;
 	std::string print_type(std::string type) const;
 	unsigned int nb_type(std::string type) const;
+	// dessins
+	void draw_ville(Couleur paint) const;
+	void draw_liens(Couleur paint) const;
+	void draw_quartiers(Couleur paint) const;
+	void draw_short_path(Couleur paint, size_t indice_logement) const;
+
 
 private:
 	void decodage(std::string line);

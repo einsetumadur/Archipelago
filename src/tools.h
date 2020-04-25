@@ -9,6 +9,7 @@
 #define TOOLS_H
 
 #include <iostream>
+#include "graphic_color.h"
 
 struct Point 
 {
@@ -20,6 +21,7 @@ struct Cercle
 {
 	Point centre;
 	double rayon;
+
 }; 
 
 struct Vecteur 
@@ -34,6 +36,7 @@ struct Seg_droite
 	Vecteur directeur;
 };
 
+// calculs :
 double prod_scal(Vecteur a, Vecteur b);
 double norme(Vecteur a);
 Vecteur scalaire_vecteur(double k, Vecteur v);
@@ -43,5 +46,9 @@ double distance_vecteurs(Vecteur a, Vecteur b);
 bool collision_cercle(Cercle c, Cercle e);
 bool collision_droite_cercle(Cercle c, Seg_droite d);
 bool champ(Cercle a, Cercle b, Cercle c);
+// dessins :
+void draw_ligne(Point c_a, Point c_b, Couleur paint);
+void draw_rectangle(Point c, double rayon, Couleur paint);
+void draw_cercle(Point c, int rayon, Couleur paint);
 
 #endif

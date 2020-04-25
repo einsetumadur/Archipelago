@@ -11,7 +11,7 @@ all : Archipelago
 error.o : error.cc error.h constantes.h
 	$(CXX) $(CXXFLAGS) -c error.cc -o error.o
 
-tools.o : tools.cc tools.h constantes.h
+tools.o : tools.cc tools.h graphics.h constantes.h
 	$(CXX) $(CXXFLAGS) -c tools.cc -o tools.o
 
 noeud.o : noeud.cc noeud.h tools.h error.h constantes.h
@@ -21,7 +21,7 @@ ville.o : ville.cc ville.h noeud.h
 	$(CXX) $(CXXFLAGS) -c ville.cc -o ville.o
 
 graphics.o : graphics.cc graphics.h
-	$(CXX) $(CXXFLAGS) -c graphics.cc -o graphics.o
+	$(CXX) $(CXXFLAGS) $(LINKING) -c graphics.cc -o graphics.o
 
 gui.o : gui.cc gui.h ville.h graphics.h
 	$(CXX) $(CXXFLAGS) $(LINKING) -c gui.cc -o gui.o

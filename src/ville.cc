@@ -34,13 +34,7 @@ Ville::~Ville()
 	}
 }
 
-Ville* Ville::getVille()
-{
-	return &ville;
-}
-
 // chargement du fichier :
-
 void main_ville(char* nom_fichier) 
 {
 	ville.chargement(nom_fichier);
@@ -74,6 +68,10 @@ void Ville::sauvegarde(string file) const
 {
 	fstream fichier;
 	fichier.open(file, ios::out | ios::trunc);
+	
+	for(auto nd : quartiers) {
+		nd->updateIn(true);
+	}
 	
 	if(!fichier.is_open())	cout << "unable to save file" << file << endl;
 	else
@@ -146,8 +144,42 @@ double Ville::ci()
 	return cout_infra(quartiers);
 }
 
-// lecture du fichier : 
+// dessins
+void Ville::draw_ville(Couleur paint) const
+{	
+	draw_liens(paint);
+	draw_quartiers(paint);
+}
 
+void Ville::draw_liens(Couleur paint) const
+{
+	for(auto nd : quartiers) {
+		nd->updateIn(true);
+	}
+	for(auto nd : quartiers) {
+		for(auto nd_lien : nd->getLiens()) {
+			if(nd_lien->getIn() == true) {
+				draw_ligne(nd->getCentre(), nd_lien->getCentre(), paint);
+			}
+		}
+		nd->updateIn(false);
+	}
+}
+
+void Ville::draw_quartiers(Couleur paint) const
+{
+	for(auto nd : quartiers) {
+		nd->draw_noeud(paint);
+	}
+}
+
+void Ville::draw_short_path(Couleur paint, size_t indice_logement) const
+{
+	quartiers[indice_logement]->draw_noeud(ROUGE);
+	quartiers[indice_logement]->draw_path(paint);
+}
+
+// lecture du fichier : 
 void Ville::decodage(string line)
 {
 	istringstream data(line);

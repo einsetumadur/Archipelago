@@ -13,15 +13,13 @@
 #include <string>
 #include <vector>
 
+enum Type_error {NO_ERROR, RES_U, LITTLE_NBP, BIG_NBP, SELF_L_N, L_VAC, MULT_S_L, 
+				 MAX_L, N_L_SUP, ID_U, N_N_SUP};
+enum Scenario_djikstra {scen_aleatoire, scen_production, scen_transport};
+
 const std::string logement("Logement");
 const std::string production("Production");
 const std::string transport("Transport");
-constexpr int scen_aleatoire(0);
-constexpr int scen_production(1);
-constexpr int scen_transport(2);
-
-enum Type_error {NO_ERROR, RES_U, LITTLE_NBP, BIG_NBP, SELF_L_N, L_VAC, MULT_S_L, 
-				 MAX_L, N_L_SUP, ID_U, N_N_SUP};
 				 
 class Noeud 
 {
@@ -31,15 +29,16 @@ public:
 	std::string print();
 	// getters & setters 
 	unsigned int getNbp() const;
-	double getX() const ;
-	double getY() const ;
-	double getRayon() const ;
+	double getX() const;
+	double getY() const;
+	Point getCentre() const;
+	double getRayon() const;
 	Cercle getBatiment() const;
 	unsigned int getUid() const;
 	std::vector<Noeud*> getLiens() const;
 	double getAccess() const ;
 	unsigned int getParent() const ;
-	bool getIn() const ;
+	bool getIn() const;
 	virtual double getSpeed() const = 0;
 	virtual std::string getType() const = 0;
 	void updateIn(bool b);	
@@ -50,10 +49,19 @@ public:
 	bool multiple_link(Noeud* b)const;
 	virtual bool maxi_link() const;
 	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const; 
+	// fonctions de dessins
+	virtual void draw_noeud(Couleur paint) const = 0;
+	virtual void draw_path(Couleur paint) const;
 	// MTA
-	virtual void diff_cas(std::vector<int>& queue, const std::vector<Noeud*>& tn,  
-						  int& scenario, size_t i, int& cmt_tab, double& cmt_mta,
-						   unsigned int nb_p, unsigned int nb_t);
+	virtual void controle_djikstra(std::vector<int>& queue, 
+								   const std::vector<Noeud*>& tn,  
+								   Scenario_djikstra& scenario, size_t i, 
+								   int& cmt_tab, double& cmt_mta, unsigned int nb_p,
+								   unsigned int nb_t);
+	unsigned int scenario_no_link(unsigned int nb_t, unsigned int nb_p, 
+								  Scenario_djikstra& scenario);
+	unsigned int scenario_nd_min(const std::vector<Noeud*>& tn, unsigned int nd_min,
+								 Scenario_djikstra& scenario);
 	// CI
 	void calcul_ci(Noeud* nd_lien, double& cmt) const;
 	
@@ -73,8 +81,8 @@ protected:
 					size_t i);
 	void sort_queue(std::vector<int>& queue, const std::vector<Noeud*>& tn);
 	unsigned int djikstra(std::vector<int>& queue, const std::vector<Noeud*>& tn, 
-						  int& scenario, int& cmt_tab, unsigned int nb_p, 
-						  unsigned int nb_t);
+						  Scenario_djikstra& scenario, int& cmt_tab, 
+						  unsigned int nb_p, unsigned int nb_t);
 	void recherche_voisins(std::vector<int>& queue, const std::vector<Noeud*>& tn, 
 						   unsigned int nd_min);
 	double temps_lien(Noeud* b) const;	
@@ -91,13 +99,16 @@ public:
 	bool maxi_link() const override;
 	double getSpeed() const override;
 	std::string getType() const override;
-	void diff_cas(std::vector<int>& queue, const std::vector<Noeud*>& tn,  
-				  int& typ, size_t i, int& cmt_tab, double& cmt_mta, 
-				  unsigned int nb_p, unsigned int nb_t) override;
+	void controle_djikstra(std::vector<int>& queue, const std::vector<Noeud*>& tn,  
+						   Scenario_djikstra& scenario, size_t i, int& cmt_tab, 
+						   double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
+						   override;
 	void path_prod(const std::vector<Noeud*>& tn, unsigned int nd);
 	void path_tran(const std::vector<Noeud*>& tn, unsigned int nd);
+	void draw_noeud(Couleur paint) const override;
+	void draw_path(Couleur paint) const override;
 
-protected:
+private:
 	double speed;
 	std::vector<Noeud*> short_path_tran;
 	std::vector<Noeud*> short_path_prod;
@@ -111,6 +122,7 @@ public:
 	~Transport() override;
 	double getSpeed() const override;
 	std::string getType() const override;
+	void draw_noeud(Couleur paint) const override;
 
 private:
 	double speed;
@@ -123,14 +135,15 @@ public:
 	~Production() override;
 	double getSpeed() const override;
 	std::string getType() const override;
-	
+	void draw_noeud(Couleur paint) const override;
+
 private:
 	double speed;
 
 };
 
 double short_path(const std::vector<Noeud*>& tn,unsigned int nb_p, 
-				  unsigned int nb_t); // MTA pour être appelé par ville
+				  unsigned int nb_t);			  // MTA pour être appelé par ville
 double cout_infra(const std::vector<Noeud*>& tn); // CI pour être appelé par ville
 
 #endif

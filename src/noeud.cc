@@ -16,6 +16,8 @@
 
 using namespace std;
 
+constexpr int no_action(0);
+
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite): 
              uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite)
 {
@@ -57,7 +59,7 @@ string Noeud::print()
 	return to_string(uid)+" "+to_string(getX())+" "+to_string(getY())+" "+
 		   to_string(nbp);
 }
-    
+
 string Logement::getType() const 
 {
 	return logement;
@@ -83,6 +85,10 @@ double Noeud::getX() const
 double Noeud::getY() const 
 {
 	return batiment.centre.pos_y;
+}
+Point Noeud::getCentre() const
+{
+	return batiment.centre;
 }
 double Noeud::getRayon() const 
 {
@@ -206,6 +212,57 @@ bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const
 	return false;
 } 
 
+void Logement::draw_noeud(Couleur paint) const 
+{
+	draw_cercle(getCentre(), getRayon(), paint);
+}
+
+void Transport::draw_noeud(Couleur paint) const
+{
+	draw_cercle(getCentre(), getRayon(), paint);
+	
+	draw_ligne(getCentre(), {getX() + getRayon()*sqrt(2)/2, 
+							 getY() + getRayon()*sqrt(2)/2}, paint);
+	draw_ligne(getCentre(), {getX() + getRayon()*sqrt(2)/2, 
+							 getY() - getRayon()*sqrt(2)/2}, paint);
+	draw_ligne(getCentre(), {getX() - getRayon()*sqrt(2)/2, 
+							 getY() - getRayon()*sqrt(2)/2}, paint);
+	draw_ligne(getCentre(), {getX() - getRayon()*sqrt(2)/2, 
+							 getY() + getRayon()*sqrt(2)/2}, paint);
+	
+	draw_ligne(getCentre(), {getX(), getY() + getRayon()}, paint);
+	draw_ligne(getCentre(), {getX(), getY() - getRayon()}, paint);
+	draw_ligne(getCentre(), {getX() + getRayon(), getY()}, paint);
+	draw_ligne(getCentre(), {getX() - getRayon(), getY()}, paint);
+}
+
+void Production::draw_noeud(Couleur paint) const
+{
+	draw_cercle(getCentre(), getRayon(), paint);
+	draw_rectangle(getCentre(), getRayon(), paint);
+}
+
+void Noeud::draw_path(Couleur paint) const
+{
+}
+
+void Logement::draw_path(Couleur paint) const
+{
+	// chemin le plus court pour production :
+	for(size_t i(0) ; i != short_path_prod.size() - 1; ++i) {
+		short_path_prod[i]->draw_noeud(paint);
+		draw_ligne(short_path_prod[i]->getCentre(),
+				   short_path_prod[i+1]->getCentre(), paint);
+	}
+	
+	// chemin le plus court pour transport : 
+	for(size_t i(0) ; i != short_path_tran.size() - 1; ++i) {
+		short_path_tran[i]->draw_noeud(paint);
+		draw_ligne(short_path_tran[i]->getCentre(), 
+				   short_path_tran[i+1]->getCentre(), paint);
+	}
+
+}
 /* CI */
 double cout_infra(const vector<Noeud*>& tn)
 {
@@ -256,38 +313,37 @@ void Noeud::calcul_ci(Noeud* nd_lien, double& cmt)	const
 double short_path(const vector<Noeud*>& tn, unsigned int nb_p, unsigned int nb_t)
 {
 	double cmt_mta(0);
-	int scenario(scen_aleatoire);
+	Scenario_djikstra scenario(scen_aleatoire);
 	int cmt_tab(0);
 	vector<int> queue(tn.size());
 	
 	for(size_t i(0) ; i < tn.size() ; ++i) {
 		scenario = scen_aleatoire;
 		cmt_tab = 0;
-		if(tn[i]->getType() == logement) 		tn[i]->diff_cas(queue, tn, scenario, 
-																i, cmt_tab, cmt_mta, 
-																nb_p, nb_t);		
+		if(tn[i]->getType() == logement) 		tn[i]->controle_djikstra
+													   (queue, tn, scenario, i, 
+													    cmt_tab, cmt_mta, nb_p, 
+													    nb_t);		
 	}
 	
 	return (cmt_mta);
 }
 
-void Noeud::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,  
-					 int& scenario, size_t i, int& cmt_tab, double& cmt_mta, 
-					  unsigned int nb_p, unsigned int nb_t) 
+void Noeud::controle_djikstra(vector<int>& queue, const vector<Noeud*>& tn,  
+					 Scenario_djikstra& scenario, size_t i, int& cmt_tab, 
+					 double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
 {
 }
 
 // distingue les cas selon le type du noeud renvoyé par Djikstra
 // la variable int scenario impose quel type de noeud on cherche dans Djikstra
-void Logement::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,  
-						int& scenario, size_t i, int& cmt_tab, double& cmt_mta,
-						unsigned int nb_p, unsigned int nb_t) 
+void Logement::controle_djikstra(vector<int>& queue, const vector<Noeud*>& tn,  
+						Scenario_djikstra& scenario, size_t i, int& cmt_tab,
+						double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
 {
 	init_queue(queue, tn, i);
 	sort_queue(queue, tn);
-
 	unsigned int nd(0);
-	
 	if(nb_p == 0 and nb_t == 0)		cmt_mta += infinite_time + infinite_time;
 	else
 	{		
@@ -296,10 +352,8 @@ void Logement::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,
 		{
 			cmt_mta += tn[nd]->getAccess();
 			path_tran(tn, nd);
-			
 			scenario = scen_production;
 			nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
-
 			if(not(nd == no_link))	
 			{ 
 				cmt_mta += tn[nd]->getAccess(); 
@@ -311,7 +365,6 @@ void Logement::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,
 		{
 			cmt_mta +=  tn[nd]->getAccess();
 			path_prod(tn, nd);
-			
 			scenario = scen_transport;
 			nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
 			if(not(nd == no_link))	
@@ -327,18 +380,10 @@ void Logement::diff_cas(vector<int>& queue, const vector<Noeud*>& tn,
 
 // applique l'algorithme de Djikstra : noeud le plus proche
 unsigned int Noeud::djikstra(vector<int>& queue, const vector<Noeud*>& tn, 
-							 int& scenario, int& cmt_tab, unsigned int nb_p,
-							 unsigned int nb_t)
+							 Scenario_djikstra& scenario, int& cmt_tab, 
+							 unsigned int nb_p, unsigned int nb_t)
 {
-	switch(scenario)
-	{
-		case scen_production: 
-			if(nb_p == 0)	return no_link;
-			break;
-		case scen_transport: 
-			if(nb_t == 0)	return no_link;
-			break;
-	}
+	if(scenario_no_link(nb_t, nb_p, scenario) == no_link)	return no_link;
 	
 	unsigned int nd_min(0);
 	while(cmt_tab < tn.size())
@@ -354,32 +399,53 @@ unsigned int Noeud::djikstra(vector<int>& queue, const vector<Noeud*>& tn,
 															(queue, tn, nd_min);
 				return nd_min;
 			}
-			switch(scenario)
-			{
-				case scen_production: 
-					if(tn[nd_min]->getType() == production)
-					{
-						tn[nd_min]->in = false;
-						return nd_min;
-					}
-					break;
-				case scen_transport: 
-					if(tn[nd_min]->getType() == transport)
-					{
-						tn[nd_min]->in = false;
-						return nd_min;
-					}
-					break;
-			}
+			if (scenario_nd_min(tn, nd_min, scenario) == nd_min)	return nd_min;
 		}
 		tn[nd_min]->in = false;
 		cmt_tab++;
-
 		if(tn[nd_min]->getType() != production)		tn[nd_min]->recherche_voisins
 																(queue, tn, nd_min);
 	}
-	
 	return no_link;
+}
+
+unsigned int Noeud::scenario_no_link(unsigned int nb_t, unsigned int nb_p, 
+									 Scenario_djikstra& scenario)
+{
+	switch(scenario)
+	{
+		case scen_production: 
+			if(nb_p == 0)	return no_link;
+			break;
+		case scen_transport: 
+			if(nb_t == 0)	return no_link;
+			break;
+	}
+	
+	return no_action;
+}
+unsigned int Noeud::scenario_nd_min(const vector<Noeud*>& tn, unsigned int nd_min,
+									Scenario_djikstra& scenario)
+{
+	switch(scenario)
+	{
+		case scen_production: 
+			if(tn[nd_min]->getType() == production)
+			{
+				tn[nd_min]->in = false;
+				return nd_min;
+			}
+			break;
+		case scen_transport: 
+			if(tn[nd_min]->getType() == transport)
+			{
+				tn[nd_min]->in = false;
+				return nd_min;
+			}
+			break;
+	}
+	
+	return no_action;
 }
 
 // update les valeurs des voisins du noeud, s'ils sont plus proches

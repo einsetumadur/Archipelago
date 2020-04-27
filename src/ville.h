@@ -32,6 +32,7 @@ public:
 	void sauvegarde(std::string file) const;
 	std::string print_type(std::string type) const;
 	unsigned int nb_type(std::string type) const;
+	unsigned int nb_liens() const;
 	// dessins
 	void draw_ville(Couleur paint) const;
 	void draw_liens(Couleur paint) const;

@@ -54,10 +54,15 @@ Production::~Production()
 {
 }
 
-string Noeud::print()
+string Noeud::print() const
 {
 	return to_string(uid)+" "+to_string(getX())+" "+to_string(getY())+" "+
 		   to_string(nbp);
+}
+
+string Noeud::print_lien(Noeud* nd_lien) const 
+{
+	return to_string(uid)+" "+to_string(nd_lien->getUid());
 }
 
 string Logement::getType() const 

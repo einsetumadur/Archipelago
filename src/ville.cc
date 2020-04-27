@@ -51,10 +51,8 @@ void Ville::chargement(char* nom_fichier)
 			if(line[0] == '#')  continue;  
 			decodage(line);
 		}
-		cout << "MTA : " << mta() << endl;
-		cout << "ENJ : " << enj() << endl;
-		cout << "CI : " << ci() << endl;
 		if(chargement_verif) 	cout << error::success();
+		sauvegarde("fichier");
 	}
 	else 	
 	{
@@ -69,16 +67,25 @@ void Ville::sauvegarde(string file) const
 	fstream fichier;
 	fichier.open(file, ios::out | ios::trunc);
 	
-	for(auto nd : quartiers) {
-		nd->updateIn(true);
-	}
-	
 	if(!fichier.is_open())	cout << "unable to save file" << file << endl;
 	else
 	{
 		fichier << print_type(logement) << endl;
 		fichier << print_type(transport) << endl;
 		fichier << print_type(production) << endl;
+		
+		string bloc(to_string(nb_liens()));
+		for(auto nd : quartiers) {
+			nd->updateIn(true);
+		}
+		for(auto noeud : quartiers) {
+			for(auto nd_lien : noeud->getLiens()) {
+				if(nd_lien->getIn()) 	bloc.append("\t"+noeud->print_lien(nd_lien)
+													+"\n");
+			}
+			noeud->updateIn(false);
+		}
+		fichier << bloc << endl;
 	}
 	fichier.close();
 }
@@ -86,7 +93,6 @@ void Ville::sauvegarde(string file) const
 string Ville::print_type(string type) const
 {
 	string bloc(to_string(nb_type(type)));
-	bloc[0] = nb_type(type);
 	for(auto noeud : quartiers)
 	{
 		if(noeud->getType()==type) bloc.append("\t" + noeud->print() + "\n");
@@ -104,6 +110,22 @@ unsigned int Ville::nb_type(string type) const
 	}
 	
 	return count;
+}
+
+unsigned int Ville::nb_liens() const
+{
+	for(auto nd : quartiers) {
+		nd->updateIn(true);
+	}
+	unsigned int cmt(0);
+	for(auto nd : quartiers) {
+		for(auto nd_liens : nd->getLiens()) {
+			if(nd_liens->getIn() == true) 	cmt++;
+		}
+		nd->updateIn(false);
+	}
+	
+	return cmt;
 }
 
 bool Ville::get_chargement_verif()

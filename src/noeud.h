@@ -26,7 +26,8 @@ class Noeud
 public:
 	Noeud(unsigned int id,double x, double y, unsigned int capacite);
 	virtual ~Noeud() = 0;
-	std::string print();
+	std::string print() const;
+	std::string print_lien(Noeud* nd_lien) const;
 	// getters & setters 
 	unsigned int getNbp() const;
 	double getX() const;

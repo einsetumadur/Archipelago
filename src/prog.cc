@@ -13,16 +13,9 @@ int main(int argc, char** argv)
 {
 	auto app = Gtk::Application::create();
 
-	if(argc > 1) 
-	{
-		MaFenetre eventWindow(argv[1]);
-		eventWindow.set_default_size(400,400);
-		eventWindow.set_resizable(false);
-		return app->run(eventWindow);
-	} else {
-		/*MaFenetre eventWindow();
-		eventWindow.set_default_size(400,400);
-		eventWindow.set_resizable(false);
-		return app->run(eventWindow);*/
-	}
+	MaFenetre eventWindow(argv[1]);
+	eventWindow.set_default_size(1000,800);
+	eventWindow.set_resizable(false);
+	return app->run(eventWindow);
+
 }

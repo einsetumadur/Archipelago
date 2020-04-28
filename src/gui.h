@@ -15,35 +15,28 @@
 
 struct Cadre
 {
-    double xMin; 
-	double xMax;
-	double yMin;
-	double yMax;
-	double asp; 
-	int height;  
-	int width;   
+    double zoom,size;
+    double xMin,xMax;
+    double yMin,yMax; 
 };
 class Dessin : public Gtk::DrawingArea
 {
 public:
     Dessin();
     virtual ~Dessin();
-    void affiche();
+    void refresh();
     void clear();
-    void ligne(double x1, double x2, double y1, double y2);
     void encadre(Cadre x);
-    void encadre(double xMin, double xMax, double yMin, 
-                 double yMax, int height, int width);
-    double getAsp();
-
+    void encadre();
+    void set_ville(Ville* ville);
+    Cadre cadre;
 protected: 
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
 private:
     void projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr,Cadre cadre);
     bool empty;
-    void refresh();
-    Cadre cadre;
+    Ville* maVille;
 };
 
 class MaFenetre : public Gtk::Window
@@ -52,7 +45,6 @@ public :
     MaFenetre();
     MaFenetre(char* fichier);
     virtual ~MaFenetre();
-    void update();
 
 protected:
     void on_button_clicked_exit();
@@ -67,15 +59,19 @@ protected:
     void on_button_clicked_housing();
     void on_button_clicked_transport();
     void on_button_clicked_production();
+    bool on_button_press_event(GdkEventButton * event);
+    bool on_button_release_event(GdkEventButton * event);
+    bool on_key_press_event(GdkEventKey * key_event);
 
     Gtk::Box mainWindow,leftPanel,rightPanel,general,display,editor,information;
     Dessin graph;
     Gtk::Button exitButton,newButton,openButton,saveButton;
     Gtk::Button shortPathButton,zoominButton,zoomoutButton,zoomresetButton;
     Gtk::ToggleButton editButton;
-    Gtk::CheckButton housing,transport,production;
+    Gtk::RadioButtonGroup type;
+    Gtk::RadioButton housing,transport,production;
     Gtk::Frame generalFrame,displayFrame,editorFrame,infoFrame;
-    Gtk::Label ENJ,CI,MTA;
+    Gtk::Label ENJ,CI,MTA,currentZoom;
 
 private:
     void affiche();

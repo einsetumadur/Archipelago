@@ -31,9 +31,21 @@ Ville::Ville(bool val):
 
 Ville::~Ville()
 {
+}
+
+void Ville::reset()
+{
 	for(auto noeud : quartiers) {
 		delete noeud;
 	}
+	quartiers.clear();
+	chargement_verif = true;
+	msg_error = (NO_ERROR);
+	error_param_un =(0); 
+	error_param_deux = (0);
+	nbp_nbL = (0); 
+	nbp_nbP = (0);
+	nbp_nbT = (0);
 }
 
 // chargement du fichier :
@@ -184,8 +196,10 @@ double Ville::ci()
 // dessins
 void Ville::draw_ville(Couleur paint) const
 {	
+if(quartiers.size() != 0) {
 	draw_liens(paint);
 	draw_quartiers(paint);
+}
 }
 
 void Ville::draw_liens(Couleur paint) const

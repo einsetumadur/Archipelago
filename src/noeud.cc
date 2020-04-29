@@ -16,10 +16,13 @@
 
 using namespace std;
 
-constexpr int no_action(0);
+constexpr int no_action(-5);	// nbr différent de no_link choisi aléatoirement
+constexpr double angle_transport(sqrt(2)/2);
 
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite): 
-             uid(id), batiment{ {x,y}, sqrt(capacite)}, nbp(capacite)
+	uid(id), 
+	batiment{{x,y}, sqrt(capacite)}, 
+	nbp(capacite)
 {
 } 
 
@@ -28,7 +31,8 @@ Noeud::~Noeud()
 }
 
 Logement::Logement(unsigned int id,double x, double y, unsigned int capacite):
-				   Noeud(id,x,y,capacite), speed(default_speed)
+	Noeud(id,x,y,capacite), 
+	speed(default_speed)
 {
 }
 
@@ -37,7 +41,8 @@ Logement::~Logement()
 }
 			
 Transport::Transport(unsigned int id,double x, double y, unsigned int capacite):
-					 Noeud(id,x,y,capacite), speed(fast_speed)
+	Noeud(id,x,y,capacite), 
+	speed(fast_speed)
 {
 }
 
@@ -46,7 +51,8 @@ Transport::~Transport()
 }
 
 Production::Production(unsigned int id,double x, double y, unsigned int capacite):
-					   Noeud(id,x,y,capacite), speed(default_speed)
+	Noeud(id,x,y,capacite), 
+	speed(default_speed)
 {
 }
 
@@ -226,14 +232,14 @@ void Transport::draw_noeud(Couleur paint) const
 {
 	draw_cercle(getCentre(), getRayon(), paint);
 	
-	draw_ligne(getCentre(), {getX() + getRayon()*sqrt(2)/2, 
-							 getY() + getRayon()*sqrt(2)/2}, paint);
-	draw_ligne(getCentre(), {getX() + getRayon()*sqrt(2)/2, 
-							 getY() - getRayon()*sqrt(2)/2}, paint);
-	draw_ligne(getCentre(), {getX() - getRayon()*sqrt(2)/2, 
-							 getY() - getRayon()*sqrt(2)/2}, paint);
-	draw_ligne(getCentre(), {getX() - getRayon()*sqrt(2)/2, 
-							 getY() + getRayon()*sqrt(2)/2}, paint);
+	draw_ligne(getCentre(), {getX() + getRayon()*angle_transport, 
+							 getY() + getRayon()*angle_transport}, paint);
+	draw_ligne(getCentre(), {getX() + getRayon()*angle_transport, 
+							 getY() - getRayon()*angle_transport}, paint);
+	draw_ligne(getCentre(), {getX() - getRayon()*angle_transport, 
+							 getY() - getRayon()*angle_transport}, paint);
+	draw_ligne(getCentre(), {getX() - getRayon()*angle_transport, 
+							 getY() + getRayon()*angle_transport}, paint);
 	
 	draw_ligne(getCentre(), {getX(), getY() + getRayon()}, paint);
 	draw_ligne(getCentre(), {getX(), getY() - getRayon()}, paint);

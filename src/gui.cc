@@ -42,10 +42,10 @@ void Dessin::set_zoom(zAction act)
         currentZoom = 0;
         break;
     case ZIN:
-        currentZoom++;
+        currentZoom+= increment_zoom;
         break;
     case ZOUT:
-        currentZoom--;
+        currentZoom-= increment_zoom;
         break;
     default:
         cout<<"Zooming error"<<endl;
@@ -53,8 +53,6 @@ void Dessin::set_zoom(zAction act)
     }
 
     cadre.zoom = exp(-currentZoom);
-    refresh();
-    cout<<"zoom : "<<currentZoom<<endl;
 }
 
 double Dessin::get_current_zoom()
@@ -67,12 +65,13 @@ void Dessin::refresh()
     auto win = get_window();
     if(win)
     {
-        Gdk::Rectangle rect(0,0,get_allocation().get_width(),get_allocation().get_height());
+        Gdk::Rectangle rect(0,0,get_allocation().get_width(),
+							get_allocation().get_height());
         win->invalidate_rect(rect,false);
     }
 }
 
-void Dessin::projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr,Cadre cadre)
+void Dessin::projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr, Cadre cadre)
 {   
     encadre();
     double factor = cadre.size/get_allocation().get_width();
@@ -92,32 +91,28 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         graphic_set_context(cr);
 
-        cr->set_line_width(2);
+        cr->set_line_width(epaisseur_trait);
         cr->set_source_rgb(1,1,1);
         cr->move_to(0,0);
         cr->line_to(width,0);
         cr->line_to(width,height);
         cr->line_to(0,height);
         cr->line_to(0,0);
+        cr->paint();
         cr->stroke();
 
         projectionOrtho(cr,cadre);
+        
 
         if(!(maVille == nullptr))
         {  
             maVille->draw_ville(NOIR);
-            cout<<"tried to show ville"<<endl;
+            if(not(maVille->get_chargement_verif()))
+            {
+				maVille->reset();
+				// ICI UPDATE MTA, CI, ENJ ENCORE !
+			}
         } 
-
-        cr->set_source_rgb(1,0,0);
-        cr->move_to(0,0);
-        cr->line_to(20,0);
-        cr->stroke();
-
-        cr->set_source_rgb(0,0,1);
-        cr->move_to(0,0);
-        cr->line_to(0,20);
-        cr->stroke();
     }
     return true;
 }
@@ -129,8 +124,7 @@ void Dessin::encadre(Cadre x)
 
 void Dessin::encadre()
 {
-    if(cadre.zoom <= 0.0) cadre.zoom = 1;
-    cadre.size = get_allocation().get_width()/cadre.zoom;
+    cadre.size = get_allocation().get_width()/(cadre.zoom + zoom_initial);
     cadre.xMax = cadre.size/2;
     cadre.xMin = -cadre.yMin;
     cadre.yMin = cadre.xMin;
@@ -140,11 +134,10 @@ void Dessin::encadre()
 //initialisation de la fenetre 
 MaFenetre::MaFenetre()
 {
-
 }
 
 MaFenetre::MaFenetre(char* fichier):
-    mainWindow(Gtk::ORIENTATION_HORIZONTAL,10),
+	mainWindow(Gtk::ORIENTATION_HORIZONTAL,10),
     leftPanel(Gtk::ORIENTATION_VERTICAL,10),
     rightPanel(Gtk::ORIENTATION_VERTICAL,10),
     general(Gtk::ORIENTATION_VERTICAL,10),
@@ -176,10 +169,10 @@ MaFenetre::MaFenetre(char* fichier):
     graph.get_ville_ptr()->chargement(fichier);
 
     set_title("Archipelago");
-    set_icon_from_file("Archicon.png"); //haha
+    set_icon_from_file("Archicon.png"); 
     set_border_width(5);
 
-    graph.set_size_request(800,800);
+    graph.set_size_request(size_graphe,size_graphe);
     currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
 
     add(mainWindow);
@@ -187,31 +180,31 @@ MaFenetre::MaFenetre(char* fichier):
     mainWindow.pack_start(leftPanel);
     mainWindow.pack_start(rightPanel);
 
-    general.set_border_width(10);
+    general.set_border_width(epaisseur_bord);
     general.pack_start(exitButton,false,false);
     general.pack_start(newButton,false,false);
     general.pack_start(openButton,false,false);
     general.pack_start(saveButton,false,false);
 
-    display.set_border_width(10);
+    display.set_border_width(epaisseur_bord);
     display.pack_start(shortPathButton,false,false);
     display.pack_start(zoominButton,false,false);
     display.pack_start(zoomoutButton,false,false);
     display.pack_start(zoomresetButton,false,false);
     display.pack_start(currentZoom);
 
-    editor.set_border_width(10);
+    editor.set_border_width(epaisseur_bord);
     editor.pack_start(editButton,false,false);
     editor.pack_start(housing,false,false);
     editor.pack_start(transport,false,false);
     editor.pack_start(production,false,false);
 
-    information.set_border_width(10);
+    information.set_border_width(epaisseur_bord);
     information.pack_start(ENJ);
     information.pack_start(CI);
     information.pack_start(MTA);
 
-    leftPanel.set_border_width(10);
+    leftPanel.set_border_width(epaisseur_bord);
     leftPanel.pack_start(generalFrame);
     leftPanel.pack_start(displayFrame);
     leftPanel.pack_start(editorFrame);
@@ -261,12 +254,13 @@ MaFenetre::~MaFenetre()
 
 void MaFenetre::on_button_clicked_exit()
 {
+	cout << "Exit" << endl;
     close();
 }
 
 void MaFenetre::on_button_clicked_new()
 {
-    if(graph.get_ville_ptr() == nullptr) graph.set_ville(new Ville(true));
+    if(graph.get_ville_ptr() == nullptr)	graph.set_ville(new Ville(true));
     else 
     {
         graph.get_ville_ptr()->reset();
@@ -277,7 +271,7 @@ void MaFenetre::on_button_clicked_new()
 void MaFenetre::on_button_clicked_open()
 {
     Gtk::FileChooserDialog dialog("Please choose a file",
-          Gtk::FILE_CHOOSER_ACTION_OPEN);
+								  Gtk::FILE_CHOOSER_ACTION_OPEN);
     dialog.set_transient_for(*this);
 
     dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
@@ -289,14 +283,14 @@ void MaFenetre::on_button_clicked_open()
     {
         case(Gtk::RESPONSE_OK):
         {
-            cout<<"avant open : "<<graph.get_ville_ptr();
-            //delete graph.get_ville_ptr();
-            cout<<" apres delete : "<<graph.get_ville_ptr()<<endl;
             string filename = dialog.get_filename();
+            
             if(graph.get_ville_ptr()==nullptr) graph.set_ville(new Ville(true));
-            cout<<"chargement de "<<filename<<" dans adresse "<<graph.get_ville_ptr()<<endl;
-            graph.get_ville_ptr()->chargement(&filename[0]);
-            if(graph.get_ville_ptr()->get_chargement_verif()) update();
+            
+            graph.get_ville_ptr()->reset();
+			graph.get_ville_ptr()->chargement(&filename[0]);
+            if(graph.get_ville_ptr()->get_chargement_verif())	update();
+   
             break;
         }
         case(Gtk::RESPONSE_CANCEL):
@@ -314,11 +308,12 @@ void MaFenetre::on_button_clicked_open()
 
 void MaFenetre::on_button_clicked_save()
 {
-    if(graph.get_ville_ptr() == nullptr) cout<<"nothing to save"<<endl;
+    if(graph.get_ville_ptr() == nullptr)	cout<<"nothing to save"<<endl;
     else 
     {
+		cout << "Save" << endl;
         Gtk::FileChooserDialog dialog("Please choose a file",
-            Gtk::FILE_CHOOSER_ACTION_SAVE);
+									  Gtk::FILE_CHOOSER_ACTION_SAVE);
         dialog.set_transient_for(*this);
 
         dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
@@ -332,7 +327,7 @@ void MaFenetre::on_button_clicked_save()
             {
                 string filename = dialog.get_filename();
                 cout << "File selected: " <<  filename << std::endl;
-                if(graph.get_ville_ptr()==nullptr) break;
+                if(graph.get_ville_ptr()==nullptr)	break;
                 graph.get_ville_ptr()->sauvegarde(filename);
                 break;
             }
@@ -358,21 +353,24 @@ void MaFenetre::on_button_clicked_shortestPath()
 void MaFenetre::on_button_clicked_zoomIn()
 {
     graph.set_zoom(ZIN);
+    graph.encadre();
     currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
-    graph.refresh();
+	graph.refresh();
     cout<<"zoomed in"<<endl;
 }
 
 void MaFenetre::on_button_clicked_zoomOut()
 {
     graph.set_zoom(ZOUT);
+    graph.encadre();
     currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
-    graph.refresh();
+	graph.refresh();
     cout<<"zoomed out"<<endl;
 }
 void MaFenetre::on_button_clicked_zoomReset()
 {
     graph.set_zoom(ZR);
+    graph.encadre();
     currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
     graph.refresh();
     cout<<"zoom reset"<<endl;
@@ -426,11 +424,11 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 		{ 
 			//double[2] p = {clic_x - dessin_x, clic_y - dessin_y};
 			
-			if(event->button == 1) // Left click
+			if(event->button == left_click) 
 			{
 				cout<<"mouse left clicked"<<endl;
 			}
-			else if(event->button == 3) // Right click
+			else if(event->button == right_click) 
 			{
 				cout<<"mouse right clicked"<<endl;
 			}
@@ -456,11 +454,11 @@ bool MaFenetre::on_button_release_event(GdkEventButton * event)
 		{ 
 			//double[2] p = {clic_x - dessin_x, clic_y - dessin_y};
 			
-			if(event->button == 1) // Left click release
+			if(event->button == left_click) 
 			{
 				cout<<"mouse left released"<<endl;
 			}
-			else if(event->button == 3) // Right click release
+			else if(event->button == right_click) 
 			{
 				cout<<"mouse right released"<<endl;
 			}
@@ -475,16 +473,16 @@ bool MaFenetre::on_key_press_event(GdkEventKey * key_event)
 	{
 		switch(gdk_keyval_to_unicode(key_event->keyval))
 		{
-			case 'a':
+			case a:
 				cout<<"typed a"<<endl;
 				break;
-			case 'w':
+			case w:
 				cout<<"typed w"<<endl;
 				break;
-            case 's':
+            case s:
 				cout<<"typed s"<<endl;
 				break;
-			case 'd':
+			case d:
 				cout<<"typed d"<<endl;
 				break;
 		}

@@ -28,6 +28,7 @@ public:
 	bool get_chargement_verif();
 	unsigned int get_error_param_un();
 	unsigned int get_error_param_deux();
+	void reset();
 	// sauvegarde du fichier :
 	void sauvegarde(std::string file) const;
 	std::string print_type(std::string type) const;

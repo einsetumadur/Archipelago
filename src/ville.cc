@@ -16,6 +16,8 @@
 
 using namespace std;
 
+const string nb(" # nb");
+
 namespace
 {
 	Ville ville(true);
@@ -52,7 +54,6 @@ void Ville::chargement(char* nom_fichier)
 			decodage(line);
 		}
 		if(chargement_verif) 	cout << error::success();
-		sauvegarde("fichier");
 	}
 	else 	
 	{
@@ -70,14 +71,27 @@ void Ville::sauvegarde(string file) const
 	if(!fichier.is_open())	cout << "unable to save file" << file << endl;
 	else
 	{
+		fichier << nb+logement << endl;
+		fichier << to_string(nb_type(logement)) << endl;
+		fichier << "#"+logement+":" << endl;
 		fichier << print_type(logement) << endl;
+		
+		fichier << nb+transport << endl;
+		fichier << to_string(nb_type(transport)) << endl;
+		fichier << "#"+transport+":" << endl;
 		fichier << print_type(transport) << endl;
+		
+		fichier << nb+production << endl;
+		fichier << to_string(nb_type(production)) << endl;
+		fichier << "#"+production+":" << endl;
 		fichier << print_type(production) << endl;
 		
 		string bloc(to_string(nb_liens()));
+		
 		for(auto nd : quartiers) {
 			nd->updateIn(true);
 		}
+		
 		for(auto noeud : quartiers) {
 			for(auto nd_lien : noeud->getLiens()) {
 				if(nd_lien->getIn()) 	bloc.append("\t"+noeud->print_lien(nd_lien)
@@ -92,7 +106,8 @@ void Ville::sauvegarde(string file) const
 
 string Ville::print_type(string type) const
 {
-	string bloc(to_string(nb_type(type)));
+	//string bloc(to_string(nb_type(type)));
+	string bloc("");
 	for(auto noeud : quartiers)
 	{
 		if(noeud->getType()==type) bloc.append("\t" + noeud->print() + "\n");

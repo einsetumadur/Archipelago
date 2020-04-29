@@ -40,9 +40,8 @@ public:
 	void draw_quartiers(Couleur paint) const;
 	void draw_short_path(Couleur paint, size_t indice_logement) const;
 
-
 private:
-	void decodage(std::string line);
+	void decodage(std::string line, int& etat);
 	static Ville* getVille();
 	// creation de la ville & fonctions errors
 	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);

@@ -56,16 +56,28 @@ void main_ville(char* nom_fichier)
 
 void Ville::chargement(char* nom_fichier)
 {
+	reset();
 	string line;
 	ifstream fichier(nom_fichier); 
 	if(!fichier.fail()) 
 	{
+		cout<<"############ en charge ############"<<endl;
 		while(getline(fichier >> ws,line) and chargement_verif) 
 		{
 			if(line[0] == '#')  continue;  
+			cout<<line<<endl;
 			decodage(line);
 		}
+		cout<<"##################################"<<endl;
 		if(chargement_verif) 	cout << error::success();
+		cout<<"########## in memory #############"<<endl;
+		for (auto node : quartiers)
+		{
+			cout<<node->print()<<endl;
+		}
+		cout<<"taille quartier : "<<quartiers.size()<<endl;
+		cout<<"##################################"<<endl;
+		
 	}
 	else 	
 	{

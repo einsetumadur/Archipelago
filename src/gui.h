@@ -40,7 +40,7 @@ private:
     void projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr,Cadre cadre);
     bool empty;
     Cadre cadre;
-    int currentZoom;
+    double currentZoom;
     Ville* maVille;
 };
 

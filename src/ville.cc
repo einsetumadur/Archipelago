@@ -17,6 +17,7 @@
 using namespace std;
 
 const string nb(" # nb");
+const string nb_link("# nb link");
 
 namespace
 {
@@ -24,8 +25,13 @@ namespace
 }
 
 Ville::Ville(bool val): 
-			 chargement_verif(val), msg_error(NO_ERROR), error_param_un(0), 
-			 error_param_deux(0), nbp_nbL(0), nbp_nbP(0), nbp_nbT(0)
+	chargement_verif(val), 
+	msg_error(NO_ERROR), 
+	error_param_un(0), 
+	error_param_deux(0), 
+	nbp_nbL(0), 
+	nbp_nbP(0), 
+	nbp_nbT(0)
 {
 }
 
@@ -35,17 +41,24 @@ Ville::~Ville()
 
 void Ville::reset()
 {
-	for(auto noeud : quartiers) {
-		delete noeud;
+	if(not(quartiers.empty()))
+	{
+		for(auto nd : quartiers) {
+			nd->getLiens().clear();
+		}
+		
+		for(auto noeud : quartiers) {
+			delete noeud;
+		}
+		quartiers.clear();
 	}
-	quartiers.clear();
 	chargement_verif = true;
-	msg_error = (NO_ERROR);
-	error_param_un =(0); 
-	error_param_deux = (0);
-	nbp_nbL = (0); 
-	nbp_nbP = (0);
-	nbp_nbT = (0);
+	msg_error = NO_ERROR;
+	error_param_un = 0; 
+	error_param_deux = 0;
+	nbp_nbL = 0; 
+	nbp_nbP = 0;
+	nbp_nbT = 0;
 }
 
 // chargement du fichier :
@@ -55,29 +68,18 @@ void main_ville(char* nom_fichier)
 }
 
 void Ville::chargement(char* nom_fichier)
-{
-	reset();
+{	
 	string line;
 	ifstream fichier(nom_fichier); 
 	if(!fichier.fail()) 
-	{
-		cout<<"############ en charge ############"<<endl;
+	{	
+		int etat = NBL; 
 		while(getline(fichier >> ws,line) and chargement_verif) 
 		{
 			if(line[0] == '#')  continue;  
-			cout<<line<<endl;
-			decodage(line);
+			decodage(line, etat);			
 		}
-		cout<<"##################################"<<endl;
-		if(chargement_verif) 	cout << error::success();
-		cout<<"########## in memory #############"<<endl;
-		for (auto node : quartiers)
-		{
-			cout<<node->print()<<endl;
-		}
-		cout<<"taille quartier : "<<quartiers.size()<<endl;
-		cout<<"##################################"<<endl;
-		
+		if(chargement_verif) 	cout << error::success() << endl; 
 	}
 	else 	
 	{
@@ -110,7 +112,9 @@ void Ville::sauvegarde(string file) const
 		fichier << "#"+production+":" << endl;
 		fichier << print_type(production) << endl;
 		
+		fichier << nb_link << endl;
 		string bloc(to_string(nb_liens()));
+		bloc.append("\n");
 		
 		for(auto nd : quartiers) {
 			nd->updateIn(true);
@@ -130,7 +134,6 @@ void Ville::sauvegarde(string file) const
 
 string Ville::print_type(string type) const
 {
-	//string bloc(to_string(nb_type(type)));
 	string bloc("");
 	for(auto noeud : quartiers)
 	{
@@ -208,10 +211,8 @@ double Ville::ci()
 // dessins
 void Ville::draw_ville(Couleur paint) const
 {	
-if(quartiers.size() != 0) {
 	draw_liens(paint);
 	draw_quartiers(paint);
-}
 }
 
 void Ville::draw_liens(Couleur paint) const
@@ -243,11 +244,9 @@ void Ville::draw_short_path(Couleur paint, size_t indice_logement) const
 }
 
 // lecture du fichier : 
-void Ville::decodage(string line)
+void Ville::decodage(string line, int& etat)
 {
 	istringstream data(line);
-
-	static int etat(NBL); 
 	static int i(0);
 	static int total(0);
 	unsigned int uid1;
@@ -259,7 +258,7 @@ void Ville::decodage(string line)
 			if(!(data >> total))	cout << "wrong input format" << endl; 
 			else 					i = 0 ;
 			if(total == 0)			etat = NBT; 
-			else 					etat = LOGE ; 
+			else 					etat = LOGE ;    
 			break;
 
 		case LOGE: 	
@@ -323,7 +322,7 @@ void Ville::ajout_noeud(istringstream& param,int& counter, Etat_lecture type)
 	unsigned int popmax;
 	double posx;
 	double posy;
-
+	
 	if( !(param >> numid >> posx >> posy >> popmax))	cout << "wrong input format" 
 															 << endl;
 	else

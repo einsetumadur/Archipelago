@@ -32,6 +32,7 @@ public:
     void set_ville(Ville* ville);
     void set_zoom(zAction act);
     double get_current_zoom();
+    Ville* get_ville_ptr();
 protected: 
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
@@ -80,7 +81,6 @@ protected:
 
 private:
     void affiche();
-    Ville *maVille;
 };
 
 std::string d_to_sci(double num);

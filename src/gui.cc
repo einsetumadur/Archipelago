@@ -29,6 +29,11 @@ void Dessin::set_ville(Ville* ville)
     maVille = ville;
 }
 
+Ville* Dessin::get_ville_ptr()
+{
+    return maVille;
+}
+
 void Dessin::set_zoom(zAction act)
 {
     switch (act)
@@ -100,7 +105,7 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         if(!(maVille == nullptr))
         {  
-            maVille->draw_ville(ROUGE);
+            maVille->draw_ville(NOIR);
             cout<<"tried to show ville"<<endl;
         } 
 
@@ -155,6 +160,9 @@ MaFenetre::MaFenetre(char* fichier):
     zoomoutButton("zoom out"),
     zoomresetButton("zoom reset"),
     currentZoom("zoom : ?"),
+    MTA("MTA : ?"),
+    CI("CI : ?"),
+    ENJ("ENJ : ?"),
     editButton("edit link"),
     housing(type,"housing"),
     transport(type,"transport"),
@@ -164,29 +172,14 @@ MaFenetre::MaFenetre(char* fichier):
     editorFrame("Editor"),
     infoFrame("Information")
 {
-    maVille = new Ville(true);
-    maVille->chargement(fichier);
-
-    if(maVille->get_chargement_verif()) 
-    {
-        ENJ.set_label("ENJ :" + d_to_sci(maVille->enj()));
-        CI.set_label("CI : "+ d_to_sci(maVille->ci()));
-        MTA.set_label("MTA : "  + d_to_sci(maVille->mta()));
-    } else {
-        ENJ.set_label("ENJ : no file");
-        CI.set_label("CI : no file");
-        MTA.set_label("MTA : no file");
-        maVille = nullptr;
-    }
-
-    housing.set_active(true);
+    graph.set_ville(new Ville(true));
+    graph.get_ville_ptr()->chargement(fichier);
 
     set_title("Archipelago");
     set_icon_from_file("Archicon.png"); //haha
     set_border_width(5);
 
     graph.set_size_request(800,800);
-    graph.set_ville(maVille);
     currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
 
     add(mainWindow);
@@ -260,6 +253,7 @@ MaFenetre::MaFenetre(char* fichier):
     rightPanel.pack_start(graph);
 
     show_all_children();
+    update();
 }
 
 MaFenetre::~MaFenetre()
@@ -272,11 +266,11 @@ void MaFenetre::on_button_clicked_exit()
 
 void MaFenetre::on_button_clicked_new()
 {
-    if(maVille == nullptr) maVille = new Ville(true);
+    if(graph.get_ville_ptr() == nullptr) graph.set_ville(new Ville(true));
     else 
     {
-        delete maVille;
-        maVille = new Ville(true);
+        graph.get_ville_ptr()->reset();
+        update();
     }
 }
 
@@ -295,12 +289,14 @@ void MaFenetre::on_button_clicked_open()
     {
         case(Gtk::RESPONSE_OK):
         {
+            cout<<"avant open : "<<graph.get_ville_ptr();
+            //delete graph.get_ville_ptr();
+            cout<<" apres delete : "<<graph.get_ville_ptr()<<endl;
             string filename = dialog.get_filename();
-            cout << "File selected: " <<  filename << std::endl;
-            if(maVille==nullptr) maVille = new Ville(true);
-            maVille->chargement(&filename[0]);
-            graph.set_ville(maVille);
-            if(maVille->get_chargement_verif()) update();
+            if(graph.get_ville_ptr()==nullptr) graph.set_ville(new Ville(true));
+            cout<<"chargement de "<<filename<<" dans adresse "<<graph.get_ville_ptr()<<endl;
+            graph.get_ville_ptr()->chargement(&filename[0]);
+            if(graph.get_ville_ptr()->get_chargement_verif()) update();
             break;
         }
         case(Gtk::RESPONSE_CANCEL):
@@ -318,7 +314,7 @@ void MaFenetre::on_button_clicked_open()
 
 void MaFenetre::on_button_clicked_save()
 {
-    if(maVille == nullptr) cout<<"nothing to save"<<endl;
+    if(graph.get_ville_ptr() == nullptr) cout<<"nothing to save"<<endl;
     else 
     {
         Gtk::FileChooserDialog dialog("Please choose a file",
@@ -336,8 +332,8 @@ void MaFenetre::on_button_clicked_save()
             {
                 string filename = dialog.get_filename();
                 cout << "File selected: " <<  filename << std::endl;
-                if(maVille==nullptr) break;
-                maVille->sauvegarde(filename);
+                if(graph.get_ville_ptr()==nullptr) break;
+                graph.get_ville_ptr()->sauvegarde(filename);
                 break;
             }
             case(Gtk::RESPONSE_CANCEL):
@@ -500,8 +496,8 @@ bool MaFenetre::on_key_press_event(GdkEventKey * key_event)
 void MaFenetre::update()
 {
     currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
-    ENJ.set_label("ENJ :" + d_to_sci(maVille->enj()));
-    CI.set_label("CI : "+ d_to_sci(maVille->ci()));
-    MTA.set_label("MTA : "  + d_to_sci(maVille->mta()));
+    ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
+    CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
+    MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
     graph.refresh();
 }

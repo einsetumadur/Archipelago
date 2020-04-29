@@ -13,6 +13,7 @@
 #ifndef GUI_H
 #define GUI_H
 
+enum zAction {ZR,ZIN,ZOUT};
 struct Cadre
 {
     double zoom,size;
@@ -29,13 +30,16 @@ public:
     void encadre(Cadre x);
     void encadre();
     void set_ville(Ville* ville);
-    Cadre cadre;
+    void set_zoom(zAction act);
+    double get_current_zoom();
 protected: 
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
 private:
     void projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr,Cadre cadre);
     bool empty;
+    Cadre cadre;
+    int currentZoom;
     Ville* maVille;
 };
 
@@ -45,6 +49,7 @@ public :
     MaFenetre();
     MaFenetre(char* fichier);
     virtual ~MaFenetre();
+    void update();
 
 protected:
     void on_button_clicked_exit();

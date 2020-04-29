@@ -17,7 +17,7 @@ using namespace std;
 
 Dessin::Dessin(): empty(false)
 {
-    cadre.zoom = 1;
+    set_zoom(ZR);
     cadre.size = 1;
 }
 
@@ -27,6 +27,34 @@ Dessin::~Dessin()
 void Dessin::set_ville(Ville* ville)
 {
     maVille = ville;
+}
+
+void Dessin::set_zoom(zAction act)
+{
+    switch (act)
+    {
+    case ZR:
+        currentZoom = 0;
+        break;
+    case ZIN:
+        currentZoom++;
+        break;
+    case ZOUT:
+        currentZoom--;
+        break;
+    default:
+        cout<<"Zooming error"<<endl;
+        break;
+    }
+
+    cadre.zoom = exp(-currentZoom);
+    refresh();
+    cout<<"zoom : "<<currentZoom<<endl;
+}
+
+double Dessin::get_current_zoom()
+{
+    return cadre.zoom;
 }
 
 void Dessin::refresh()
@@ -56,6 +84,7 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         Gtk::Allocation allocation = get_allocation();
         const int width = allocation.get_width();
         const int height = allocation.get_height();
+
         graphic_set_context(cr);
 
         cr->set_line_width(2);
@@ -69,7 +98,11 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         projectionOrtho(cr,cadre);
 
-        if(!(maVille == nullptr)) maVille->draw_ville(ROUGE);
+        if(!(maVille == nullptr))
+        {  
+            maVille->draw_ville(ROUGE);
+            cout<<"tried to show ville"<<endl;
+        } 
 
         cr->set_source_rgb(1,0,0);
         cr->move_to(0,0);
@@ -154,6 +187,7 @@ MaFenetre::MaFenetre(char* fichier):
 
     graph.set_size_request(800,800);
     graph.set_ville(maVille);
+    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
 
     add(mainWindow);
 
@@ -265,6 +299,8 @@ void MaFenetre::on_button_clicked_open()
             cout << "File selected: " <<  filename << std::endl;
             if(maVille==nullptr) maVille = new Ville(true);
             maVille->chargement(&filename[0]);
+            graph.set_ville(maVille);
+            if(maVille->get_chargement_verif()) update();
             break;
         }
         case(Gtk::RESPONSE_CANCEL):
@@ -325,23 +361,25 @@ void MaFenetre::on_button_clicked_shortestPath()
 
 void MaFenetre::on_button_clicked_zoomIn()
 {
-    graph.cadre.zoom += 0.1;
+    graph.set_zoom(ZIN);
+    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
     graph.refresh();
-    cout<<"zoom in : "<<graph.cadre.zoom<<endl;
+    cout<<"zoomed in"<<endl;
 }
 
 void MaFenetre::on_button_clicked_zoomOut()
 {
-    graph.cadre.zoom -= 0.1;
+    graph.set_zoom(ZOUT);
+    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
     graph.refresh();
-    cout<<"zoom out : "<<graph.cadre.zoom<<endl;
+    cout<<"zoomed out"<<endl;
 }
-
 void MaFenetre::on_button_clicked_zoomReset()
 {
-    graph.cadre.zoom = 1;
+    graph.set_zoom(ZR);
+    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
     graph.refresh();
-    cout<<"zoom reset : "<<graph.cadre.zoom<<endl;
+    cout<<"zoom reset"<<endl;
 }
 
 void MaFenetre::on_button_clicked_edit()
@@ -459,3 +497,11 @@ bool MaFenetre::on_key_press_event(GdkEventKey * key_event)
 	return Gtk::Window::on_key_press_event(key_event);
 }
 
+void MaFenetre::update()
+{
+    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
+    ENJ.set_label("ENJ :" + d_to_sci(maVille->enj()));
+    CI.set_label("CI : "+ d_to_sci(maVille->ci()));
+    MTA.set_label("MTA : "  + d_to_sci(maVille->mta()));
+    graph.refresh();
+}

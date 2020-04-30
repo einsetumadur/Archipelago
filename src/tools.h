@@ -1,8 +1,8 @@
 /**\
- * \name   tools.h
- * \author Regamey Gilles & Zakeeruddin Sufyan 
- * \date    April 2020
- * \version 2.0
+ * \name    tools.h
+ * \author  Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    Mai 2020
+ * \version Rendu 2 - Architecture 11 b1
  */
  
 #ifndef TOOLS_H

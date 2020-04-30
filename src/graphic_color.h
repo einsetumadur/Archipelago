@@ -8,7 +8,7 @@
 #ifndef GRAPHIC_COLOR_H
 #define GRAPHIC_COLOR_H
 
-enum Couleur {NOIR, ROUGE, VERT};
+enum Couleur {NOIR, ROUGE, VERT, BLANC};
 
 constexpr double epaisseur_trait(5.5);
 constexpr double epaisseur_bord(10);

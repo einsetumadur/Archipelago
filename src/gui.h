@@ -14,12 +14,14 @@
 #define GUI_H
 
 enum zAction {ZR,ZIN,ZOUT};
+
 struct Cadre
 {
     double zoom,size;
     double xMin,xMax;
     double yMin,yMax; 
 };
+
 class Dessin : public Gtk::DrawingArea
 {
 public:

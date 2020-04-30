@@ -1,8 +1,8 @@
 /**\
  * \name    noeud.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
- * \version Rendu 2
+ * \date    Mai 2020
+ * \version Rendu 2 - Architecture 11 b1
  */
 
 #include <iostream>
@@ -74,84 +74,6 @@ string Noeud::print() const
 string Noeud::print_lien(Noeud* nd_lien) const 
 {
 	return to_string(uid)+" "+to_string(nd_lien->getUid());
-}
-
-string Logement::getType() const 
-{
-	return logement;
-}
-string Production::getType() const 
-{
-	return production;
-}
-string Transport::getType() const 
-{
-	return transport;
-}
-
-unsigned int Noeud::getNbp() const
-{
-    return nbp;
-}
-
-double Noeud::getX() const 
-{
-	return batiment.centre.pos_x;
-}
-double Noeud::getY() const 
-{
-	return batiment.centre.pos_y;
-}
-Point Noeud::getCentre() const
-{
-	return batiment.centre;
-}
-double Noeud::getRayon() const 
-{
-	return batiment.rayon;
-}
-Cercle Noeud::getBatiment() const  
-{
-	return batiment;
-}
-unsigned int Noeud::getUid() const 
-{
-	return uid;
-}
-
-vector<Noeud*> Noeud::getLiens() const
-{
-	return tab_liens;
-}
-
-double Noeud::getAccess() const 
-{
-	return access;
-}
-
-unsigned int Noeud::getParent() const
-{
-	return parent;
-}
-
-bool Noeud::getIn() const
-{
-	return in;
-}
-
-double Production::getSpeed() const
-{
-	return speed;
-}
-
-double Logement::getSpeed() const
-{
-	return speed;
-}
-
-double Transport::getSpeed() const
-{
-	return speed;
 }
 
 void Noeud::updateIn(bool b)

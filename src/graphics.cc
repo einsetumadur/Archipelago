@@ -1,13 +1,11 @@
 /**\
- * \name   graphics.cc
- * \author Regamey Gilles & Zakeeruddin Sufyan 
+ * \name    graphics.cc
+ * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    march 2020
- * \version 1.0
+ * \version Rendu 2 - Architecture 11 b1
  */
 
 #include "graphic_gui.h"
-#include <iostream>
-using namespace std;
 
 constexpr double rapport_vertical(4.);
 constexpr double rapport_horizon(0.75);

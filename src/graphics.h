@@ -1,8 +1,8 @@
 /**\
- * \name   graphics.h
- * \author Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
- * \version 1.0
+ * \name    graphics.h
+ * \author  Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    Mai 2020
+ * \version Rendu 2 - Architecture 11 b1
  */
 
 #ifndef GRAPHIC_H
@@ -16,4 +16,6 @@ void rectangle(double c_x, double c_y, double rayon, Couleur paint);
 void choix_couleur(Couleur paint);
 
 #endif 
+
+
 

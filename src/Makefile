@@ -11,13 +11,13 @@ all : Archipelago
 error.o : error.cc error.h constantes.h
 	$(CXX) $(CXXFLAGS) -c error.cc -o error.o
 
-tools.o : tools.cc tools.h graphics.h constantes.h
+tools.o : tools.cc tools.h graphics.h 
 	$(CXX) $(CXXFLAGS) -c tools.cc -o tools.o
 
 noeud.o : noeud.cc noeud.h tools.h error.h constantes.h
 	$(CXX) $(CXXFLAGS) -c noeud.cc -o noeud.o
 
-ville.o : ville.cc ville.h noeud.h 
+ville.o : ville.cc ville.h noeud.h constantes.h
 	$(CXX) $(CXXFLAGS) -c ville.cc -o ville.o
 
 graphics.o : graphics.cc graphics.h

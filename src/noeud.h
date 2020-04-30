@@ -28,6 +28,7 @@ public:
 	virtual ~Noeud() = 0;
 	std::string print() const;
 	std::string print_lien(Noeud* nd_lien) const;
+	void reset_tab_liens();
 	// getters & setters 
 	unsigned int getNbp() const;
 	double getX() const;

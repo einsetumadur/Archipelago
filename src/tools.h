@@ -1,8 +1,8 @@
 /**\
  * \name   tools.h
  * \author Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
- * \version 1.0
+ * \date    April 2020
+ * \version 2.0
  */
  
 #ifndef TOOLS_H
@@ -43,8 +43,8 @@ Vecteur scalaire_vecteur(double k, Vecteur v);
 Vecteur projection(Vecteur a, Vecteur b);
 Vecteur vecteur_orthogonal(Point p, Seg_droite d);
 double distance_vecteurs(Vecteur a, Vecteur b);
-bool collision_cercle(Cercle c, Cercle e);
-bool collision_droite_cercle(Cercle c, Seg_droite d);
+bool collision_cercle(Cercle c, Cercle e, double dist_min);
+bool collision_droite_cercle(Cercle c, Seg_droite d, double dist_min);
 bool champ(Cercle a, Cercle b, Cercle c);
 // dessins :
 void draw_ligne(Point c_a, Point c_b, Couleur paint);

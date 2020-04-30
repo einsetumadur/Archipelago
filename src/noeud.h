@@ -1,8 +1,8 @@
 /**\
- * \name   noeud.h
- * \author Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
- * \version Rendu 2
+ * \name    noeud.h
+ * \author  Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    Mai 2020
+ * \version Rendu 2 - Architecture 11 b1
  */
  
 #ifndef NOEUD_H
@@ -16,44 +16,49 @@
 enum Type_error {NO_ERROR, RES_U, LITTLE_NBP, BIG_NBP, SELF_L_N, L_VAC, MULT_S_L, 
 				 MAX_L, N_L_SUP, ID_U, N_N_SUP};
 enum Scenario_djikstra {scen_aleatoire, scen_production, scen_transport};
-
-const std::string logement("Logement");
-const std::string production("Production");
-const std::string transport("Transport");
+		 
+const std::string logement = "Logement";
+const std::string production  = "Production";
+const std::string transport = "Transport";
 				 
 class Noeud 
 {
 public:
 	Noeud(unsigned int id,double x, double y, unsigned int capacite);
 	virtual ~Noeud() = 0;
+	
 	std::string print() const;
 	std::string print_lien(Noeud* nd_lien) const;
+	void ajout_lien(Noeud* b);
 	void reset_tab_liens();
+	
 	// getters & setters 
-	unsigned int getNbp() const;
-	double getX() const;
-	double getY() const;
-	Point getCentre() const;
-	double getRayon() const;
-	Cercle getBatiment() const;
-	unsigned int getUid() const;
-	std::vector<Noeud*> getLiens() const;
-	double getAccess() const ;
-	unsigned int getParent() const ;
-	bool getIn() const;
+	unsigned int getNbp() const { return nbp; }
+	double getX() const { return batiment.centre.pos_x; }
+	double getY() const { return batiment.centre.pos_y; }
+	Point getCentre() const { return batiment.centre; }
+	double getRayon() const { return batiment.rayon; }
+	Cercle getBatiment() const { return batiment; }
+	unsigned int getUid() const { return uid; }
+	std::vector<Noeud*> getLiens() const { return tab_liens; }
+	double getAccess() const { return access; }
+	unsigned int getParent() const { return parent; }
+	bool getIn() const { return in; }
 	virtual double getSpeed() const = 0;
 	virtual std::string getType() const = 0;
 	void updateIn(bool b);	
-	void ajout_lien(Noeud* b);
+	
 	// fonctions de tests
 	bool test_uid() const;
 	Type_error test_nbp() const;
 	bool multiple_link(Noeud* b)const;
 	virtual bool maxi_link() const;
 	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const; 
+	
 	// fonctions de dessins
 	virtual void draw_noeud(Couleur paint) const = 0;
 	virtual void draw_path(Couleur paint) const;
+	
 	// MTA
 	virtual void controle_djikstra(std::vector<int>& queue, 
 								   const std::vector<Noeud*>& tn,  
@@ -99,8 +104,8 @@ public:
 	Logement(unsigned int id,double x, double y, unsigned int capacite);
 	~Logement() override;
 	bool maxi_link() const override;
-	double getSpeed() const override;
-	std::string getType() const override;
+	double getSpeed() const override { return speed; }
+	std::string getType() const override { return logement; }
 	void controle_djikstra(std::vector<int>& queue, const std::vector<Noeud*>& tn,  
 						   Scenario_djikstra& scenario, size_t i, int& cmt_tab, 
 						   double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
@@ -122,8 +127,8 @@ class Transport : public Noeud
 public:
 	Transport(unsigned int id,double x, double y, unsigned int capacite);
 	~Transport() override;
-	double getSpeed() const override;
-	std::string getType() const override;
+	double getSpeed() const override { return speed; }
+	std::string getType() const override { return transport; }
 	void draw_noeud(Couleur paint) const override;
 
 private:
@@ -135,8 +140,8 @@ class Production : public Noeud
 public:
 	Production(unsigned int id,double x, double y, unsigned int capacite);
 	~Production() override;
-	double getSpeed() const override;
-	std::string getType() const override;
+	double getSpeed() const override { return speed; }
+	std::string getType() const override { return production; }
 	void draw_noeud(Couleur paint) const override;
 
 private:

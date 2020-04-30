@@ -60,6 +60,11 @@ Production::~Production()
 {
 }
 
+void Noeud::reset_tab_liens() 
+{
+	tab_liens.clear();
+}
+
 string Noeud::print() const
 {
 	return to_string(uid)+" "+to_string(getX())+" "+to_string(getY())+" "+
@@ -188,8 +193,7 @@ Type_error Noeud::test_nbp() const
 
 bool Noeud::multiple_link(Noeud* b) const
 {
-	for(size_t i(0) ; i < tab_liens.size() ; ++i) 
-	{
+	for(size_t i(0) ; i < tab_liens.size() ; ++i) {
 		if(tab_liens[i] == b)	return true;
 	}
 	
@@ -216,7 +220,7 @@ bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const
 			Point p = {lien_a->getX(), lien_a->getY()};
 			Seg_droite d = {p, {lien_b->getX() - lien_a->getX(), 
 								lien_b->getY() - lien_a->getY()}};
-			if(collision_droite_cercle(this->batiment, d))	return true;
+			if(collision_droite_cercle(this->batiment, d, dist_min))	return true;
 		}
 	}
 	

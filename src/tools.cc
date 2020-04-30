@@ -1,15 +1,14 @@
 /**\
  * \name   tools.cc
  * \author Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
- * \version 1.0
+ * \date    April 2020
+ * \version 2.0
  */
 
 #include <iostream>
 #include <math.h>
 #include "tools.h"
 #include "graphics.h"
-#include "constantes.h"
 
 double prod_scal(Vecteur a, Vecteur b) 
 {
@@ -51,22 +50,22 @@ double distance_vecteurs(Vecteur a, Vecteur b)
     return norme(v);
 }
 
-bool collision_cercle(Cercle c, Cercle e) 
+bool collision_cercle(Cercle c, Cercle e, double dist_min) 
 {
     Vecteur a = {c.centre.pos_x, c.centre.pos_y};
     Vecteur b = {e.centre.pos_x, e.centre.pos_y};
     double dist = distance_vecteurs(a, b);
     double somme_rayon = (c.rayon + e.rayon);
     
-    return ( dist <= (somme_rayon) );
+    return (dist <= ((somme_rayon) + dist_min));
 }
 
-bool collision_droite_cercle(Cercle c, Seg_droite d) 
+bool collision_droite_cercle(Cercle c, Seg_droite d, double dist_min) 
 {
 	Vecteur v = vecteur_orthogonal(c.centre, d);
 	Vecteur a = {c.centre.pos_x - d.debut.pos_x, c.centre.pos_y - d.debut.pos_y};
 
-	return  (norme(v) <= (c.rayon) and 
+	return  (norme(v) <= ((c.rayon) + dist_min) and 
 			(norme(projection(a, d.directeur)) <= norme(d.directeur)));
 }
 

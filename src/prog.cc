@@ -1,8 +1,8 @@
 /**\
- * \name   prog.cc
- * \author Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
- * \version 1.0
+ * \name    prog.cc
+ * \author  Regamey Gilles & Zakeeruddin Sufyan 
+ * \date    Mai 2020
+ * \version Rendu 2 - Architecture 11 b1
  */
 
 #include <iostream>
@@ -19,3 +19,4 @@ int main(int argc, char** argv)
 	return app->run(eventWindow);
 
 }
+

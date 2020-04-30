@@ -13,6 +13,7 @@
 #include "ville.h"
 #include "noeud.h"
 #include "error.h"
+#include "constantes.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ void Ville::reset()
 	if(not(quartiers.empty()))
 	{
 		for(auto nd : quartiers) {
-			nd->getLiens().clear();
+			nd->reset_tab_liens();
 		}
 		
 		for(auto noeud : quartiers) {
@@ -364,7 +365,7 @@ void Ville::error_noeud(Noeud* const nd)
 	}
 	
 	Type_error val = nd->test_nbp();
-	if(val and chargement_verif)	
+	if(val != NO_ERROR and chargement_verif)	
 	{
 		chargement_verif = false;
 		msg_error = val;
@@ -489,7 +490,7 @@ void Ville::collis_noeuds()
 			for(size_t j(i+1) ; j < quartiers.size() ; ++j) 
 			{
 				if(collision_cercle(quartiers[i]->getBatiment(), 
-									quartiers[j]->getBatiment()))
+									quartiers[j]->getBatiment(), dist_min))
 				{										   
 						chargement_verif = false;
 						cout << error::node_node_superposition

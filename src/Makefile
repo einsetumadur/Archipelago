@@ -23,7 +23,7 @@ ville.o : ville.cc ville.h noeud.h constantes.h
 graphics.o : graphics.cc graphics.h
 	$(CXX) $(CXXFLAGS) $(LINKING) -c graphics.cc -o graphics.o
 
-gui.o : gui.cc gui.h ville.h graphics.h
+gui.o : gui.cc gui.h ville.h graphics.h constantes.h
 	$(CXX) $(CXXFLAGS) $(LINKING) -c gui.cc -o gui.o
 
 prog.o : prog.cc ville.h gui.h

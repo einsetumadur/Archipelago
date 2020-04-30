@@ -11,6 +11,7 @@
 #include "graphic_color.h"
 #include "graphic_gui.h"
 #include "ville.h"
+#include "constantes.h"
 #include <cairomm/context.h>
 
 using namespace std;
@@ -42,10 +43,10 @@ void Dessin::set_zoom(zAction act)
         currentZoom = 0;
         break;
     case ZIN:
-        currentZoom+= increment_zoom;
+        currentZoom+= delta_zoom;
         break;
     case ZOUT:
-        currentZoom-= increment_zoom;
+        currentZoom-= delta_zoom;
         break;
     default:
         cout<<"Zooming error"<<endl;
@@ -106,12 +107,14 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         if(!(maVille == nullptr))
         {  
-            maVille->draw_ville(NOIR);
             if(not(maVille->get_chargement_verif()))
             {
 				maVille->reset();
+				maVille->draw_ville(NOIR);
 				// ICI UPDATE MTA, CI, ENJ ENCORE !
 			}
+			else 	maVille->draw_ville(NOIR);
+
         } 
     }
     return true;
@@ -124,7 +127,7 @@ void Dessin::encadre(Cadre x)
 
 void Dessin::encadre()
 {
-    cadre.size = get_allocation().get_width()/(cadre.zoom + zoom_initial);
+    cadre.size = get_allocation().get_width()/(cadre.zoom);
     cadre.xMax = cadre.size/2;
     cadre.xMin = -cadre.yMin;
     cadre.yMin = cadre.xMin;
@@ -172,7 +175,7 @@ MaFenetre::MaFenetre(char* fichier):
     set_icon_from_file("Archicon.png"); 
     set_border_width(5);
 
-    graph.set_size_request(size_graphe,size_graphe);
+    graph.set_size_request(800, 800);
     currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
 
     add(mainWindow);

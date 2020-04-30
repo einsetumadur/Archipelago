@@ -1,8 +1,8 @@
 /**\
  * \name    ville.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
- * \version Rendu 2
+ * \date    Mai 2020
+ * \version Rendu 2 - Architecture 11 b1
  */
 
 #include <iostream>
@@ -17,8 +17,8 @@
 
 using namespace std;
 
-const string nb(" # nb");
-const string nb_link("# nb link");
+constexpr char nb[] = " # nb";
+constexpr char nb_link[] = "# nb link";
 
 namespace
 {
@@ -94,7 +94,6 @@ void Ville::sauvegarde(string file) const
 {
 	fstream fichier;
 	fichier.open(file, ios::out | ios::trunc);
-	
 	if(!fichier.is_open())	cout << "unable to save file" << file << endl;
 	else
 	{
@@ -116,11 +115,9 @@ void Ville::sauvegarde(string file) const
 		fichier << nb_link << endl;
 		string bloc(to_string(nb_liens()));
 		bloc.append("\n");
-		
 		for(auto nd : quartiers) {
 			nd->updateIn(true);
 		}
-		
 		for(auto noeud : quartiers) {
 			for(auto nd_lien : noeud->getLiens()) {
 				if(nd_lien->getIn()) 	bloc.append("\t"+noeud->print_lien(nd_lien)
@@ -169,21 +166,6 @@ unsigned int Ville::nb_liens() const
 	}
 	
 	return cmt;
-}
-
-bool Ville::get_chargement_verif()
-{
-	return chargement_verif;
-}
-
-unsigned int Ville::get_error_param_un()
-{
-	return error_param_un;
-}
-
-unsigned int Ville::get_error_param_deux()
-{
-	return error_param_deux;
 }
 
 double Ville::mta()

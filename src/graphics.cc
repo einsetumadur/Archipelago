@@ -7,7 +7,7 @@
 
 #include "graphic_gui.h"
 
-constexpr double rapport_vertical(4.);
+constexpr double rapport_vertical(8);
 constexpr double rapport_horizon(0.75);
 
 static const Cairo::RefPtr<Cairo::Context>* ptcr(nullptr); 
@@ -64,14 +64,15 @@ void cercle(double c_x, double c_y, double rayon, Couleur paint)
 
 void rectangle(double c_x, double c_y, double rayon, Couleur paint)
 {
+
 	(*ptcr)->set_line_width(epaisseur_trait);
 	choix_couleur(paint);
-	(*ptcr)->move_to(c_x, c_y + rayon/ rapport_vertical); 
-	(*ptcr)->line_to(c_x - (rapport_horizon*rayon), c_y + rayon/rapport_vertical);
-	(*ptcr)->move_to(c_x, c_y + rayon/ rapport_vertical); 
+	(*ptcr)->move_to(c_x - (rapport_horizon*rayon), c_y + rayon/rapport_vertical);
 	(*ptcr)->line_to(c_x + (rapport_horizon*rayon), c_y + rayon/rapport_vertical);
 	(*ptcr)->line_to(c_x + (rapport_horizon*rayon), c_y - rayon/rapport_vertical);
 	(*ptcr)->line_to(c_x - (rapport_horizon*rayon), c_y - rayon/rapport_vertical);
 	(*ptcr)->line_to(c_x - (rapport_horizon*rayon), c_y + rayon/rapport_vertical);
+	(*ptcr)->line_to(c_x + (rapport_horizon*rayon), c_y + rayon/rapport_vertical);
 	(*ptcr)->stroke();
+	
 }

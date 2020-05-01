@@ -12,25 +12,21 @@
 
 double prod_scal(Vecteur a, Vecteur b) 
 {
-	
 	return a.x*b.x + a.y*b.y;
 }
 
 double norme(Vecteur a) 
 {
-	
 	return sqrt(prod_scal(a,a));
 }
 
 Vecteur scalaire_vecteur(double k, Vecteur v) 
 {		
-	
 	return {k*v.x, k*v.y};
 }
 
 Vecteur projection(Vecteur a, Vecteur b) 
 {
-	
 	return	scalaire_vecteur(prod_scal(a,b)/prod_scal(b,b), b);
 }
 

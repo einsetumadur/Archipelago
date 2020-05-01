@@ -36,7 +36,7 @@ struct Seg_droite
 	Vecteur directeur;
 };
 
-// calculs :
+// calculs 
 double prod_scal(Vecteur a, Vecteur b);
 double norme(Vecteur a);
 Vecteur scalaire_vecteur(double k, Vecteur v);
@@ -46,7 +46,7 @@ double distance_vecteurs(Vecteur a, Vecteur b);
 bool collision_cercle(Cercle c, Cercle e, double dist_min);
 bool collision_droite_cercle(Cercle c, Seg_droite d, double dist_min);
 bool champ(Cercle a, Cercle b, Cercle c);
-// dessins :
+// dessins 
 void draw_ligne(Point c_a, Point c_b, Couleur paint);
 void draw_rectangle(Point c, double rayon, Couleur paint);
 void draw_cercle(Point c, int rayon, Couleur paint);

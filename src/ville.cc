@@ -66,7 +66,7 @@ void Ville::chargement(char* nom_fichier)
 {	
 	string line;
 	ifstream fichier(nom_fichier); 
-	if(nom_fichier == nullptr) cout<<"no file selected"<<endl; 
+	if(nom_fichier == nullptr)  cout << "no file selected" << endl; 
 	else if(!fichier.fail()) 
 	{	
 		int etat = NBL; 
@@ -75,7 +75,7 @@ void Ville::chargement(char* nom_fichier)
 			if(line[0] == '#')  continue;  
 			decodage(line, etat);			
 		}
-		if(chargement_verif) 	cout << error::success() << endl; 
+		if(chargement_verif)  cout << error::success() << endl; 
 	}
 	else 	
 	{
@@ -84,101 +84,20 @@ void Ville::chargement(char* nom_fichier)
 	}
 }
 
-// sauvegarde du fichier : 
-void Ville::sauvegarde(string file) const
-{
-	fstream fichier;
-	fichier.open(file, ios::out | ios::trunc);
-	if(!fichier.is_open())	cout << "unable to save file" << file << endl;
-	else
-	{
-		fichier << nb+logement << endl;
-		fichier << to_string(nb_type(logement)) << endl;
-		fichier << "#"+logement+":" << endl;
-		fichier << print_type(logement) << endl;
-		
-		fichier << nb+transport << endl;
-		fichier << to_string(nb_type(transport)) << endl;
-		fichier << "#"+transport+":" << endl;
-		fichier << print_type(transport) << endl;
-		
-		fichier << nb+production << endl;
-		fichier << to_string(nb_type(production)) << endl;
-		fichier << "#"+production+":" << endl;
-		fichier << print_type(production) << endl;
-		
-		fichier << nb_link << endl;
-		string bloc(to_string(nb_liens()));
-		bloc.append("\n");
-		for(auto nd : quartiers) {
-			nd->updateIn(true);
-		}
-		for(auto noeud : quartiers) {
-			for(auto nd_lien : noeud->getLiens()) {
-				if(nd_lien->getIn()) 	bloc.append("\t"+noeud->print_lien(nd_lien)
-													+"\n");
-			}
-			noeud->updateIn(false);
-		}
-		fichier << bloc << endl;
-	}
-	fichier.close();
-}
-
-string Ville::print_type(string type) const
-{
-	string bloc("");
-	for(auto noeud : quartiers)
-	{
-		if(noeud->getType()==type) bloc.append("\t" + noeud->print() + "\n");
-	}
-	
-	return bloc;
-}
-
-unsigned int Ville::nb_type(string type) const
-{
-	unsigned int count(0);
-	for(auto noeud : quartiers)
-	{
-		if(noeud->getType() == type)	count++;
-	}
-	
-	return count;
-}
-
-unsigned int Ville::nb_liens() const
-{
-	for(auto nd : quartiers) {
-		nd->updateIn(true);
-	}
-	unsigned int cmt(0);
-	for(auto nd : quartiers) {
-		for(auto nd_liens : nd->getLiens()) {
-			if(nd_liens->getIn() == true) 	cmt++;
-		}
-		nd->updateIn(false);
-	}
-	
-	return cmt;
-}
-
 double Ville::mta()
 {
 	unsigned int nb_l = nb_type(logement);
 	unsigned int nb_p = nb_type(production);
 	unsigned int nb_t = nb_type(transport);
 
-	if(quartiers.size() == 0 or nb_l == 0)		return 0;
-	else 										return short_path(quartiers, nb_p,
-																  nb_t)/nb_l;
+	if(quartiers.size() == 0 or nb_l == 0)  return 0;
+	else  return short_path(quartiers, nb_p, nb_t)/nb_l;
 }
 
 double Ville::enj()
 {
-	if(quartiers.size() == 0)	return 0;
-	else 						return (nbp_nbL - (nbp_nbT + nbp_nbP))/ 
-									   (nbp_nbL + nbp_nbP + nbp_nbT);
+	if(quartiers.size() == 0)  return 0;
+	else  return (nbp_nbL - (nbp_nbT + nbp_nbP))/(nbp_nbL + nbp_nbP + nbp_nbT);
 }
 
 double Ville::ci()
@@ -186,42 +105,8 @@ double Ville::ci()
 	return cout_infra(quartiers);
 }
 
-// dessins
-void Ville::draw_ville(Couleur paint) const
-{	
-	draw_liens(paint);
-	draw_quartiers(paint);
-}
+///////////////////////////// Lecture fichier //////////////////////////////////////
 
-void Ville::draw_liens(Couleur paint) const
-{
-	for(auto nd : quartiers) {
-		nd->updateIn(true);
-	}
-	for(auto nd : quartiers) {
-		for(auto nd_lien : nd->getLiens()) {
-			if(nd_lien->getIn() == true) {
-				draw_ligne(nd->getCentre(), nd_lien->getCentre(), paint);
-			}
-		}
-		nd->updateIn(false);
-	}
-}
-
-void Ville::draw_quartiers(Couleur paint) const
-{
-	for(auto nd : quartiers) {
-		nd->draw_noeud(paint);
-	}
-}
-
-void Ville::draw_short_path(Couleur paint, size_t indice_logement) const
-{
-	quartiers[indice_logement]->draw_noeud(ROUGE);
-	quartiers[indice_logement]->draw_path(paint);
-}
-
-// lecture du fichier : 
 void Ville::decodage(string line, int& etat)
 {
 	istringstream data(line);
@@ -233,56 +118,56 @@ void Ville::decodage(string line, int& etat)
 	switch(etat) 
 	{
 		case NBL: 
-			if(!(data >> total))	cout << "wrong input format" << endl; 
-			else 					i = 0 ;
-			if(total == 0)			etat = NBT; 
-			else 					etat = LOGE ;    
+			if(!(data >> total))  cout << "wrong input format" << endl; 
+			else  i = 0 ;
+			if(total == 0)  etat = NBT; 
+			else  etat = LOGE ;    
 			break;
 
 		case LOGE: 	
 			ajout_noeud(data,i, LOGE);
-			if(i == total)			etat = NBT ;
+			if(i == total)  etat = NBT ;
 			break;
 
 		case NBP: 
-			if(!(data >> total))	cout << "wrong input format" << endl; 
-			else 	i = 0;
-			if(total == 0)			etat = NBLI; 
-			else 					etat = PROD ; 
+			if(!(data >> total))  cout << "wrong input format" << endl; 
+			else  i = 0;
+			if(total == 0)  etat = NBLI; 
+			else  etat = PROD ; 
 			break;
 
 		case PROD: 
 			ajout_noeud(data, i, PROD);
-			if(i == total) 			etat = NBLI ; 
+			if(i == total)  etat = NBLI ; 
 			break;
 
 		case NBT: 
-			if(!(data >> total))	cout << "wrong input format" << endl; 
+			if(!(data >> total))  cout << "wrong input format" << endl; 
 			else i = 0;
-			if(total==0)			etat = NBP; 
-			else 					etat = TRAN ; 
+			if(total==0)  etat = NBP; 
+			else  etat = TRAN ; 
 			break;
 
 		case TRAN: 
 			ajout_noeud(data, i, TRAN);
-			if(i == total)			etat = NBP; 
+			if(i == total)  etat = NBP; 
 			break;
 
 		case NBLI: 
-			if(!(data >> total))	cout << "wrong input format" << endl; 
-			else i = 0;
-			if(total == 0)			etat = FIN; 
-			else etat = LIENS ; 
+			if(!(data >> total))  cout << "wrong input format" << endl; 
+			else  i = 0;
+			if(total == 0)  etat = FIN; 
+			else  etat = LIENS ; 
 			break;
 
 		case LIENS: 
-			if(!(data >> uid1 >> uid2)) 	cout << "wrong input format" << endl; 
+			if(!(data >> uid1 >> uid2))  cout << "wrong input format" << endl; 
 			else
 			{
 				creation_lien(uid1, uid2);
 				++i;
 			}
-			if(i == total)			etat = FIN ; 
+			if(i == total)  etat = FIN ; 
 			break;
 
 		case FIN:  
@@ -301,8 +186,8 @@ void Ville::ajout_noeud(istringstream& param,int& counter, Etat_lecture type)
 	double posx;
 	double posy;
 	
-	if( !(param >> numid >> posx >> posy >> popmax))	cout << "wrong input format" 
-															 << endl;
+	if(!(param >> numid >> posx >> posy >> popmax))  cout << "wrong input format" 
+														  << endl;
 	else
 	{
 		switch(type)
@@ -349,7 +234,7 @@ void Ville::error_noeud(Noeud* const nd)
 		error_param_un = nd->getNbp();
 	}
 	
-	if(chargement_verif)	redondance_uid(nd->getUid());
+	if(chargement_verif)  redondance_uid(nd->getUid());
 }
 	
 void Ville::creation_lien(unsigned int uid_a, unsigned int uid_b) 
@@ -386,7 +271,6 @@ void Ville::creation_lien(unsigned int uid_a, unsigned int uid_b)
 	if(a != nullptr and b != nullptr and chargement_verif)
 	{
 		error_lien(a, b);
-			
 		a->ajout_lien(b); 
 		b->ajout_lien(a);
 	}
@@ -438,7 +322,7 @@ Noeud* Ville::trouve_lien(unsigned int uid) const
 {
 	for(size_t i(0) ; i <  quartiers.size() ; ++i)
 	{
-		if(uid == quartiers[i]->getUid())	return quartiers[i];
+		if(uid == quartiers[i]->getUid())  return quartiers[i];
 	}
 
 	return nullptr;
@@ -479,4 +363,117 @@ void Ville::collis_noeuds()
 			}
 		}
 	}
+}
+
+///////////////////////////// Section Dessin ///////////////////////////////////////
+
+void Ville::draw_ville(Couleur paint) const
+{	
+	draw_liens(paint);
+	draw_quartiers(paint);
+}
+
+void Ville::draw_liens(Couleur paint) const
+{
+	for(auto nd : quartiers) {
+		nd->updateIn(true);
+	}
+	for(auto nd : quartiers) {
+		for(auto nd_lien : nd->getLiens()) {
+			if(nd_lien->getIn() == true)  draw_ligne(nd->getCentre(),
+													 nd_lien->getCentre(), paint);
+		}
+		nd->updateIn(false);
+	}
+}
+
+void Ville::draw_quartiers(Couleur paint) const
+{
+	for(auto nd : quartiers) {
+		nd->draw_noeud(paint);
+	}
+}
+
+void Ville::draw_short_path(Couleur paint, size_t indice_logement) const
+{
+	quartiers[indice_logement]->draw_noeud(ROUGE);
+	quartiers[indice_logement]->draw_path(paint);
+}
+
+///////////////////////////// Sauvegarde fichier ///////////////////////////////////
+
+void Ville::sauvegarde(string file) const
+{
+	fstream fichier;
+	fichier.open(file, ios::out | ios::trunc);
+	if(!fichier.is_open())  cout << "unable to save file" << file << endl;
+	else
+	{
+		fichier << nb+logement << endl;
+		fichier << to_string(nb_type(logement)) << endl;
+		fichier << "#"+logement+":" << endl;
+		fichier << print_type(logement) << endl;
+		
+		fichier << nb+transport << endl;
+		fichier << to_string(nb_type(transport)) << endl;
+		fichier << "#"+transport+":" << endl;
+		fichier << print_type(transport) << endl;
+		
+		fichier << nb+production << endl;
+		fichier << to_string(nb_type(production)) << endl;
+		fichier << "#"+production+":" << endl;
+		fichier << print_type(production) << endl;
+		
+		fichier << nb_link << endl;
+		string bloc(to_string(nb_liens()));
+		bloc.append("\n");
+		for(auto nd : quartiers) {
+			nd->updateIn(true);
+		}
+		for(auto noeud : quartiers) {
+			for(auto nd_lien : noeud->getLiens()) {
+				if(nd_lien->getIn()) bloc.append("\t"+noeud->print_lien(nd_lien)
+												 +"\n");
+			}
+			noeud->updateIn(false);
+		}
+		fichier << bloc << endl;
+	}
+	fichier.close();
+}
+
+string Ville::print_type(string type) const
+{
+	string bloc("");
+	for(auto noeud : quartiers) {
+		if(noeud->getType()==type)  bloc.append("\t" + noeud->print() + "\n");
+	}
+	
+	return bloc;
+}
+
+unsigned int Ville::nb_type(string type) const
+{
+	unsigned int count(0);
+	for(auto noeud : quartiers) {
+		if(noeud->getType() == type)  count++;
+	}
+	
+	return count;
+}
+
+unsigned int Ville::nb_liens() const
+{
+	for(auto nd : quartiers) {
+		nd->updateIn(true);
+	}
+	unsigned int cmt(0);
+	for(auto nd : quartiers) {
+		for(auto nd_liens : nd->getLiens()) {
+			if(nd_liens->getIn() == true)  cmt++;
+		}
+		nd->updateIn(false);
+	}
+	
+	return cmt;
 }

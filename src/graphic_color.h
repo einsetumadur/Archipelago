@@ -10,7 +10,7 @@
 
 enum Couleur {NOIR, ROUGE, VERT, BLANC};
 
-constexpr double epaisseur_trait(5.5);
+constexpr double epaisseur_trait(3);
 constexpr double epaisseur_bord(3);
 constexpr int left_click(1);
 constexpr int right_click(2);

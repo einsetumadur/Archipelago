@@ -62,17 +62,12 @@ void Ville::reset()
 	nbp_nbT = 0;
 }
 
-// chargement du fichier :
-void main_ville(char* nom_fichier) 
-{
-	ville.chargement(nom_fichier);
-}
-
 void Ville::chargement(char* nom_fichier)
 {	
 	string line;
 	ifstream fichier(nom_fichier); 
-	if(!fichier.fail()) 
+	if(nom_fichier == nullptr) cout<<"no file selected"<<endl; 
+	else if(!fichier.fail()) 
 	{	
 		int etat = NBL; 
 		while(getline(fichier >> ws,line) and chargement_verif) 

@@ -67,6 +67,4 @@ private:
 	
 };
 
-void main_ville(char* nom_fichier);
-
 #endif

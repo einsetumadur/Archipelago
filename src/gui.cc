@@ -16,10 +16,12 @@
 
 using namespace std;
 
+///////////////////////////// Section Dessin //////////////////////////////////////////
+
 Dessin::Dessin(): empty(false)
 {
-    set_zoom(ZR);
-    cadre.size = 1;
+    space.zoom = 1;
+    space.size = dim_max;
 }
 
 Dessin::~Dessin()
@@ -35,30 +37,37 @@ Ville* Dessin::get_ville_ptr()
     return maVille;
 }
 
+void Dessin::encadre()
+{
+    space.size = 2*dim_max/space.zoom;
+    space.xMin = -space.size/2;
+    space.xMax = space.size/2;
+    space.yMin = -space.size/2;
+    space.yMax = space.size/2;
+}
+
 void Dessin::set_zoom(zAction act)
 {
     switch (act)
     {
     case ZR:
-        currentZoom = 0;
+        space.zoom = 1;
         break;
     case ZIN:
-        currentZoom+= delta_zoom;
+        if(space.zoom < max_zoom) space.zoom += delta_zoom;
         break;
     case ZOUT:
-        currentZoom-= delta_zoom;
+        if(space.zoom > min_zoom + epsil_zero) space.zoom -= delta_zoom;
         break;
     default:
         cout<<"Zooming error"<<endl;
         break;
     }
-
-    cadre.zoom = exp(-currentZoom);
 }
 
-double Dessin::get_current_zoom()
+double Dessin::get_zoom_ind()
 {
-    return cadre.zoom;
+    return space.zoom;
 }
 
 void Dessin::refresh()
@@ -72,14 +81,16 @@ void Dessin::refresh()
     }
 }
 
-void Dessin::projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr, Cadre cadre)
+void Dessin::projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr, Space space)
 {   
     encadre();
-    double factor = cadre.size/get_allocation().get_width();
+    double factor = get_allocation().get_height()/space.size;
+    
     cr->set_identity_matrix();
-	cr->translate(get_allocation().get_width()/2 + get_allocation().get_x(),
+	cr->translate(get_allocation().get_width()/2 +      //centre le dessin
+                  get_allocation().get_x(),             
                   get_allocation().get_height()/2);
-    cr->scale(factor,-factor);
+    cr->scale(factor,-factor);                          //système euclidien
 }
 
 bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
@@ -90,7 +101,7 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         const int width = allocation.get_width();
         const int height = allocation.get_height();
 
-        graphic_set_context(cr);
+        graphic_set_context(cr);    //pour dessiner ville
 
         cr->set_line_width(epaisseur_trait);
         cr->set_source_rgb(1,1,1);
@@ -102,43 +113,19 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         cr->paint();
         cr->stroke();
 
-        projectionOrtho(cr,cadre);
+        projectionOrtho(cr,space);
         
-
         if(!(maVille == nullptr))
         {  
-            if(not(maVille->get_chargement_verif()))
-            {
-				maVille->reset();
-				maVille->draw_ville(NOIR);
-				// ICI UPDATE MTA, CI, ENJ ENCORE !
-			}
-			else 	maVille->draw_ville(NOIR);
-
+            maVille->draw_ville(NOIR);
         } 
     }
     return true;
 }
 
-void Dessin::encadre(Cadre x)
-{
-    cadre = x;
-}
-
-void Dessin::encadre()
-{
-    cadre.size = get_allocation().get_width()/(cadre.zoom);
-    cadre.xMax = cadre.size/2;
-    cadre.xMin = -cadre.yMin;
-    cadre.yMin = cadre.xMin;
-    cadre.yMax = cadre.xMax;
-}
+///////////////////////// Section Fenetre /////////////////////////////////////////////
 
 //initialisation de la fenetre 
-MaFenetre::MaFenetre()
-{
-}
-
 MaFenetre::MaFenetre(char* fichier):
 	mainWindow(Gtk::ORIENTATION_HORIZONTAL,10),
     leftPanel(Gtk::ORIENTATION_VERTICAL,10),
@@ -156,9 +143,9 @@ MaFenetre::MaFenetre(char* fichier):
     zoomoutButton("zoom out"),
     zoomresetButton("zoom reset"),
     currentZoom("zoom : ?"),
-    MTA("MTA : ?"),
-    CI("CI : ?"),
-    ENJ("ENJ : ?"),
+    MTA("MTA : 0"),
+    CI("CI : 0"),
+    ENJ("ENJ : 0"),
     editButton("edit link"),
     housing(type,"housing"),
     transport(type,"transport"),
@@ -175,8 +162,8 @@ MaFenetre::MaFenetre(char* fichier):
     set_icon_from_file("Archicon.png"); 
     set_border_width(5);
 
-    graph.set_size_request(800, 800);
-    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
+    graph.set_size_request(default_drawing_size,default_drawing_size);
+    currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
 
     add(mainWindow);
 
@@ -292,8 +279,7 @@ void MaFenetre::on_button_clicked_open()
             
             graph.get_ville_ptr()->reset();
 			graph.get_ville_ptr()->chargement(&filename[0]);
-            if(graph.get_ville_ptr()->get_chargement_verif())	update();
-   
+            update();
             break;
         }
         case(Gtk::RESPONSE_CANCEL):
@@ -357,7 +343,7 @@ void MaFenetre::on_button_clicked_zoomIn()
 {
     graph.set_zoom(ZIN);
     graph.encadre();
-    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
+    currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
 	graph.refresh();
     cout<<"zoomed in"<<endl;
 }
@@ -366,7 +352,7 @@ void MaFenetre::on_button_clicked_zoomOut()
 {
     graph.set_zoom(ZOUT);
     graph.encadre();
-    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
+    currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
 	graph.refresh();
     cout<<"zoomed out"<<endl;
 }
@@ -374,7 +360,7 @@ void MaFenetre::on_button_clicked_zoomReset()
 {
     graph.set_zoom(ZR);
     graph.encadre();
-    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
+    currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
     graph.refresh();
     cout<<"zoom reset"<<endl;
 }
@@ -496,9 +482,17 @@ bool MaFenetre::on_key_press_event(GdkEventKey * key_event)
 
 void MaFenetre::update()
 {
-    currentZoom.set_label("zoom : " + to_string(graph.get_current_zoom()));
-    ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
-    CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
-    MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
+    currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
+    if(graph.get_ville_ptr()->get_chargement_verif())
+    {
+        ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
+        CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
+        MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
+    } else {
+        graph.get_ville_ptr()->reset();
+        ENJ.set_label("ENJ : 0");
+        CI.set_label("CI : 0");
+        MTA.set_label("MTA : 0");
+    }
     graph.refresh();
 }

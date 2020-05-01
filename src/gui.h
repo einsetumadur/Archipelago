@@ -15,7 +15,7 @@
 
 enum zAction {ZR,ZIN,ZOUT};
 
-struct Cadre
+struct Space
 {
     double zoom,size;
     double xMin,xMax;
@@ -29,19 +29,18 @@ public:
     virtual ~Dessin();
     void refresh();
     void clear();
-    void encadre(Cadre x);
     void encadre();
     void set_ville(Ville* ville);
     void set_zoom(zAction act);
-    double get_current_zoom();
+    double get_zoom_ind();
     Ville* get_ville_ptr();
 protected: 
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
 private:
-    void projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr,Cadre cadre);
+    void projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr, Space space);
     bool empty;
-    Cadre cadre;
+    Space space;
     double currentZoom;
     Ville* maVille;
 };
@@ -49,7 +48,6 @@ private:
 class MaFenetre : public Gtk::Window
 {
 public :
-    MaFenetre();
     MaFenetre(char* fichier);
     virtual ~MaFenetre();
     void update();

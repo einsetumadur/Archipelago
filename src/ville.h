@@ -44,10 +44,9 @@ public:
 	void draw_quartiers(Couleur paint) const;
 	void draw_short_path(Couleur paint, size_t indice_logement) const;
 
-private:
+private:	
+	// Lecture et création de la ville
 	void decodage(std::string line, int& etat);
-	
-	// fonctions creation de la ville & errors
 	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);
 	void error_noeud(Noeud* const nd);
 	void creation_lien(unsigned int uid_a, unsigned int uid_b);

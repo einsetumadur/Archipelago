@@ -115,7 +115,8 @@ Type_error Noeud::test_nbp() const
 
 bool Noeud::multiple_link(Noeud* b) const
 {
-	for(size_t i(0) ; i < tab_liens.size() ; ++i) {
+	for(size_t i(0) ; i < tab_liens.size() ; ++i) 
+	{
 		if(tab_liens[i] == b)  return true;
 	}
 	
@@ -188,14 +189,16 @@ void Noeud::draw_path(Couleur paint) const
 void Logement::draw_path(Couleur paint) const
 {
 	// chemin le plus court pour production :
-	for(size_t i(0) ; i != short_path_prod.size() - 1; ++i) {
+	for(size_t i(0) ; i != short_path_prod.size() - 1; ++i) 
+	{
 		short_path_prod[i]->draw_noeud(paint);
 		draw_ligne(short_path_prod[i]->getCentre(),
 				   short_path_prod[i+1]->getCentre(), paint);
 	}
 	
 	// chemin le plus court pour transport : 
-	for(size_t i(0) ; i != short_path_tran.size() - 1; ++i) {
+	for(size_t i(0) ; i != short_path_tran.size() - 1; ++i) 
+	{
 		short_path_tran[i]->draw_noeud(paint);
 		draw_ligne(short_path_tran[i]->getCentre(), 
 				   short_path_tran[i+1]->getCentre(), paint);
@@ -211,12 +214,15 @@ double cout_infra(const vector<Noeud*>& tn)
 	
 	if(tn.size() == 0) return 0;
 	
-	for(auto nd : tn) {
+	for(auto nd : tn) 
+	{
 		nd->updateIn(true);
 	}
 	
-	for(auto nd : tn) {
-		for(auto nd_lien : nd->getLiens()) {
+	for(auto nd : tn) 
+	{
+		for(auto nd_lien : nd->getLiens()) 
+		{
 			if(nd_lien->getIn() == true)  nd->calcul_ci(nd_lien, cmt);
 		}
 		nd->updateIn(false);
@@ -259,7 +265,8 @@ double short_path(const vector<Noeud*>& tn, unsigned int nb_p, unsigned int nb_t
 	int cmt_tab(0);
 	vector<int> queue(tn.size());
 	
-	for(size_t i(0) ; i < tn.size() ; ++i) {
+	for(size_t i(0) ; i < tn.size() ; ++i) 
+	{
 		scenario = scen_aleatoire;
 		cmt_tab = 0;
 		if(tn[i]->getType() == logement)  tn[i]->controle_djikstra(queue, tn, 
@@ -395,7 +402,8 @@ void Noeud::recherche_voisins(vector<int>& queue, const vector<Noeud*>& tn,
 							  unsigned int nd_min)
 {
 	double alt(0);
-	for(auto lien : tab_liens) {
+	for(auto lien : tab_liens) 
+	{
 		if(lien->in) 
 		{
 			alt = getAccess() + temps_lien(lien);					
@@ -411,7 +419,8 @@ void Noeud::recherche_voisins(vector<int>& queue, const vector<Noeud*>& tn,
 
 void Noeud::init_queue(vector<int>& queue, const vector<Noeud*>& tn, size_t i)
 {
-	for(size_t j(0) ; j < tn.size(); ++j) {
+	for(size_t j(0) ; j < tn.size(); ++j) 
+	{
 		tn[j]->access = infinite_time;
 		tn[j]->parent = no_link;
 		tn[j]->in = true;
@@ -428,17 +437,20 @@ void Noeud::sort_queue(vector<int>& queue, const vector<Noeud*>& tn)
 {
 	vector<double> tab_access;
 
-	for(size_t k(0) ; k < tn.size() ; ++k) {
+	for(size_t k(0) ; k < tn.size() ; ++k) 
+	{
 		tab_access.push_back(tn[queue[k]]->access);
 	}
 
 	bool swap(true);
 	double tmp(0);
 	double mem(0);
-	for(size_t k(0) ; k < tab_access.size() - 1 and swap; ++k) {
+	for(size_t k(0) ; k < tab_access.size() - 1 and swap; ++k) 
+	{
 		if(tab_access[k+1] < tab_access[k])
 		{
-			while(tab_access[k+1] < tab_access[k]) {
+			while(tab_access[k+1] < tab_access[k]) 
+			{
 				tmp = tab_access[k+1];
 				mem = queue[k+1];
 				
@@ -458,7 +470,8 @@ void Noeud::sort_queue(vector<int>& queue, const vector<Noeud*>& tn)
 unsigned int Noeud::find_min_access(const vector<int>& queue, 
 									const vector<Noeud*>& tn)
 {
-	for(size_t k(0) ; k < tn.size() ; ++k) {
+	for(size_t k(0) ; k < tn.size() ; ++k) 
+	{
 		if(tn[queue[k]]->in)  return queue[k];
 	}
 }
@@ -467,14 +480,16 @@ unsigned int Noeud::find_min_access(const vector<int>& queue,
 		// vers un noeud production
 void Logement::path_prod(const vector<Noeud*>& tn, unsigned int nd)
 {
-	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) {
+	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) 
+	{
 		short_path_prod.push_back(p);
 	}	
 }
 		// vers un noeud transport
 void Logement::path_tran(const vector<Noeud*>& tn, unsigned int nd)
 {
-	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) {
+	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) 
+	{
 		short_path_tran.push_back(p);
 	}
 }

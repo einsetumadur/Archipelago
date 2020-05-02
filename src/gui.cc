@@ -25,14 +25,15 @@ Dessin::Dessin(): empty(false)
 }
 
 Dessin::~Dessin()
-{}
+{
+}
 
 void Dessin::set_ville(Ville* ville)
 {
 	maVille = ville;
 }
 
-Ville* Dessin::get_ville_ptr()
+Ville* Dessin::get_ville_ptr() const 
 {
 	return maVille;
 }
@@ -50,22 +51,22 @@ void Dessin::set_zoom(zAction act)
 {
 	switch (act)
 	{
-	case ZR:
-		space.zoom = 1;
-		break;
-	case ZIN:
-		if(space.zoom < max_zoom) space.zoom += delta_zoom;
-		break;
-	case ZOUT:
-		if(space.zoom > min_zoom + epsil_zero) space.zoom -= delta_zoom;
-		break;
-	default:
-		cout<<"Zooming error"<<endl;
-		break;
+		case ZR:
+			space.zoom = 1;
+			break;
+		case ZIN:
+			if(space.zoom < max_zoom)  space.zoom += delta_zoom;
+			break;
+		case ZOUT:
+			if(space.zoom > min_zoom + epsil_zero)  space.zoom -= delta_zoom;
+			break;
+		default:
+			cout<<"Zooming error"<<endl;
+			break;
 	}
 }
 
-double Dessin::get_zoom_ind()
+double Dessin::get_zoom_ind() const
 {
 	return space.zoom;
 }
@@ -115,7 +116,7 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 		projectionOrtho(cr,space);
 
-		if(!(maVille == nullptr))	maVille->draw_ville(NOIR);
+		if(!(maVille == nullptr))  maVille->draw_ville(NOIR);
 	}
 	return true;
 }
@@ -163,7 +164,8 @@ MaFenetre::MaFenetre(char* fichier):
 }
 
 MaFenetre::~MaFenetre()
-{}
+{
+}
 
 void MaFenetre::construct_scaffolding()
 {
@@ -245,7 +247,7 @@ void MaFenetre::on_button_clicked_exit()
 
 void MaFenetre::on_button_clicked_new()
 {
-	if(graph.get_ville_ptr() == nullptr)	graph.set_ville(new Ville(true));
+	if(graph.get_ville_ptr() == nullptr)  graph.set_ville(new Ville(true));
 	else 
 	{
 		graph.get_ville_ptr()->reset();
@@ -270,7 +272,7 @@ void MaFenetre::on_button_clicked_open()
 		{
 			string filename = dialog.get_filename();
 
-			if(graph.get_ville_ptr()==nullptr)	graph.set_ville(new Ville(true));
+			if(graph.get_ville_ptr()==nullptr)  graph.set_ville(new Ville(true));
 
 			graph.get_ville_ptr()->reset();
 			graph.get_ville_ptr()->chargement(&filename[0]);
@@ -292,7 +294,7 @@ void MaFenetre::on_button_clicked_open()
 
 void MaFenetre::on_button_clicked_save()
 {
-	if(graph.get_ville_ptr() == nullptr)	cout<<"nothing to save"<<endl;
+	if(graph.get_ville_ptr() == nullptr)  cout<<"nothing to save"<<endl;
 	else 
 	{
 		cout << "Save" << endl;
@@ -403,7 +405,7 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 		{ 
 			//double[2] p = {clic_x - dessin_x, clic_y - dessin_y};
 			
-			if(event->button == left_click)	cout<<"mouse left clicked"<<endl;
+			if(event->button == left_click)	 cout<<"mouse left clicked"<<endl;
 			else if(event->button == right_click)	cout<<"mouse right clicked"<<endl;
 		}
 	}
@@ -427,8 +429,8 @@ bool MaFenetre::on_button_release_event(GdkEventButton * event)
 		{ 
 			//double[2] p = {clic_x - dessin_x, clic_y - dessin_y};
 			
-			if(event->button == left_click)	cout<<"mouse left released"<<endl;
-			else if(event->button == right_click)	cout<<"mouse right released"<<endl;
+			if(event->button == left_click)	 cout<<"mouse left released"<<endl;
+			else if(event->button == right_click)  cout<<"mouse right released"<<endl;
 		}
 	}
 	return true;
@@ -468,7 +470,7 @@ void MaFenetre::update()
 		CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
 		MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
 	}
-	 else
+	else
 	{
 		graph.get_ville_ptr()->reset();
 		ENJ.set_label("ENJ : 0");
@@ -477,4 +479,3 @@ void MaFenetre::update()
 	}
 	graph.refresh();
 }
-

@@ -44,11 +44,13 @@ void Ville::reset()
 {
 	if(not(quartiers.empty()))
 	{
-		for(auto nd : quartiers) {
+		for(auto nd : quartiers) 
+		{
 			nd->reset_tab_liens();
 		}
 		
-		for(auto noeud : quartiers) {
+		for(auto noeud : quartiers) 
+		{
 			delete noeud;
 		}
 		quartiers.clear();
@@ -123,43 +125,36 @@ void Ville::decodage(string line, int& etat)
 			if(total == 0)  etat = NBT; 
 			else  etat = LOGE ;    
 			break;
-
 		case LOGE: 	
 			ajout_noeud(data,i, LOGE);
 			if(i == total)  etat = NBT ;
 			break;
-
 		case NBP: 
 			if(!(data >> total))  cout << "wrong input format" << endl; 
 			else  i = 0;
 			if(total == 0)  etat = NBLI; 
 			else  etat = PROD ; 
 			break;
-
 		case PROD: 
 			ajout_noeud(data, i, PROD);
 			if(i == total)  etat = NBLI ; 
 			break;
-
-		case NBT: 
+		case NBT:
 			if(!(data >> total))  cout << "wrong input format" << endl; 
 			else i = 0;
 			if(total==0)  etat = NBP; 
 			else  etat = TRAN ; 
 			break;
-
 		case TRAN: 
 			ajout_noeud(data, i, TRAN);
 			if(i == total)  etat = NBP; 
 			break;
-
 		case NBLI: 
 			if(!(data >> total))  cout << "wrong input format" << endl; 
 			else  i = 0;
 			if(total == 0)  etat = FIN; 
 			else  etat = LIENS ; 
 			break;
-
 		case LIENS: 
 			if(!(data >> uid1 >> uid2))  cout << "wrong input format" << endl; 
 			else
@@ -169,11 +164,9 @@ void Ville::decodage(string line, int& etat)
 			}
 			if(i == total)  etat = FIN ; 
 			break;
-
 		case FIN:  
 			break;
-
-		default:	
+		default:
 			cout << "defaultswitch error." << endl;
 			break;
 	}
@@ -375,11 +368,14 @@ void Ville::draw_ville(Couleur paint) const
 
 void Ville::draw_liens(Couleur paint) const
 {
-	for(auto nd : quartiers) {
+	for(auto nd : quartiers) 
+	{
 		nd->updateIn(true);
 	}
-	for(auto nd : quartiers) {
-		for(auto nd_lien : nd->getLiens()) {
+	for(auto nd : quartiers) 
+	{
+		for(auto nd_lien : nd->getLiens()) 
+		{
 			if(nd_lien->getIn() == true)  draw_ligne(nd->getCentre(),
 													 nd_lien->getCentre(), paint);
 		}
@@ -389,7 +385,8 @@ void Ville::draw_liens(Couleur paint) const
 
 void Ville::draw_quartiers(Couleur paint) const
 {
-	for(auto nd : quartiers) {
+	for(auto nd : quartiers) 
+	{
 		nd->draw_noeud(paint);
 	}
 }
@@ -413,25 +410,25 @@ void Ville::sauvegarde(string file) const
 		fichier << to_string(nb_type(logement)) << endl;
 		fichier << "#"+logement+":" << endl;
 		fichier << print_type(logement) << endl;
-		
 		fichier << nb+transport << endl;
 		fichier << to_string(nb_type(transport)) << endl;
 		fichier << "#"+transport+":" << endl;
 		fichier << print_type(transport) << endl;
-		
 		fichier << nb+production << endl;
 		fichier << to_string(nb_type(production)) << endl;
 		fichier << "#"+production+":" << endl;
 		fichier << print_type(production) << endl;
-		
 		fichier << nb_link << endl;
 		string bloc(to_string(nb_liens()));
 		bloc.append("\n");
-		for(auto nd : quartiers) {
+		for(auto nd : quartiers) 
+		{
 			nd->updateIn(true);
 		}
-		for(auto noeud : quartiers) {
-			for(auto nd_lien : noeud->getLiens()) {
+		for(auto noeud : quartiers) 
+		{
+			for(auto nd_lien : noeud->getLiens()) 
+			{
 				if(nd_lien->getIn()) bloc.append("\t"+noeud->print_lien(nd_lien)
 												 +"\n");
 			}
@@ -445,7 +442,8 @@ void Ville::sauvegarde(string file) const
 string Ville::print_type(string type) const
 {
 	string bloc("");
-	for(auto noeud : quartiers) {
+	for(auto noeud : quartiers) 
+	{
 		if(noeud->getType()==type)  bloc.append("\t" + noeud->print() + "\n");
 	}
 	
@@ -455,7 +453,8 @@ string Ville::print_type(string type) const
 unsigned int Ville::nb_type(string type) const
 {
 	unsigned int count(0);
-	for(auto noeud : quartiers) {
+	for(auto noeud : quartiers) 
+	{
 		if(noeud->getType() == type)  count++;
 	}
 	
@@ -464,12 +463,15 @@ unsigned int Ville::nb_type(string type) const
 
 unsigned int Ville::nb_liens() const
 {
-	for(auto nd : quartiers) {
+	for(auto nd : quartiers) 
+	{
 		nd->updateIn(true);
 	}
 	unsigned int cmt(0);
-	for(auto nd : quartiers) {
-		for(auto nd_liens : nd->getLiens()) {
+	for(auto nd : quartiers) 
+	{
+		for(auto nd_liens : nd->getLiens()) 
+		{
 			if(nd_liens->getIn() == true)  cmt++;
 		}
 		nd->updateIn(false);

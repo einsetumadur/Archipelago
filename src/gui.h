@@ -1,8 +1,8 @@
 /**\
  * \name    gui.h
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
- * \version 2.0
+ * \date    Mai 2020
+ * \version Rendu 2 : Architecture 11 b1
  */
 
 #include <gtkmm.h>
@@ -32,8 +32,8 @@ public:
 	void encadre();
 	void set_ville(Ville* ville);
 	void set_zoom(zAction act);
-	double get_zoom_ind();
-	Ville* get_ville_ptr();
+	double get_zoom_ind() const;
+	Ville* get_ville_ptr() const;
 protected: 
 	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 

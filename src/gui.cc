@@ -115,10 +115,7 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 		projectionOrtho(cr,space);
 
-		if(!(maVille == nullptr))
-		{
-			maVille->draw_ville(NOIR);
-		}
+		if(!(maVille == nullptr))	maVille->draw_ville(NOIR);
 	}
 	return true;
 }
@@ -273,7 +270,7 @@ void MaFenetre::on_button_clicked_open()
 		{
 			string filename = dialog.get_filename();
 
-			if(graph.get_ville_ptr()==nullptr) graph.set_ville(new Ville(true));
+			if(graph.get_ville_ptr()==nullptr)	graph.set_ville(new Ville(true));
 
 			graph.get_ville_ptr()->reset();
 			graph.get_ville_ptr()->chargement(&filename[0]);
@@ -365,12 +362,7 @@ void MaFenetre::on_button_clicked_zoomReset()
 
 void MaFenetre::on_button_clicked_edit()
 {
-	cout<<"edit link ";
-
-	if(housing.get_active())          cout<<"for housing"<<endl;
-	else if(transport.get_active())   cout<<"for transport"<<endl;
-	else if(production.get_active())  cout<<"for production"<<endl;
-	else cout<<"*no type selected*"<<endl;
+	cout<<"edit link "<<endl;
 }
 
 void MaFenetre::on_button_clicked_housing()
@@ -411,14 +403,8 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 		{ 
 			//double[2] p = {clic_x - dessin_x, clic_y - dessin_y};
 			
-			if(event->button == left_click) 
-			{
-				cout<<"mouse left clicked"<<endl;
-			}
-			else if(event->button == right_click) 
-			{
-				cout<<"mouse right clicked"<<endl;
-			}
+			if(event->button == left_click)	cout<<"mouse left clicked"<<endl;
+			else if(event->button == right_click)	cout<<"mouse right clicked"<<endl;
 		}
 	}
 	return true;
@@ -441,14 +427,8 @@ bool MaFenetre::on_button_release_event(GdkEventButton * event)
 		{ 
 			//double[2] p = {clic_x - dessin_x, clic_y - dessin_y};
 			
-			if(event->button == left_click) 
-			{
-				cout<<"mouse left released"<<endl;
-			}
-			else if(event->button == right_click) 
-			{
-				cout<<"mouse right released"<<endl;
-			}
+			if(event->button == left_click)	cout<<"mouse left released"<<endl;
+			else if(event->button == right_click)	cout<<"mouse right released"<<endl;
 		}
 	}
 	return true;

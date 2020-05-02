@@ -1,8 +1,8 @@
 /**\
  * \name    gui.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
- * \date    march 2020
- * \version 2.0
+ * \date    Mai 2020
+ * \version Rendu 2 : Architecture 11b1
  */
 
 #include <iostream>

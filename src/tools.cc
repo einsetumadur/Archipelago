@@ -69,11 +69,11 @@ bool champ(Cercle a, Cercle b, Cercle c)
 {
 	Point p = { a.centre.pos_x, a.centre.pos_y };
 	Seg_droite d = { p, {b.centre.pos_x - a.centre.pos_x, 
-						b.centre.pos_y - a.centre.pos_y} }; 
+						 b.centre.pos_y - a.centre.pos_y} }; 
 	Vecteur ac = { c.centre.pos_x - a.centre.pos_x, 
-					c.centre.pos_y - a.centre.pos_y };
+				   c.centre.pos_y - a.centre.pos_y };
 	Vecteur bc = { c.centre.pos_x - b.centre.pos_x, 
-					c.centre.pos_y - b.centre.pos_y };
+				   c.centre.pos_y - b.centre.pos_y };
 	
 	return (prod_scal(d.directeur, ac) >= 0 and 
 			prod_scal(bc, scalaire_vecteur(-1, d.directeur)) >= 0);

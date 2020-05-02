@@ -17,13 +17,13 @@
 
 using namespace std;
 
-constexpr char nb[] = " # nb";
-constexpr char nb_link[] = "# nb link";
-
 namespace
 {
 	Ville ville(true);
 }
+
+constexpr char nb[] = " # nb";
+constexpr char nb_link[] = "# nb link";
 
 Ville::Ville(bool val): 
 	chargement_verif(val), 

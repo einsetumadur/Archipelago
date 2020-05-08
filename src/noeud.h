@@ -44,9 +44,11 @@ public:
 	double getAccess() const { return access; }
 	unsigned int getParent() const { return parent; }
 	bool getIn() const { return in; }
+	Couleur getPaint() const { return paint; }
 	virtual double getSpeed() const = 0;
 	virtual std::string getType() const = 0;
 	void updateIn(bool b);	
+	void updatePaint(Couleur c);
 	
 	// fonctions de tests
 	bool test_uid() const;
@@ -56,7 +58,7 @@ public:
 	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const; 
 	
 	// fonctions de dessins
-	virtual void draw_noeud(Couleur paint) const = 0;
+	virtual void draw_noeud() const = 0;
 	virtual void draw_path(Couleur paint) const;
 	
 	// MTA
@@ -82,6 +84,7 @@ protected:
 	double access;
 	bool in;
 	unsigned int parent;
+	Couleur paint;
 	
 	// MTA
 	void init_queue(std::vector<int>& queue, const std::vector<Noeud*>& tn, 
@@ -112,7 +115,7 @@ public:
 						   override;
 	void path_prod(const std::vector<Noeud*>& tn, unsigned int nd);
 	void path_tran(const std::vector<Noeud*>& tn, unsigned int nd);
-	void draw_noeud(Couleur paint) const override;
+	void draw_noeud() const override;
 	void draw_path(Couleur paint) const override;
 
 private:
@@ -129,7 +132,7 @@ public:
 	~Transport() override;
 	double getSpeed() const override { return speed; }
 	std::string getType() const override { return transport; }
-	void draw_noeud(Couleur paint) const override;
+	void draw_noeud() const override;
 
 private:
 	double speed;
@@ -142,7 +145,7 @@ public:
 	~Production() override;
 	double getSpeed() const override { return speed; }
 	std::string getType() const override { return production; }
-	void draw_noeud(Couleur paint) const override;
+	void draw_noeud() const override;
 
 private:
 	double speed;

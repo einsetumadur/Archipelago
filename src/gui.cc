@@ -114,11 +114,23 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 		cr->paint();
 		cr->stroke();
 
+		cr->set_source_rgb(0,0,0);
+		cr->move_to(mouseCursor[0]-20,mouseCursor[1]);
+		cr->line_to(mouseCursor[0]+20,mouseCursor[1]);
+		cr->move_to(mouseCursor[0],mouseCursor[1]-20);
+		cr->line_to(mouseCursor[0],mouseCursor[1]+20);
+
 		projectionOrtho(cr,space);
 
 		if(!(maVille == nullptr))  maVille->draw_ville(NOIR);
 	}
 	return true;
+}
+
+void Dessin::set_cursor(double x,double y)
+{
+	mouseCursor[0] = x;
+	mouseCursor[1] = y;
 }
 
 ///////////////////////// Section Fenetre /////////////////////////////////////////////
@@ -152,6 +164,7 @@ MaFenetre::MaFenetre(char* fichier):
 
 	graph.set_size_request(default_drawing_size,default_drawing_size);
 	currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
+	graph.set_cursor(0,0);
 
 	add(mainWindow);
 
@@ -403,9 +416,9 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 		if(clic_x >= dessin_x && clic_x <= dessin_x + width &&
 		   clic_y >= dessin_y && clic_y <= dessin_y + height)
 		{ 
-			//double[2] p = {clic_x - dessin_x, clic_y - dessin_y};
+			graph.set_cursor(clic_x - dessin_x, clic_y - dessin_y);
 			
-			if(event->button == left_click)	 cout<<"mouse left clicked"<<endl;
+			if(event->button == left_click)	 cout<<"mouse left clicked at ( "<<clic_x - dessin_x<<" , "<<clic_y - dessin_y<<" )"<<endl;
 			else if(event->button == right_click)	cout<<"mouse right clicked"<<endl;
 		}
 	}
@@ -429,8 +442,14 @@ bool MaFenetre::on_button_release_event(GdkEventButton * event)
 		{ 
 			//double[2] p = {clic_x - dessin_x, clic_y - dessin_y};
 			
-			if(event->button == left_click)	 cout<<"mouse left released"<<endl;
-			else if(event->button == right_click)  cout<<"mouse right released"<<endl;
+			if(event->button == left_click)
+			{
+				 cout<<"mouse left released"<<endl;
+			}
+			else if(event->button == right_click) 
+			{
+				 cout<<"mouse right released"<<endl;
+			}
 		}
 	}
 	return true;

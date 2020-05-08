@@ -34,6 +34,7 @@ public:
 	void set_zoom(zAction act);
 	double get_zoom_ind() const;
 	Ville* get_ville_ptr() const;
+	void set_cursor(double x,double y);
 protected: 
 	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
@@ -43,6 +44,7 @@ private:
 	Space space;
 	double currentZoom;
 	Ville* maVille;
+	double mouseCursor[2];
 };
 
 class MaFenetre : public Gtk::Window

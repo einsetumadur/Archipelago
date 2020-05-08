@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 
 	MaFenetre eventWindow(argv[1]);
 	eventWindow.set_default_size(1000,800);
-	eventWindow.set_resizable(false);
+	eventWindow.set_resizable(true);
 	return app->run(eventWindow);
 
 }

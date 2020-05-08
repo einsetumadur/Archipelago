@@ -22,7 +22,8 @@ constexpr double angle_transport(sqrt(2)/2);
 Noeud::Noeud(unsigned int id, double x, double y, unsigned int capacite): 
 	uid(id), 
 	batiment{{x,y}, sqrt(capacite)}, 
-	nbp(capacite)
+	nbp(capacite),
+	paint(NOIR)
 {
 } 
 
@@ -79,6 +80,11 @@ string Noeud::print_lien(Noeud* nd_lien) const
 void Noeud::updateIn(bool b)
 {
 	in = b;
+}
+
+void Noeud::updatePaint(Couleur c)
+{
+	paint = c;
 }
 
 void Noeud::ajout_lien(Noeud* b) 
@@ -152,12 +158,12 @@ bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const
 
 ///////////////////////////// Section Dessin ///////////////////////////////////////
 
-void Logement::draw_noeud(Couleur paint) const 
+void Logement::draw_noeud() const 
 {
 	draw_cercle(getCentre(), getRayon(), paint);
 }
 
-void Transport::draw_noeud(Couleur paint) const
+void Transport::draw_noeud() const
 {
 	draw_cercle(getCentre(), getRayon(), paint);
 	
@@ -176,7 +182,7 @@ void Transport::draw_noeud(Couleur paint) const
 	draw_ligne(getCentre(), {getX() - getRayon(), getY()}, paint);
 }
 
-void Production::draw_noeud(Couleur paint) const
+void Production::draw_noeud() const
 {
 	draw_cercle(getCentre(), getRayon(), paint);
 	draw_rectangle(getCentre(), getRayon(), paint);
@@ -191,7 +197,7 @@ void Logement::draw_path(Couleur paint) const
 	// chemin le plus court pour production :
 	for(size_t i(0) ; i != short_path_prod.size() - 1; ++i) 
 	{
-		short_path_prod[i]->draw_noeud(paint);
+		short_path_prod[i]->draw_noeud();
 		draw_ligne(short_path_prod[i]->getCentre(),
 				   short_path_prod[i+1]->getCentre(), paint);
 	}
@@ -199,7 +205,7 @@ void Logement::draw_path(Couleur paint) const
 	// chemin le plus court pour transport : 
 	for(size_t i(0) ; i != short_path_tran.size() - 1; ++i) 
 	{
-		short_path_tran[i]->draw_noeud(paint);
+		short_path_tran[i]->draw_noeud();
 		draw_ligne(short_path_tran[i]->getCentre(), 
 				   short_path_tran[i+1]->getCentre(), paint);
 	}

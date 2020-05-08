@@ -360,13 +360,17 @@ void Ville::collis_noeuds()
 
 ///////////////////////////// Section Dessin ///////////////////////////////////////
 
-void Ville::draw_ville(Couleur paint) const
+void Ville::setPaint(size_t indice, Couleur paint) 
+{
+	quartiers[indice]->updatePaint(paint);
+}
+void Ville::draw_ville() const
 {	
-	draw_liens(paint);
-	draw_quartiers(paint);
+	draw_liens();
+	draw_quartiers();
 }
 
-void Ville::draw_liens(Couleur paint) const
+void Ville::draw_liens() const
 {
 	for(auto nd : quartiers) 
 	{
@@ -377,23 +381,24 @@ void Ville::draw_liens(Couleur paint) const
 		for(auto nd_lien : nd->getLiens()) 
 		{
 			if(nd_lien->getIn() == true)  draw_ligne(nd->getCentre(),
-													 nd_lien->getCentre(), paint);
+													 nd_lien->getCentre(),
+													 nd->getPaint());
 		}
 		nd->updateIn(false);
 	}
 }
 
-void Ville::draw_quartiers(Couleur paint) const
+void Ville::draw_quartiers() const
 {
 	for(auto nd : quartiers) 
 	{
-		nd->draw_noeud(paint);
+		nd->draw_noeud();
 	}
 }
 
 void Ville::draw_short_path(Couleur paint, size_t indice_logement) const
 {
-	quartiers[indice_logement]->draw_noeud(ROUGE);
+	quartiers[indice_logement]->draw_noeud();
 	quartiers[indice_logement]->draw_path(paint);
 }
 

@@ -39,9 +39,10 @@ public:
 	unsigned int nb_liens() const;
 	
 	// dessins
-	void draw_ville(Couleur paint) const;
-	void draw_liens(Couleur paint) const;
-	void draw_quartiers(Couleur paint) const;
+	void setPaint(size_t indice, Couleur paint);
+	void draw_ville() const;
+	void draw_liens() const;
+	void draw_quartiers() const;
 	void draw_short_path(Couleur paint, size_t indice_logement) const;
 
 private:	
@@ -67,3 +68,4 @@ private:
 };
 
 #endif
+

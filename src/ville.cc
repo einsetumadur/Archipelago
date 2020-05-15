@@ -36,6 +36,7 @@ Ville::Ville(bool val):
 	nbp_nbT(0)
 {
 	grid.resize(1000,vector<tile>(1000));
+	cout<<"gridsize set to "<<grid.size()<<endl;
 }
 
 Ville::~Ville()
@@ -223,6 +224,8 @@ void Ville::check_load_noeud(Noeud* newNoeud)
 void Ville::load_in_tile(Noeud* node)
 {
 	// load the node in the corresponding tile of the infinite grid.
+	//cout<<"loading in tile index["<<get_tile_index(node->getX())<<":"
+		<<get_tile_index(node->getY())<<"]"<<endl;
 	grid[get_tile_index(node->getX())][get_tile_index(node->getY())].push_back(node);
 }
 
@@ -347,15 +350,18 @@ Noeud* Ville::trouve_lien(unsigned int uid) const
 
 void Ville::redondance_uid(unsigned int numid)
 {
-	for (size_t i(0); i < quartiers.size() - 1 ; i++) 
+	if(!quartiers.empty())
 	{
-		if(quartiers[i]->getUid() == numid)
+		for (size_t i(0); i < quartiers.size() - 1 ; i++) 
 		{
-			cout << error::identical_uid(numid);
-			chargement_verif = false;
-			msg_error = ID_U;
-			error_param_un = numid;
-		}	
+			if(quartiers[i]->getUid() == numid)
+			{
+				cout << error::identical_uid(numid);
+				chargement_verif = false;
+				msg_error = ID_U;
+				error_param_un = numid;
+			}	
+		}
 	}
 }
 

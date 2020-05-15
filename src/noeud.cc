@@ -537,7 +537,7 @@ bool Noeud::operator==(const Noeud& nd) const
 	return (uid == nd.uid); 
 }
 
-void clean_vector_erase(std::vector<Noeud*> list , unsigned int index)
+void clean_vector_erase(std::vector<Noeud*>& list , unsigned int index)
 {
 	//swap node to be erased with the last one in the array then pop back
 	if(!( index == list.size()-1)) 

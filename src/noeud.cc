@@ -114,6 +114,12 @@ bool Noeud::is_connected_to(Noeud* node)
 	return false;
 }
 
+bool Noeud::is_under(double x, double y)
+{
+	if(is_in_circle(x,y,batiment))	return true;
+	else return false;
+}
+
 ///////////////////////////// Fonctions error //////////////////////////////////////
 bool Noeud::test_uid() const
 {

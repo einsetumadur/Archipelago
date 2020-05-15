@@ -81,6 +81,14 @@ void Ville::chargement(char* nom_fichier)
 			decodage(line, etat);			
 		}
 		if(chargement_verif)  cout << error::success() << endl; 
+
+		cout<<"[";
+		for (size_t i = 0; i < occupied_uids.size() ; i++)
+		{
+			cout<<occupied_uids[i]<<",";
+		}
+		cout<<"]"<<endl;
+		
 	}
 	else 	
 	{
@@ -218,14 +226,15 @@ void Ville::check_load_noeud(Noeud* newNoeud)
 	{
 		quartiers.push_back(newNoeud);
 		load_in_tile(newNoeud);
+		load_uid(newNoeud->getUid());
 	}
 }
 
 void Ville::load_in_tile(Noeud* node)
 {
 	// load the node in the corresponding tile of the infinite grid.
-	//cout<<"loading in tile index["<<get_tile_index(node->getX())<<":"
-		<<get_tile_index(node->getY())<<"]"<<endl;
+	/*cout<<"loading in tile index["<<get_tile_index(node->getX())<<":"
+		<<get_tile_index(node->getY())<<"]"<<endl;*/
 	grid[get_tile_index(node->getX())][get_tile_index(node->getY())].push_back(node);
 }
 
@@ -518,7 +527,7 @@ unsigned int Ville::nb_liens() const
 void Ville::ajout_noeud(double x, double y, Type_noeud type)
 {
 	//Comment avoir un uid different ? tableau uid occupés ?
-	static unsigned int currentUid;
+	unsigned int currentUid = occupied_uids.back() + 1;
 	switch (type)
 	{
 	case LOGEMENT:
@@ -567,7 +576,16 @@ void Ville::load_uid(unsigned int uid) //remplace la test uid ?
 		{
 			for (unsigned int i = 0; i < occupied_uids.size(); i++)
 			{
-				//if(uid < occupied_uids[i])	occupied_uids.insert();
+				if(uid < occupied_uids[i])
+				{
+					occupied_uids.push_back(occupied_uids.back());
+					for (unsigned int j = occupied_uids.size()-1; j >= i ; j--)
+					{
+						occupied_uids[j+1] = occupied_uids[j];
+					}
+					occupied_uids[i] = uid;
+					break;
+				}
 			}
 		}
 		
@@ -618,5 +636,14 @@ void Ville::edit_lien(Noeud* node1, Noeud* node2)
 
 Noeud* Ville::trouve_noeud(double x, double y)
 {
+	/*manque test sur les tiles adjacentes
+	for(auto node : grid[get_tile_index(x)][get_tile_index(y)])
+	{
+		if(node->is_under(x,y))	return node;
+	}*/
+	for(auto node : quartiers)
+	{
+		if(node->is_under(x,y))	return node;
+	}
 	return nullptr;
 }

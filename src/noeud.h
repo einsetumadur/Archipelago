@@ -59,6 +59,7 @@ public:
 	virtual bool maxi_link() const;
 	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const; 
 	bool is_connected_to(Noeud* node);
+	bool is_under(double x, double y);
 	
 	// fonctions de dessins
 	virtual void draw_noeud() const = 0;

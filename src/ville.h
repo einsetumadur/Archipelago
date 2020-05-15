@@ -49,22 +49,35 @@ private:
 	// Lecture et création de la ville
 	void decodage(std::string line, int& etat);
 	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);
+	void ajout_noeud(double x, double y, Type_noeud type);
+	void retire_noeud(Noeud* node);
+	void deplace_noeud(Noeud* node, double x, double y);
 	void error_noeud(Noeud* const nd);
+	void update_node_paint(Noeud* node, Couleur color);
 	void creation_lien(unsigned int uid_a, unsigned int uid_b);
 	void error_lien(Noeud* const a, Noeud* const b);
 	Noeud* trouve_lien(unsigned int uid) const; 
 	void redondance_uid(unsigned int numid);
-	void collis_noeuds();
+	void collis_noeuds(Noeud* node);
+	void check_load_noeud(Noeud* newNoeud);
+	void load_in_tile(Noeud* node);
+	unsigned int get_tile_index(double coord);
+	void unload_quartier(Noeud* node);
+	void unload_in_tile(Noeud* node);
+	void load_uid(unsigned int uid);
+	void unload_uid(unsigned int uid);
+	void clean_vector_erase(std::vector<Noeud*> list , unsigned int index);
 
 	bool chargement_verif;
 	Type_error msg_error;
 	unsigned int error_param_un;
 	unsigned int error_param_deux;
 	std::vector<Noeud*> quartiers;	
+	std::vector<std::vector<tile>> grid;
+	std::vector<unsigned int> occupied_uids;
 	double nbp_nbL;
 	double nbp_nbT;
 	double nbp_nbP;
-	
 };
 
 #endif

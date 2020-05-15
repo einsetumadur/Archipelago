@@ -16,11 +16,11 @@
 enum Type_error {NO_ERROR, RES_U, LITTLE_NBP, BIG_NBP, SELF_L_N, L_VAC, MULT_S_L, 
 				 MAX_L, N_L_SUP, ID_U, N_N_SUP};
 enum Scenario_djikstra {scen_aleatoire, scen_production, scen_transport};
+enum Type_noeud {LOGEMENT,TRANSPORT,PRODUCTION};
 		 
 const std::string logement = "Logement";
 const std::string production  = "Production";
 const std::string transport = "Transport";
-				 
 class Noeud 
 {
 public:
@@ -31,6 +31,7 @@ public:
 	std::string print_lien(Noeud* nd_lien) const;
 	void ajout_lien(Noeud* b);
 	void reset_tab_liens();
+	unsigned int get_grid_pos(double coord);
 	
 	// getters & setters 
 	unsigned int getNbp() const { return nbp; }
@@ -100,6 +101,7 @@ protected:
 							     const std::vector<Noeud*>& tn);
 };
 
+typedef std::vector<Noeud*> tile;
 class Logement : public Noeud 
 {
 	

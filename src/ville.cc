@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cmath>
 #include "ville.h"
 #include "noeud.h"
 #include "error.h"
@@ -34,6 +35,7 @@ Ville::Ville(bool val):
 	nbp_nbP(0), 
 	nbp_nbT(0)
 {
+	grid.resize(1000,vector<tile>(1000));
 }
 
 Ville::~Ville()
@@ -185,29 +187,51 @@ void Ville::ajout_noeud(istringstream& param,int& counter, Etat_lecture type)
 	{
 		switch(type)
 		{
-			case(LOGE):
-				quartiers.push_back(new Logement(numid,posx,posy,popmax));
-				error_noeud(quartiers.back());
-				collis_noeuds();
+			case(LOGE):{
+				Noeud* tmpl = new Logement(numid,posx,posy,popmax);
+				check_load_noeud(tmpl);
 				nbp_nbL += popmax;
 				++counter;
-				break;
-			case(TRAN):
-				quartiers.push_back(new Transport(numid,posx,posy,popmax));
-				error_noeud(quartiers.back());
-				collis_noeuds();
+				break;}
+			case(TRAN):{
+				Noeud* tmpt = new Transport(numid,posx,posy,popmax);
+				check_load_noeud(tmpt);
 				nbp_nbT += popmax;
 				++counter;
-				break;
-			case(PROD):
-				quartiers.push_back(new Production(numid,posx,posy,popmax));
-				error_noeud(quartiers.back());
-				collis_noeuds();	
+				break;}
+			case(PROD):{
+				Noeud* tmpp = new Production(numid,posx,posy,popmax);
+				check_load_noeud(tmpp);	
 				nbp_nbP += popmax;	
 				++counter;
-				break;
+				break;}
 		}
 	}
+}
+
+void Ville::check_load_noeud(Noeud* newNoeud)
+{
+	error_noeud(newNoeud);
+	collis_noeuds(newNoeud);
+	if(get_chargement_verif())
+	{
+		quartiers.push_back(newNoeud);
+		load_in_tile(newNoeud);
+	}
+}
+
+void Ville::load_in_tile(Noeud* node)
+{
+	// load the node in the corresponding tile of the infinite grid.
+	grid[get_tile_index(node->getX())][get_tile_index(node->getY())].push_back(node);
+}
+
+unsigned int Ville::get_tile_index(double coord)
+{
+	unsigned int tileindex = abs(coord/sqrt(max_capacity));
+	tileindex = 2*tileindex;
+	if(coord < 0 ) tileindex++;
+	return tileindex;
 }
 
 void Ville::error_noeud(Noeud* const nd)
@@ -335,25 +359,23 @@ void Ville::redondance_uid(unsigned int numid)
 	}
 }
 
-void Ville::collis_noeuds()
+void Ville::collis_noeuds(Noeud* node)
 {	
 	if(chargement_verif)
 	{	
 		for(size_t i(0) ; i < quartiers.size() ; ++i) 
 		{
-			for(size_t j(i+1) ; j < quartiers.size() ; ++j) 
-			{
-				if(collision_cercle(quartiers[i]->getBatiment(), 
-									quartiers[j]->getBatiment(), dist_min))
-				{										   
-						chargement_verif = false;
-						cout << error::node_node_superposition
-								(quartiers[i]->getUid(), quartiers[j]->getUid());
-						msg_error = N_N_SUP;
-						error_param_un = quartiers[i]->getUid();
-						error_param_deux =  quartiers[j]->getUid();
-				}
+			if(collision_cercle(quartiers[i]->getBatiment(), 
+								node->getBatiment(), dist_min))
+			{										   
+					chargement_verif = false;
+					cout << error::node_node_superposition
+							(quartiers[i]->getUid(), node->getUid());
+					msg_error = N_N_SUP;
+					error_param_un = quartiers[i]->getUid();
+					error_param_deux =  node->getUid();
 			}
+			
 		}
 	}
 }
@@ -483,4 +505,108 @@ unsigned int Ville::nb_liens() const
 	}
 	
 	return cmt;
+}
+
+/////////////////////////////////Modification//////////////////////////////////////////
+
+void Ville::ajout_noeud(double x, double y, Type_noeud type)
+{
+	//Comment avoir un uid different ? tableau uid occupés ?
+	static unsigned int currentUid;
+	switch (type)
+	{
+	case LOGEMENT:
+		check_load_noeud(new Logement(currentUid,x,y,min_capacity));
+		break;
+	case TRANSPORT:
+		check_load_noeud(new Transport(currentUid,x,y,min_capacity));
+		break;
+	case PRODUCTION:
+		check_load_noeud(new Production(currentUid,x,y,min_capacity));
+		break;
+	}
+}
+
+void Ville::retire_noeud(Noeud* node)
+{
+	unload_in_tile(node);
+	unload_quartier(node);
+	unload_uid(node->getUid());
+}
+
+void Ville::unload_in_tile(Noeud* node)
+{
+	unsigned int m = get_tile_index(node->getX()); //get position in grid.
+	unsigned int n = get_tile_index(node->getY());
+
+	for(uint i = 0 ; i < grid[m][n].size() ; i++){
+		if(grid[m][n][i] == node)	clean_vector_erase(grid[m][n],i);
+	}
+}
+
+void Ville::unload_quartier(Noeud* node)
+{
+	for(uint i = 0 ; i < quartiers.size() ; i++){
+		if(quartiers[i] == node)	clean_vector_erase(quartiers,i);
+	}
+}
+
+void Ville::clean_vector_erase(std::vector<Noeud*> list , unsigned int index)
+{
+	//swap node to be erased with the last one in the array then pop back
+	if(!( index == list.size()-1)) 
+	{
+		Noeud* tmpN = list.back();
+		list.back() == list[index];
+		list[index] == tmpN;
+	}
+
+	list.pop_back();
+}
+
+void Ville::load_uid(unsigned int uid) //remplace la test uid ?
+{
+	if(occupied_uids.empty())	occupied_uids.push_back(uid);
+	else
+	{
+		if(uid > occupied_uids.back())	occupied_uids.push_back(uid);
+		else
+		{
+			for (unsigned int i = 0; i < occupied_uids.size(); i++)
+			{
+				//if(uid < occupied_uids[i])	occupied_uids.insert();
+			}
+		}
+		
+	}
+}
+
+void Ville::unload_uid(unsigned int uid)
+{
+	//could use bissection algo
+	for (uint i = 0; i < occupied_uids.size(); i++)
+	{
+		if(uid == occupied_uids[i])
+		{
+			for (uint j = i; j < occupied_uids.size()-1; j++)
+			{
+				occupied_uids[j] == occupied_uids[j+1];
+			}
+			occupied_uids.pop_back();
+		}
+	}
+	
+}
+
+void Ville::deplace_noeud(Noeud* node, double x, double y)
+{
+	//todo
+}
+
+void Ville::update_node_paint(Noeud* node, Couleur color)
+{
+	if(!(node == nullptr))
+	{
+		node->updatePaint(color);
+	}
 }

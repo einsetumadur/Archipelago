@@ -92,6 +92,28 @@ void Noeud::ajout_lien(Noeud* b)
 	tab_liens.push_back(b);
 }
 
+void Noeud::disconnect(Noeud* node)
+{
+	for(unsigned int i = 0 ; i < tab_liens.size(); i++)
+	{
+		if(node == tab_liens[i])
+		{
+			clean_vector_erase(tab_liens,i);
+			break;
+		}
+	}
+	
+}
+
+bool Noeud::is_connected_to(Noeud* node)
+{
+	for( auto noeud : tab_liens)
+	{
+		if(noeud = node) return true;
+	}
+	return false;
+}
+
 ///////////////////////////// Fonctions error //////////////////////////////////////
 bool Noeud::test_uid() const
 {
@@ -513,4 +535,17 @@ double Noeud::temps_lien(Noeud* b) const
 bool Noeud::operator==(const Noeud& nd) const 
 {
 	return (uid == nd.uid); 
+}
+
+void clean_vector_erase(std::vector<Noeud*> list , unsigned int index)
+{
+	//swap node to be erased with the last one in the array then pop back
+	if(!( index == list.size()-1)) 
+	{
+		Noeud* tmpN = list.back();
+		list.back() == list[index];
+		list[index] == tmpN;
+	}
+
+	list.pop_back();
 }

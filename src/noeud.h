@@ -32,6 +32,7 @@ public:
 	void ajout_lien(Noeud* b);
 	void reset_tab_liens();
 	unsigned int get_grid_pos(double coord);
+	void disconnect(Noeud* node);
 	
 	// getters & setters 
 	unsigned int getNbp() const { return nbp; }
@@ -57,6 +58,7 @@ public:
 	bool multiple_link(Noeud* b)const;
 	virtual bool maxi_link() const;
 	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const; 
+	bool is_connected_to(Noeud* node);
 	
 	// fonctions de dessins
 	virtual void draw_noeud() const = 0;
@@ -157,5 +159,7 @@ private:
 double short_path(const std::vector<Noeud*>& tn,unsigned int nb_p, 
 				  unsigned int nb_t);			  // MTA pour être appelé par ville
 double cout_infra(const std::vector<Noeud*>& tn); // CI pour être appelé par ville
+
+void clean_vector_erase(std::vector<Noeud*>& list , unsigned int index);
 
 #endif

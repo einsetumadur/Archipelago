@@ -45,12 +45,15 @@ public:
 	void draw_quartiers() const;
 	void draw_short_path(Couleur paint, size_t indice_logement) const;
 
+	//modification
+	void ajout_noeud(double x, double y, Type_noeud type);
+	void retire_noeud(Noeud* node);
+	void edit_lien(Noeud* node1, Noeud* node2);
+
 private:	
 	// Lecture et création de la ville
 	void decodage(std::string line, int& etat);
 	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);
-	void ajout_noeud(double x, double y, Type_noeud type);
-	void retire_noeud(Noeud* node);
 	void deplace_noeud(Noeud* node, double x, double y);
 	void error_noeud(Noeud* const nd);
 	void update_node_paint(Noeud* node, Couleur color);
@@ -66,7 +69,6 @@ private:
 	void unload_in_tile(Noeud* node);
 	void load_uid(unsigned int uid);
 	void unload_uid(unsigned int uid);
-	void clean_vector_erase(std::vector<Noeud*> list , unsigned int index);
 
 	bool chargement_verif;
 	Type_error msg_error;

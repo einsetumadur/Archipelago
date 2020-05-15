@@ -551,19 +551,6 @@ void Ville::unload_quartier(Noeud* node)
 	}
 }
 
-void Ville::clean_vector_erase(std::vector<Noeud*> list , unsigned int index)
-{
-	//swap node to be erased with the last one in the array then pop back
-	if(!( index == list.size()-1)) 
-	{
-		Noeud* tmpN = list.back();
-		list.back() == list[index];
-		list[index] == tmpN;
-	}
-
-	list.pop_back();
-}
-
 void Ville::load_uid(unsigned int uid) //remplace la test uid ?
 {
 	if(occupied_uids.empty())	occupied_uids.push_back(uid);
@@ -608,5 +595,17 @@ void Ville::update_node_paint(Noeud* node, Couleur color)
 	if(!(node == nullptr))
 	{
 		node->updatePaint(color);
+	}
+}
+
+void edit_lien(Noeud* node1, Noeud* node2)
+{
+	if(node1->is_connected_to(node2))
+	{
+		node1->disconnect(node2);
+		node2->disconnect(node1);
+	} else {
+		node1->ajout_lien(node2);
+		node2->ajout_lien(node1);
 	}
 }

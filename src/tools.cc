@@ -79,6 +79,14 @@ bool champ(Cercle a, Cercle b, Cercle c)
 			prod_scal(bc, scalaire_vecteur(-1, d.directeur)) >= 0);
 }
 
+bool is_in_circle(double x, double y, Cercle circle)
+{
+	double dist_to_center = sqrt((x - circle.centre.pos_x)*(x - circle.centre.pos_x)+
+								 (y - circle.centre.pos_y)*(y - circle.centre.pos_y));
+	if(dist_to_center <= circle.rayon) return true;
+	else return false;
+}
+
 void draw_ligne(Point c_a, Point c_b, Couleur paint)
 {
 	ligne(c_a.pos_x, c_a.pos_y, c_b.pos_x, c_b.pos_y, paint);

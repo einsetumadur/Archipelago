@@ -46,8 +46,10 @@ public:
 	void draw_short_path(Couleur paint, size_t indice_logement) const;
 
 	//modification
+	Noeud* trouve_noeud(double x, double y);
 	void ajout_noeud(double x, double y, Type_noeud type);
 	void retire_noeud(Noeud* node);
+	void update_node_paint(Noeud* node, Couleur color);
 	void edit_lien(Noeud* node1, Noeud* node2);
 
 private:	
@@ -56,7 +58,6 @@ private:
 	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);
 	void deplace_noeud(Noeud* node, double x, double y);
 	void error_noeud(Noeud* const nd);
-	void update_node_paint(Noeud* node, Couleur color);
 	void creation_lien(unsigned int uid_a, unsigned int uid_b);
 	void error_lien(Noeud* const a, Noeud* const b);
 	Noeud* trouve_lien(unsigned int uid) const; 

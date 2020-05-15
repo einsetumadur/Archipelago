@@ -598,7 +598,7 @@ void Ville::update_node_paint(Noeud* node, Couleur color)
 	}
 }
 
-void edit_lien(Noeud* node1, Noeud* node2)
+void Ville::edit_lien(Noeud* node1, Noeud* node2)
 {
 	if(node1->is_connected_to(node2))
 	{
@@ -608,4 +608,9 @@ void edit_lien(Noeud* node1, Noeud* node2)
 		node1->ajout_lien(node2);
 		node2->ajout_lien(node1);
 	}
+}
+
+Noeud* Ville::trouve_noeud(double x, double y)
+{
+	return nullptr;
 }

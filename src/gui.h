@@ -35,16 +35,19 @@ public:
 	double get_zoom_ind() const;
 	Ville* get_ville_ptr() const;
 	void set_cursor(double x,double y);
+	void add_point(Point p);
+	Space space;
+
 protected: 
 	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 
 private:
 	void projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr, Space space);
 	bool empty;
-	Space space;
 	double currentZoom;
 	Ville* maVille;
 	double mouseCursor[2];
+	std::vector<Point> centre;
 };
 
 class MaFenetre : public Gtk::Window
@@ -70,9 +73,14 @@ protected:
 	bool on_button_press_event(GdkEventButton * event);
 	bool on_button_release_event(GdkEventButton * event);
 	bool on_key_press_event(GdkEventKey * key_event);
+	
+	void on_button_press_edit();
+	void on_button_release_edit();
 
 	Gtk::Box mainWindow,leftPanel,rightPanel,general,display,editor,information;
 	Dessin graph;
+	Noeud* nd_actif;
+	Type_noeud nd_button;
 	Gtk::Button exitButton,newButton,openButton,saveButton;
 	Gtk::Button shortPathButton,zoominButton,zoomoutButton,zoomresetButton;
 	Gtk::ToggleButton editButton;

@@ -44,7 +44,7 @@ void Dessin::encadre()
 	space.xMin = -space.size/2;
 	space.xMax = space.size/2;
 	space.yMin = -space.size/2;
-	space.yMax = space.size/2;
+	space.yMax = space.size/2;	 
 }
 
 void Dessin::set_zoom(zAction act)
@@ -78,7 +78,7 @@ void Dessin::refresh()
 	{
 		Gdk::Rectangle rect(0,0,get_allocation().get_width(),
 							get_allocation().get_height());
-		win->invalidate_rect(rect,false);
+		win->invalidate_rect(rect,true);
 	}
 }
 
@@ -88,9 +88,10 @@ void Dessin::projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr, Space spac
 	double factor = get_allocation().get_height()/space.size;
 
 	cr->set_identity_matrix();
-	cr->translate(get_allocation().get_width()/2 +	//centre le dessin
+	cr->translate(get_allocation().get_height()/2 +	//centre le dessin
 				  get_allocation().get_x(),
 				  get_allocation().get_height()/2);
+				  		  
 	cr->scale(factor,-factor);	//système euclidien
 }
 
@@ -104,6 +105,8 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 		graphic_set_context(cr);    //pour dessiner ville
 
+		projectionOrtho(cr,space);
+
 		cr->set_line_width(epaisseur_trait);
 		cr->set_source_rgb(1,1,1);
 		cr->move_to(0,0);
@@ -112,17 +115,15 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 		cr->line_to(0,height);
 		cr->line_to(0,0);
 		cr->paint();
-		cr->stroke();
-
-		cr->set_source_rgb(0,0,0);
-		cr->move_to(mouseCursor[0]-20,mouseCursor[1]);
-		cr->line_to(mouseCursor[0]+20,mouseCursor[1]);
-		cr->move_to(mouseCursor[0],mouseCursor[1]-20);
-		cr->line_to(mouseCursor[0],mouseCursor[1]+20);
-
-		projectionOrtho(cr,space);
-
-		if(!(maVille == nullptr))  maVille->draw_ville(NOIR);
+		cr->stroke();		
+		
+		if(centre.size()>0) 
+		{
+			cercle(centre[0].pos_x, centre[0].pos_y, 200, ROUGE);
+			centre.clear();
+		}
+						
+		if(!(maVille == nullptr))  maVille->draw_ville();
 	}
 	return true;
 }
@@ -131,6 +132,11 @@ void Dessin::set_cursor(double x,double y)
 {
 	mouseCursor[0] = x;
 	mouseCursor[1] = y;
+}
+
+void Dessin::add_point(Point p)
+{
+	centre.push_back(p);
 }
 
 ///////////////////////// Section Fenetre /////////////////////////////////////////////
@@ -153,7 +159,9 @@ MaFenetre::MaFenetre(char* fichier):
 	editButton("edit link"),housing(type,"housing"),
 	transport(type,"transport"),production(type,"production"),
 	infoFrame("Information"),
-	MTA("MTA : 0"),CI("CI : 0"),ENJ("ENJ : 0")
+	MTA("MTA : 0"),CI("CI : 0"),ENJ("ENJ : 0"),
+	nd_actif(nullptr),
+	nd_button(LOGEMENT)
 {
 	graph.set_ville(new Ville(true));
 	graph.get_ville_ptr()->chargement(fichier);
@@ -165,7 +173,7 @@ MaFenetre::MaFenetre(char* fichier):
 	graph.set_size_request(default_drawing_size,default_drawing_size);
 	currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
 	graph.set_cursor(0,0);
-
+   
 	add(mainWindow);
 
 	construct_scaffolding();
@@ -182,27 +190,27 @@ MaFenetre::~MaFenetre()
 
 void MaFenetre::construct_scaffolding()
 {
-	mainWindow.pack_start(leftPanel);
-	mainWindow.pack_start(rightPanel);
+	mainWindow.pack_start(leftPanel, Gtk::PACK_SHRINK);
+	mainWindow.pack_start(rightPanel, Gtk::PACK_SHRINK);
 
 	general.set_border_width(epaisseur_bord);
-	general.pack_start(exitButton,false,false);
-	general.pack_start(newButton,false,false);
-	general.pack_start(openButton,false,false);
-	general.pack_start(saveButton,false,false);
+	general.pack_start(exitButton,false,false, Gtk::PACK_SHRINK);
+	general.pack_start(newButton,false,false, Gtk::PACK_SHRINK);
+	general.pack_start(openButton,false,false, Gtk::PACK_SHRINK);
+	general.pack_start(saveButton,false,false, Gtk::PACK_SHRINK);
 
 	display.set_border_width(epaisseur_bord);
-	display.pack_start(shortPathButton,false,false);
-	display.pack_start(zoominButton,false,false);
-	display.pack_start(zoomoutButton,false,false);
-	display.pack_start(zoomresetButton,false,false);
+	display.pack_start(shortPathButton,false,false, Gtk::PACK_SHRINK);
+	display.pack_start(zoominButton,false,false, Gtk::PACK_SHRINK);
+	display.pack_start(zoomoutButton,false,false, Gtk::PACK_SHRINK);
+	display.pack_start(zoomresetButton,false,false, Gtk::PACK_SHRINK);
 	display.pack_start(currentZoom);
 
 	editor.set_border_width(epaisseur_bord);
-	editor.pack_start(editButton,false,false);
-	editor.pack_start(housing,false,false);
-	editor.pack_start(transport,false,false);
-	editor.pack_start(production,false,false);
+	editor.pack_start(editButton,false,false, Gtk::PACK_SHRINK);
+	editor.pack_start(housing,false,false, Gtk::PACK_SHRINK);
+	editor.pack_start(transport,false,false, Gtk::PACK_SHRINK);
+	editor.pack_start(production,false,false, Gtk::PACK_SHRINK);
 
 	information.set_border_width(epaisseur_bord);
 	information.pack_start(ENJ);
@@ -233,7 +241,7 @@ void MaFenetre::connect_signal_handlers()
 	saveButton.signal_clicked().connect(sigc::mem_fun(*this,
 				&MaFenetre::on_button_clicked_save));
 
-	shortPathButton.signal_clicked().connect( sigc::mem_fun(*this,
+	shortPathButton.signal_clicked().connect(sigc::mem_fun(*this,
 				&MaFenetre::on_button_clicked_shortestPath));
 	zoominButton.signal_clicked().connect(sigc::mem_fun(*this,
 				&MaFenetre::on_button_clicked_zoomIn));
@@ -346,6 +354,7 @@ void MaFenetre::on_button_clicked_save()
 
 void MaFenetre::on_button_clicked_shortestPath()
 {
+	shortPathButton.signal_activate();
 	cout<<"ShortestPath"<<endl;
 }
 
@@ -377,22 +386,36 @@ void MaFenetre::on_button_clicked_zoomReset()
 
 void MaFenetre::on_button_clicked_edit()
 {
-	cout<<"edit link "<<endl;
+	if(editButton.get_active())  on_button_press_edit();
+	else on_button_release_edit();
+}
+
+void MaFenetre::on_button_press_edit()
+{
+	/* if(activeNode == no_link) 
+	{
+		cout << "Please select first a node to edit !" << endl;
+		editButton.set_active(false);
+	} */		
+}
+void MaFenetre::on_button_release_edit()
+{
+	cout << "release! " << editButton.get_active() << endl;
 }
 
 void MaFenetre::on_button_clicked_housing()
 {
-	//not implemented yet
+	if(housing.get_active())  nd_button = LOGEMENT;
 }
 
 void MaFenetre::on_button_clicked_transport()
 {
-	//not implemented yet
+	if(transport.get_active())  nd_button = TRANSPORT;
 }
 
 void MaFenetre::on_button_clicked_production()
 {
-	//not implemented yet
+	if(production.get_active())  nd_button = PRODUCTION;
 }
 
 string d_to_sci(double num)
@@ -413,16 +436,124 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 		double width = graph.get_allocation().get_width();
 		double height= graph.get_allocation().get_height();
 		
+		double x_d = clic_x - dessin_x;
+		double y_d = clic_y - dessin_y;
+		double x_m = (x_d/width)*(dim_max - (-1*dim_max)) - dim_max;
+		double y_m = dim_max - (dim_max + dim_max)*(y_d/height);
+	
 		if(clic_x >= dessin_x && clic_x <= dessin_x + width &&
 		   clic_y >= dessin_y && clic_y <= dessin_y + height)
 		{ 
-			graph.set_cursor(clic_x - dessin_x, clic_y - dessin_y);
+			graph.set_cursor(x_m, y_m);			
+			graph.add_point({x_m, y_m});
+			graph.refresh();
+				
+			if(event->button == left_click)	
+			{
+				 Noeud* clic_nd = graph.get_ville_ptr()->trouve_noeud(x_m, y_m);
+				 if(clic_nd == nullptr)
+				 {
+					if(nd_actif != nullptr)	
+					{
+						graph.get_ville_ptr()->update_node_paint(nd_actif, NOIR);
+						nd_actif = nullptr; 
+						update();
+					}
+					else
+					{
+						cout << "HELLO" << endl;
+						graph.get_ville_ptr()->ajout_noeud(x_m, y_m, nd_button);			//creer_noeud(...) return l'indice du nouveau noeud dans quartiers, place le nd au bon endroit, et fais les tests nécessaire.
+						
+					/*	if(not(get_chargement_verif()))
+						{	
+							switch(get_msg_error()):
+								case N_N_SUP: 
+									cout << "Collision with existing node ! " << endl;
+									changer chargement_verif à true;
+									ainsi que les attributs de msg error;
+									delete_noeud(new_nd);
+									break;
+								case N_L_SUP:
+									cout << "Collision with existing link ! " << endl;
+									changer chargement_verif à true;
+									ainsi que les attributs de msg error;
+									delete_noeud(new_nd);
+									break;
+							update();
+
+						}*/
+						update();
+					}
+				}
+				else if(clic_nd != nd_actif)
+				{
+				    if(editButton.get_active())
+				    {
+						graph.get_ville_ptr()->edit_lien(clic_nd, nd_actif);		//-> si les deux noeuds sont deja reliés, supprimer le lien. Sinon, créer le lien et tester collision
+						
+						/*if(not(chargement_verif))
+						{
+							cout << le msg de error.cc pour collision entre lien et quartier << endl;
+							changer chargement_verif à true;
+							ainsi que les attributs de msg error;
+						}*/
+						
+						update();
+					}
+				    else
+				    {
+						if(nd_actif == nullptr)
+						{
+							graph.get_ville_ptr()->update_node_paint(clic_nd, ROUGE);
+							update();
+						}
+						else
+						{
+							graph.get_ville_ptr()->update_node_paint(nd_actif, NOIR);						
+							graph.get_ville_ptr()->update_node_paint(clic_nd, ROUGE);
+							update();
+						}
+					}
+				}
+				else if(clic_nd == nd_actif and nd_actif != nullptr)
+				{
+					if(editButton.get_active())  cout << "Node cannot connect to itself" << endl;
+					else
+					{
+						graph.get_ville_ptr()->retire_noeud(clic_nd);			// delete quartiers[clic_nd], attention à bien delete les liens et tout aussi !
+						update();
+					}
+				}	
+				cout<<"mouse left clicked at ( " <<	 x_m <<" , "<< y_m <<" )"<<endl;
+			}
 			
-			if(event->button == left_click)	 cout<<"mouse left clicked at ( "<<clic_x - dessin_x<<" , "<<clic_y - dessin_y<<" )"<<endl;
-			else if(event->button == right_click)	cout<<"mouse right clicked"<<endl;
+			else if(event->button == right_click)
+			{
+				/*if(nd_actif != nullptr)
+				{
+					if(not(graph.get_ville_ptr()->deplace_noeud(Noeud*, x_m, y_m)))		// deplace_active_noeud(...) return un bool de si lopération sest bien passé, déplace le noeud en question, refais tous les liens, etc)
+					{																	// et dans le cas ou ya erreur, il rechange les coordonné€s de activeNode au ou cétait normalement.			
+						switch(graph.get_ville_ptr()->get_msg_error()):
+							case N_N_SUP:
+								cout << "There is a collision between existing nodes ! " << endl;
+								changer chargement_verif à true;
+								ainsi que les attributs de msg error;
+								update();
+								break;
+							case N_L_SUP:
+								cout << "Some links collide with some nodes ! " << endl;
+								changer chargement_verif à true;
+								ainsi que les attributs de msg error;
+								update();
+								break;
+					}
+					else  update();
+				}	*/
+				cout<<"mouse right clicked"<<endl;
+			}
 		}
-	}
 	return true;
+	}
 }
 
 bool MaFenetre::on_button_release_event(GdkEventButton * event)
@@ -461,16 +592,19 @@ bool MaFenetre::on_key_press_event(GdkEventKey * key_event)
 	{
 		switch(gdk_keyval_to_unicode(key_event->keyval))
 		{
-			case a:
-				cout<<"typed a"<<endl;
+			case 'i':
+				cout<<"typed i"<<endl;
+				on_button_clicked_zoomIn();
 				break;
-			case w:
-				cout<<"typed w"<<endl;
+			case 'o':
+				cout<<"typed o"<<endl;
+				on_button_clicked_zoomOut();
 				break;
-			case s:
-				cout<<"typed s"<<endl;
+			case 'r':
+				cout<<"typed r"<<endl;
+				on_button_clicked_zoomReset();
 				break;
-			case d:
+			case 'd':
 				cout<<"typed d"<<endl;
 				break;
 		}
@@ -491,6 +625,7 @@ void MaFenetre::update()
 	}
 	else
 	{
+		/* swtich - case avec les msg d'erreur + enlever les cout << msg erreur de ville.cc*/
 		graph.get_ville_ptr()->reset();
 		ENJ.set_label("ENJ : 0");
 		CI.set_label("CI : 0");
@@ -498,3 +633,4 @@ void MaFenetre::update()
 	}
 	graph.refresh();
 }
+

@@ -107,9 +107,9 @@ void Noeud::disconnect(Noeud* node)
 
 bool Noeud::is_connected_to(Noeud* node)
 {
-	for( auto noeud : tab_liens)
+	for(auto noeud : tab_liens)
 	{
-		if(noeud = node) return true;
+		if(noeud == node) return true;
 	}
 	return false;
 }
@@ -220,24 +220,64 @@ void Noeud::draw_path(Couleur paint) const
 {
 }
 
-void Logement::draw_path(Couleur paint) const
+void Logement::draw_path(Couleur paint_f) const
 {
 	// chemin le plus court pour production :
-	for(size_t i(0) ; i != short_path_prod.size() - 1; ++i) 
+	for(auto nd : get_short_path_prod()) 
 	{
-		short_path_prod[i]->draw_noeud();
-		draw_ligne(short_path_prod[i]->getCentre(),
-				   short_path_prod[i+1]->getCentre(), paint);
+		nd->updatePaint(paint_f);
+	}
+	unsigned int p_size = short_path_prod.size();
+	if(p_size == 1)
+	{
+		draw_ligne(short_path_prod[0]->getCentre(), 
+				   getCentre(), VERT);
+		short_path_prod[0]->draw_noeud();
+		draw_noeud();
+	}
+	else if (p_size > 0)
+	{
+		draw_ligne(short_path_prod.back()->getCentre(), 
+				   getCentre(), paint_f);
+		short_path_prod.back()->draw_noeud();
+		draw_noeud();
+		for(size_t i(0) ; p_size != 0 && i != p_size - 1; ++i) 
+		{
+			draw_ligne(short_path_prod[i]->getCentre(),
+					   short_path_prod[i+1]->getCentre(), paint_f);
+			short_path_prod[i]->draw_noeud();
+			short_path_prod[i+1]->draw_noeud();
+		}
 	}
 	
 	// chemin le plus court pour transport : 
-	for(size_t i(0) ; i != short_path_tran.size() - 1; ++i) 
+	for(auto nd : get_short_path_tran()) 
 	{
-		short_path_tran[i]->draw_noeud();
-		draw_ligne(short_path_tran[i]->getCentre(), 
-				   short_path_tran[i+1]->getCentre(), paint);
+		nd->updatePaint(VERT);
 	}
-
+	unsigned int t_size = short_path_tran.size();	
+		
+	if(t_size == 1)
+	{
+		draw_ligne(short_path_tran[0]->getCentre(), 
+				   getCentre(), paint_f);
+		short_path_tran[0]->draw_noeud();
+		draw_noeud();
+	}
+	else if (t_size > 0)
+	{
+		draw_ligne(short_path_tran.back()->getCentre(), 
+				   getCentre(), paint_f);
+		short_path_tran.back()->draw_noeud();
+		draw_noeud();
+		for(size_t i(0) ; t_size != 0 && i != t_size - 1; ++i) 
+		{
+			draw_ligne(short_path_tran[i]->getCentre(), 
+					   short_path_tran[i+1]->getCentre(), paint_f);
+			short_path_tran[i]->draw_noeud();
+			short_path_tran[i+1]->draw_noeud();
+		}
+	}
 }
 
 ///////////////////////////// Section CI ///////////////////////////////////////////
@@ -514,20 +554,31 @@ unsigned int Noeud::find_min_access(const vector<int>& queue,
 		// vers un noeud production
 void Logement::path_prod(const vector<Noeud*>& tn, unsigned int nd)
 {
+	if(short_path_prod.size() != 0)  short_path_prod.clear();
 	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) 
 	{
-		short_path_prod.push_back(p);
+		bool tmp(true);
+		for(auto nd : short_path_prod)
+		{
+			if(nd == p)  tmp = false;
+		}
+		if(tmp)  short_path_prod.push_back(p);
 	}	
 }
 		// vers un noeud transport
 void Logement::path_tran(const vector<Noeud*>& tn, unsigned int nd)
 {
+	if(short_path_tran.size() != 0)  short_path_tran.clear();
 	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) 
 	{
-		short_path_tran.push_back(p);
+		bool tmp(true);
+		for(auto nd : short_path_tran)
+		{
+			if(nd == p)  tmp = false;
+		}
+		if(tmp)  short_path_tran.push_back(p);
 	}
 }
-
 // temps de connexion d'un lien
 double Noeud::temps_lien(Noeud* b) const
 {
@@ -549,9 +600,8 @@ void clean_vector_erase(std::vector<Noeud*>& list , unsigned int index)
 	if(!( index == list.size()-1)) 
 	{
 		Noeud* tmpN = list.back();
-		list.back() == list[index];
-		list[index] == tmpN;
+		list.back() = list[index];
+		list[index] = tmpN;
 	}
-
 	list.pop_back();
 }

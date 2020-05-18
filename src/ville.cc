@@ -231,6 +231,7 @@ void Ville::check_load_noeud(Noeud* newNoeud)
 {
 	error_noeud(newNoeud);
 	collis_noeuds(newNoeud);
+	obstruction_lien(newNoeud);
 	if(get_chargement_verif())
 	{
 		quartiers.push_back(newNoeud);
@@ -389,17 +390,19 @@ void Ville::collis_noeuds(Noeud* node)
 	{	
 		for(size_t i(0) ; i < quartiers.size() ; ++i) 
 		{
-			if(collision_cercle(quartiers[i]->getBatiment(), 
-								node->getBatiment(), dist_min))
-			{										   
-					chargement_verif = false;
-					cout << error::node_node_superposition
-							(quartiers[i]->getUid(), node->getUid());
-					msg_error = N_N_SUP;
-					error_param_un = quartiers[i]->getUid();
-					error_param_deux =  node->getUid();
+			if(!(quartiers[i] == node))
+			{
+				if(collision_cercle(quartiers[i]->getBatiment(), 
+									node->getBatiment(), dist_min))
+				{										   
+						chargement_verif = false;
+						cout << error::node_node_superposition
+								(quartiers[i]->getUid(), node->getUid());
+						msg_error = N_N_SUP;
+						error_param_un = quartiers[i]->getUid();
+						error_param_deux =  node->getUid();
+				}
 			}
-			
 		}
 	}
 }
@@ -538,16 +541,6 @@ unsigned int Ville::nb_liens() const
 
 /////////////////////////////////Modification//////////////////////////////////////////
 
-void Ville::modif_nbp(Noeud* nd, Point p, Point b)
-{
-	Vecteur vect_1 = {p.pos_x - nd->getX(), p.pos_y - nd->getY()};
-	double r_deb = (norme(vect_1) - nd->getRayon());
-	double r_fin = norme({b.pos_x - nd->getX(), b.pos_y - nd->getY()});
-	
-	nd->setNBP( nd->getRayon() + (r_fin - r_deb)*(r_fin - r_deb) );
-}
-
-
 void Ville::ajout_noeud(double x, double y, Type_noeud type)
 {
 	//Comment avoir un uid different ? tableau uid occupés ?
@@ -645,9 +638,16 @@ void Ville::unload_uid(unsigned int uid)
 	}
 }
 
-void Ville::deplace_noeud(Noeud* node, double x, double y)
+void Ville::deplace_noeud(Noeud* node, Point p)
 {
-	//todo
+	Point prev_point = node->getCentre();
+
+	node->setCentre(p);
+	obstruction_lien(node);
+	if(chargement_verif)	collis_noeuds(node);
+
+	if(!chargement_verif)	node->setCentre(prev_point);
+
 }
 
 void Ville::update_node_paint(Noeud* node, Couleur color)
@@ -691,4 +691,53 @@ Noeud* Ville::trouve_noeud(double x, double y)
 		if(node->is_under(x,y))	return node;
 	}
 	return nullptr;
+}
+
+void Ville::resize_node(Noeud* node, Point p1, Point p2)
+{
+	//figures out the delta of distances from center of node
+	double centx = node->getX();
+	double centy = node->getY();
+	Vecteur vectInt = {p1.pos_x-centx,p1.pos_y-centy};
+	Vecteur vectFin = {p2.pos_x-centx,p2.pos_y-centy};
+	double delta = norme(vectFin)-norme(vectInt);
+
+	double prev_nbp = node->getNbp();
+	double prev_rayon = sqrt(prev_nbp);
+
+	node->setNBP((prev_rayon + delta)*(prev_rayon + delta));
+
+	if(!(NO_ERROR == node->test_nbp())) chargement_verif = false;
+	obstruction_lien(node);
+	collis_noeuds(node);
+
+	if(!chargement_verif)	node->setNBP(prev_nbp);
+}
+
+void Ville::obstruction_lien(Noeud* node)
+{
+	for(auto noeud : quartiers)
+	{
+		noeud->updateIn(true);
+	}
+
+	for(auto noeud : quartiers)
+	{
+		vector<Noeud*> linkedList = noeud->getLiens();
+		for(auto linked : linkedList)
+		{
+			if(linked->getIn())
+			{
+				if(node->collis_lien_quartier(noeud,linked))
+				{
+				cout << error::node_link_superposition(node->getUid());
+				chargement_verif = false;
+				msg_error = N_L_SUP;
+				error_param_un = node->getUid();
+				}
+			}	
+		}
+		noeud->updateIn(false);
+	}
+	
 }

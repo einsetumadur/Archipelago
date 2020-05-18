@@ -589,7 +589,7 @@ bool MaFenetre::on_button_release_event(GdkEventButton * event)
 					}
 					else
 					{
-						graph.get_ville_ptr()->modif_nbp(nd_actif, press_click, release_click);
+						graph.get_ville_ptr()->resize_node(nd_actif, press_click, release_click);
 						graph.get_ville_ptr()->set_chargement_verif(true);
 						update_mta = false; update_ci = true; update_enj = true;
 					}

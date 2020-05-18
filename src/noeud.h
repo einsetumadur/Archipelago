@@ -52,8 +52,9 @@ public:
 	virtual std::string getType() const = 0;
 	void updateIn(bool b);	
 	void updatePaint(Couleur c);
-	
-	void setNBP(double met) { batiment.rayon = sqrt(met); nbp = met;}
+	void setNBP(double met);
+	void setCentre(Point p);
+
 	// fonctions de tests
 	bool test_uid() const;
 	Type_error test_nbp() const;

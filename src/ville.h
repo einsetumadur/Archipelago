@@ -51,18 +51,19 @@ public:
 	Noeud* trouve_noeud(double x, double y);
 	void ajout_noeud(double x, double y, Type_noeud type);
 	void retire_noeud(Noeud* node);
+	void resize_node(Noeud* node, Point p1, Point p2);
+	void deplace_noeud(Noeud* node, Point p);
 	void update_node_paint(Noeud* node, Couleur color);
 	void edit_lien(Noeud* node1, Noeud* node2);
-	void modif_nbp(Noeud* nd, Point p, Point b);
 	
 private:	
 	// Lecture et création de la ville
 	void decodage(std::string line, int& etat);
 	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);
-	void deplace_noeud(Noeud* node, double x, double y);
 	void error_noeud(Noeud* const nd);
 	void creation_lien(unsigned int uid_a, unsigned int uid_b);
 	void error_lien(Noeud* const a, Noeud* const b);
+	void obstruction_lien(Noeud* node);
 	Noeud* trouve_lien(unsigned int uid) const; 
 	void redondance_uid(unsigned int numid);
 	void collis_noeuds(Noeud* node);

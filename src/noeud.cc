@@ -87,6 +87,17 @@ void Noeud::updatePaint(Couleur c)
 	paint = c;
 }
 
+void Noeud::setNBP(double met)
+{
+	batiment.rayon = sqrt(met); 
+	nbp = met;
+}
+
+void Noeud::setCentre(Point p)
+{
+	batiment.centre = p;
+}
+
 void Noeud::ajout_lien(Noeud* b) 
 {
 	tab_liens.push_back(b);

@@ -20,6 +20,8 @@ struct Space
 	double zoom,size;
 	double xMin,xMax;
 	double yMin,yMax; 
+	double width, height;
+	double xc, yc;
 };
 
 class Dessin : public Gtk::DrawingArea
@@ -32,10 +34,12 @@ public:
 	void encadre();
 	void set_ville(Ville* ville);
 	void set_zoom(zAction act);
-	double get_zoom_ind() const;
-	Ville* get_ville_ptr() const;
-	void set_cursor(double x,double y);
-	void add_point(Point p);
+	void update_show_path(bool b);
+	double get_zoom_ind() const { return space.zoom; }
+	Ville* get_ville_ptr() const { 	return maVille; }
+	bool get_show_path() const { return show_path; }
+	Noeud* get_nd_actif() const { return nd_actif; }
+	void set_nd_actif(Noeud* nd);
 	Space space;
 
 protected: 
@@ -46,8 +50,8 @@ private:
 	bool empty;
 	double currentZoom;
 	Ville* maVille;
-	double mouseCursor[2];
-	std::vector<Point> centre;
+	Noeud* nd_actif;
+	bool show_path;
 };
 
 class MaFenetre : public Gtk::Window
@@ -56,7 +60,6 @@ public :
 	MaFenetre(char* fichier);
 	virtual ~MaFenetre();
 	void update();
-
 protected:
 	void on_button_clicked_exit();
 	void on_button_clicked_new();
@@ -74,19 +77,26 @@ protected:
 	bool on_button_release_event(GdkEventButton * event);
 	bool on_key_press_event(GdkEventKey * key_event);
 	
+	void on_button_press_shortestPath();
+	void on_button_release_shortestPath();
 	void on_button_press_edit();
 	void on_button_release_edit();
 
-	Gtk::Box mainWindow,leftPanel,rightPanel,general,display,editor,information;
 	Dessin graph;
-	Noeud* nd_actif;
 	Type_noeud nd_button;
+	Point press_click;
+	Point release_click;
+	bool update_mta;
+	bool update_ci;
+	bool update_enj;
+	
+	Gtk::Box mainWindow,leftPanel,rightPanel,general,display,editor,information;
 	Gtk::Button exitButton,newButton,openButton,saveButton;
-	Gtk::Button shortPathButton,zoominButton,zoomoutButton,zoomresetButton;
-	Gtk::ToggleButton editButton;
+	Gtk::Button zoominButton,zoomoutButton,zoomresetButton;
+	Gtk::ToggleButton editButton, shortPathButton;
 	Gtk::RadioButtonGroup type;
 	Gtk::RadioButton housing,transport,production;
-	Gtk::Frame generalFrame,displayFrame,editorFrame,infoFrame;
+	Gtk::Frame generalFrame,displayFrame,editorFrame,infoFrame, m_Frame_Area;
 	Gtk::Label ENJ,CI,MTA,currentZoom;
 
 private:

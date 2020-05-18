@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <cstdlib>
 #include "ville.h"
 #include "noeud.h"
 #include "error.h"
@@ -103,8 +104,16 @@ double Ville::mta()
 	unsigned int nb_p = nb_type(production);
 	unsigned int nb_t = nb_type(transport);
 
-	if(quartiers.size() == 0 or nb_l == 0)  return 0;
-	else  return short_path(quartiers, nb_p, nb_t)/nb_l;
+	if(quartiers.size() == 0 or nb_l == 0) 
+	{
+		cmt_mta = 0;
+		return 0;
+	}
+	else 
+	{
+		cmt_mta = short_path(quartiers, nb_p, nb_t);
+		return cmt_mta/nb_l;
+	}
 }
 
 double Ville::enj()
@@ -226,7 +235,7 @@ void Ville::check_load_noeud(Noeud* newNoeud)
 	{
 		quartiers.push_back(newNoeud);
 		load_in_tile(newNoeud);
-		load_uid(newNoeud->getUid());
+		//load_uid(newNoeud->getUid());
 	}
 }
 
@@ -419,7 +428,7 @@ void Ville::draw_liens() const
 		{
 			if(nd_lien->getIn() == true)  draw_ligne(nd->getCentre(),
 													 nd_lien->getCentre(),
-													 nd->getPaint());
+													 NOIR);
 		}
 		nd->updateIn(false);
 	}
@@ -433,10 +442,15 @@ void Ville::draw_quartiers() const
 	}
 }
 
-void Ville::draw_short_path(Couleur paint, size_t indice_logement) const
+void Ville::draw_short_path(Couleur paint, Noeud* nd) const
 {
-	quartiers[indice_logement]->draw_noeud();
-	quartiers[indice_logement]->draw_path(paint);
+	for(auto noeud : quartiers)
+	{
+		noeud->updatePaint(NOIR);
+	}
+	nd->updatePaint(ROUGE);
+	nd->draw_noeud();
+	nd->draw_path(paint);
 }
 
 ///////////////////////////// Sauvegarde fichier ///////////////////////////////////
@@ -524,20 +538,35 @@ unsigned int Ville::nb_liens() const
 
 /////////////////////////////////Modification//////////////////////////////////////////
 
+void Ville::modif_nbp(Noeud* nd, Point p, Point b)
+{
+	Vecteur vect_1 = {p.pos_x - nd->getX(), p.pos_y - nd->getY()};
+	double r_deb = (norme(vect_1) - nd->getRayon());
+	double r_fin = norme({b.pos_x - nd->getX(), b.pos_y - nd->getY()});
+	
+	nd->setNBP( nd->getRayon() + (r_fin - r_deb)*(r_fin - r_deb) );
+}
+
+
 void Ville::ajout_noeud(double x, double y, Type_noeud type)
 {
 	//Comment avoir un uid different ? tableau uid occupés ?
-	unsigned int currentUid = occupied_uids.back() + 1;
+	//unsigned int currentUid = occupied_uids.back() + 1;
+	unsigned int currentUid = rand();
+	
 	switch (type)
 	{
 	case LOGEMENT:
 		check_load_noeud(new Logement(currentUid,x,y,min_capacity));
+		if(chargement_verif)  nbp_nbL+=min_capacity;
 		break;
 	case TRANSPORT:
 		check_load_noeud(new Transport(currentUid,x,y,min_capacity));
+		if(chargement_verif)  nbp_nbT+=min_capacity;
 		break;
 	case PRODUCTION:
 		check_load_noeud(new Production(currentUid,x,y,min_capacity));
+		if(chargement_verif)  nbp_nbP+=min_capacity;
 		break;
 	}
 }
@@ -547,6 +576,14 @@ void Ville::retire_noeud(Noeud* node)
 	unload_in_tile(node);
 	unload_quartier(node);
 	unload_uid(node->getUid());
+	string type = node->getType();
+	
+	if(type == "Logement")
+			nbp_nbL -= node->getNbp();
+	if(type == "Transport")
+			nbp_nbT -= node->getNbp();
+	if(type == "Production")
+			nbp_nbP -= node->getNbp();
 }
 
 void Ville::unload_in_tile(Noeud* node)
@@ -606,7 +643,6 @@ void Ville::unload_uid(unsigned int uid)
 			occupied_uids.pop_back();
 		}
 	}
-	
 }
 
 void Ville::deplace_noeud(Noeud* node, double x, double y)
@@ -628,10 +664,19 @@ void Ville::edit_lien(Noeud* node1, Noeud* node2)
 	{
 		node1->disconnect(node2);
 		node2->disconnect(node1);
-	} else {
-		node1->ajout_lien(node2);
-		node2->ajout_lien(node1);
+	} 
+	else 
+	{
+		//node1->ajout_lien(node2);
+		//node2->ajout_lien(node1);
+		error_lien(node1, node2);
+		if(chargement_verif)  creation_lien(node1->getUid(), node2->getUid());
 	}
+}
+
+void Ville::set_chargement_verif(bool c)
+{
+	chargement_verif = c;
 }
 
 Noeud* Ville::trouve_noeud(double x, double y)

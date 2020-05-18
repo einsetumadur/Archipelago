@@ -22,14 +22,16 @@ public:
 	Ville(bool val);
 	~Ville();
 	
-	double mta();
+	double mta();	
 	double enj();
 	double ci();
 	void chargement(char* nom_fichier);
 	
 	bool get_chargement_verif() const { return chargement_verif; }
+	void set_chargement_verif(bool c);
 	unsigned int get_error_param_un() const { return error_param_un; }
 	unsigned int get_error_param_deux() const { return error_param_deux; }
+	std::vector<Noeud*> getQuartiers() const { return quartiers; }
 	void reset();
 	
 	// sauvegarde du fichier :
@@ -43,7 +45,7 @@ public:
 	void draw_ville() const;
 	void draw_liens() const;
 	void draw_quartiers() const;
-	void draw_short_path(Couleur paint, size_t indice_logement) const;
+	void draw_short_path(Couleur paint, Noeud* nd) const;
 
 	//modification
 	Noeud* trouve_noeud(double x, double y);
@@ -51,7 +53,8 @@ public:
 	void retire_noeud(Noeud* node);
 	void update_node_paint(Noeud* node, Couleur color);
 	void edit_lien(Noeud* node1, Noeud* node2);
-
+	void modif_nbp(Noeud* nd, Point p, Point b);
+	
 private:	
 	// Lecture et création de la ville
 	void decodage(std::string line, int& etat);
@@ -81,6 +84,7 @@ private:
 	double nbp_nbL;
 	double nbp_nbT;
 	double nbp_nbP;
+	double cmt_mta;
 };
 
 #endif

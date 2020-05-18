@@ -14,6 +14,6 @@ constexpr double epaisseur_trait(3);
 constexpr double epaisseur_bord(3);
 constexpr int precision(5);
 constexpr int left_click(1);
-constexpr int right_click(2);
+constexpr int right_click(3);
 
 #endif 

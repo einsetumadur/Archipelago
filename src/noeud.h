@@ -12,6 +12,7 @@
 #include "tools.h"
 #include <string>
 #include <vector>
+#include <cmath>
 
 enum Type_error {NO_ERROR, RES_U, LITTLE_NBP, BIG_NBP, SELF_L_N, L_VAC, MULT_S_L, 
 				 MAX_L, N_L_SUP, ID_U, N_N_SUP};
@@ -52,6 +53,7 @@ public:
 	void updateIn(bool b);	
 	void updatePaint(Couleur c);
 	
+	void setNBP(double met) { batiment.rayon = sqrt(met); nbp = met;}
 	// fonctions de tests
 	bool test_uid() const;
 	Type_error test_nbp() const;
@@ -118,16 +120,17 @@ public:
 						   Scenario_djikstra& scenario, size_t i, int& cmt_tab, 
 						   double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
 						   override;
-	void path_prod(const std::vector<Noeud*>& tn, unsigned int nd);
-	void path_tran(const std::vector<Noeud*>& tn, unsigned int nd);
 	void draw_noeud() const override;
 	void draw_path(Couleur paint) const override;
-
+	void path_prod(const std::vector<Noeud*>& tn, unsigned int nd);
+	void path_tran(const std::vector<Noeud*>& tn, unsigned int nd);
+	
+	std::vector<Noeud*> get_short_path_prod() const { return short_path_prod; }
+	std::vector<Noeud*> get_short_path_tran() const { return short_path_tran; }
 private:
 	double speed;
 	std::vector<Noeud*> short_path_tran;
 	std::vector<Noeud*> short_path_prod;
-		
 };
 
 class Transport : public Noeud
@@ -139,8 +142,13 @@ public:
 	std::string getType() const override { return transport; }
 	void draw_noeud() const override;
 
+	std::vector<Noeud*> get_short_path_prod() const { return short_path_prod; }
+	std::vector<Noeud*> get_short_path_tran() const { return short_path_tran; }
+
 private:
 	double speed;
+	std::vector<Noeud*> short_path_tran;
+	std::vector<Noeud*> short_path_prod;
 };
 
 class Production : public Noeud

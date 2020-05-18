@@ -477,7 +477,6 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 				}
 				else if(clic_nd != nullptr && clic_nd != nd_actif)
 				{
-						
 				    if(editButton.get_active() && nd_actif != nullptr)
 				    {
 						graph.get_ville_ptr()->edit_lien(clic_nd, nd_actif);
@@ -537,10 +536,11 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 			
 			else if(event->button == right_click && nd_actif != nullptr)
 			{
-					/*graph.get_ville_ptr()->deplace_noeud(Noeud*, x_m, y_m)	
-					graph.get_ville_ptr()->set_chargement_verif(true);
-					update_mta = true; update_ci = true; update_enj = false;
-					update();*/
+				cout << "HEY" << endl;
+				graph.get_ville_ptr()->deplace_noeud(nd_actif, press_click);
+				graph.get_ville_ptr()->set_chargement_verif(true);
+				update_mta = true; update_ci = true; update_enj = false;
+				update();
 			}
 		}
 	return true;

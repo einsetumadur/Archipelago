@@ -236,7 +236,7 @@ void Ville::check_load_noeud(Noeud* newNoeud)
 	{
 		quartiers.push_back(newNoeud);
 		load_in_tile(newNoeud);
-		//load_uid(newNoeud->getUid());
+		load_uid(newNoeud->getUid());
 	}
 }
 
@@ -371,9 +371,9 @@ void Ville::redondance_uid(unsigned int numid)
 {
 	if(!quartiers.empty())
 	{
-		for (size_t i(0); i < quartiers.size() - 1 ; i++) 
+		for (unsigned int i = 0; i < occupied_uids.size() ; i++) 
 		{
-			if(quartiers[i]->getUid() == numid)
+			if(occupied_uids[i] == numid)
 			{
 				cout << error::identical_uid(numid);
 				chargement_verif = false;
@@ -543,9 +543,7 @@ unsigned int Ville::nb_liens() const
 
 void Ville::ajout_noeud(double x, double y, Type_noeud type)
 {
-	//Comment avoir un uid different ? tableau uid occupés ?
-	//unsigned int currentUid = occupied_uids.back() + 1;
-	unsigned int currentUid = rand();
+	unsigned int currentUid = get_free_uid();
 	
 	switch (type)
 	{
@@ -618,7 +616,6 @@ void Ville::load_uid(unsigned int uid) //remplace la test uid ?
 				}
 			}
 		}
-		
 	}
 }
 
@@ -629,12 +626,33 @@ void Ville::unload_uid(unsigned int uid)
 	{
 		if(uid == occupied_uids[i])
 		{
+
 			for (uint j = i; j < occupied_uids.size()-1; j++)
 			{
-				occupied_uids[j] == occupied_uids[j+1];
+				occupied_uids[j] = occupied_uids[j+1];
 			}
 			occupied_uids.pop_back();
 		}
+	}
+}
+
+unsigned int Ville::get_free_uid()
+{
+	if(occupied_uids.empty())	return 1;
+
+	for (unsigned int i = 0; i < occupied_uids.size()-1 ; i++)
+	{
+		if(!(occupied_uids[i]+1 == occupied_uids[i+1]))	return occupied_uids[i]+1;
+	}
+
+	return occupied_uids.back()+1;
+}
+
+void Ville::set_ville_color(Couleur color)
+{
+	for(auto node : quartiers)
+	{
+		node->updatePaint(color);
 	}
 }
 
@@ -667,8 +685,6 @@ void Ville::edit_lien(Noeud* node1, Noeud* node2)
 	} 
 	else 
 	{
-		//node1->ajout_lien(node2);
-		//node2->ajout_lien(node1);
 		error_lien(node1, node2);
 		if(chargement_verif)  creation_lien(node1->getUid(), node2->getUid());
 	}
@@ -681,16 +697,26 @@ void Ville::set_chargement_verif(bool c)
 
 Noeud* Ville::trouve_noeud(double x, double y)
 {
-	/*manque test sur les tiles adjacentes
-	for(auto node : grid[get_tile_index(x)][get_tile_index(y)])
-	{
-		if(node->is_under(x,y))	return node;
-	}*/
+	double tilesize = sqrt(max_capacity);
+
+	for(int i = -1 ; i <=1 ;i++){
+		for(int j = -1 ; j<=1 ; j++){
+			for(auto node : grid[get_tile_index(x+i*tilesize)]
+								[get_tile_index(y+j*tilesize)]){
+				if(node->is_under(x,y))	return node;
+			}
+		}
+	}
+	return nullptr;
+	
+	//pas optimisée
+	/*
 	for(auto node : quartiers)
 	{
 		if(node->is_under(x,y))	return node;
 	}
 	return nullptr;
+	*/
 }
 
 void Ville::resize_node(Noeud* node, Point p1, Point p2)

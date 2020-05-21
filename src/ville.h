@@ -55,6 +55,7 @@ public:
 	void deplace_noeud(Noeud* node, Point p);
 	void update_node_paint(Noeud* node, Couleur color);
 	void edit_lien(Noeud* node1, Noeud* node2);
+	void set_ville_color(Couleur color);
 	
 private:	
 	// Lecture et création de la ville
@@ -74,6 +75,7 @@ private:
 	void unload_in_tile(Noeud* node);
 	void load_uid(unsigned int uid);
 	void unload_uid(unsigned int uid);
+	unsigned int get_free_uid();
 
 	bool chargement_verif;
 	Type_error msg_error;

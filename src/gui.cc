@@ -471,8 +471,7 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 		double clic_x = event->x ;
 		double clic_y = event->y ;
 		double dessin_x = graph.get_allocation().get_x();
-		double dessin_y = graph.get_allocation().get_y();
-		
+		double dessin_y = graph.get_allocation().get_y();	
 		double width = graph.space.width;
 		double height= graph.space.height;
 		double x_d = event->x - graph.get_allocation().get_x();
@@ -495,6 +494,8 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 			else if(event->button == right_click && nd_actif != nullptr)
 			{
 				graph.get_ville_ptr()->deplace_noeud(nd_actif, press_click);
+				if(graph.get_show_path() && 
+				   graph.get_ville_ptr()->get_chargement_verif())  init_show_path();				
 				graph.get_ville_ptr()->set_chargement_verif(true);
 				updateLabels(true, true, false);
 			}
@@ -519,8 +520,8 @@ void MaFenetre::left_press_event(Noeud* clic_nd, Noeud* nd_actif)
 		if(editButton.get_active() && nd_actif != nullptr)
 		{
 			graph.get_ville_ptr()->edit_lien(clic_nd, nd_actif);
-			if(graph.get_show_path() && graph.get_ville_ptr()->get_chargement_verif())  
-																	init_show_path();
+			if(graph.get_show_path() && 
+			   graph.get_ville_ptr()->get_chargement_verif())  init_show_path();
 			graph.get_ville_ptr()->set_chargement_verif(true);
 			updateLabels(true, true, false);
 		}

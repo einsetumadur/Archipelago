@@ -2,7 +2,7 @@
  * \name    tools.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    Mai 2020
- * \version Rendu 2 - Architecture 11 b1
+ * \version Rendu 3 - Architecture 11 b1
  */
 
 #include <iostream>
@@ -83,8 +83,8 @@ bool is_in_circle(double x, double y, Cercle circle)
 {
 	double dist_to_center = sqrt((x - circle.centre.pos_x)*(x - circle.centre.pos_x)+
 								 (y - circle.centre.pos_y)*(y - circle.centre.pos_y));
-	if(dist_to_center <= circle.rayon) return true;
-	else return false;
+	if(dist_to_center <= circle.rayon)  return true;
+	else  return false;
 }
 
 void draw_ligne(Point c_a, Point c_b, Couleur paint)
@@ -101,3 +101,4 @@ void draw_rectangle(Point c, double rayon, Couleur paint)
 {
 	rectangle(c.pos_x, c.pos_y, rayon, paint);
 }
+

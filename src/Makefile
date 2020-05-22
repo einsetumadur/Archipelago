@@ -6,7 +6,7 @@ LINKING = `pkg-config --cflags gtkmm-3.0`
 LDLIBS = `pkg-config --libs gtkmm-3.0`
 OFILES = prog.o noeud.o tools.o ville.o error.o graphics.o gui.o
 
-all : Archipelago
+all : projet
 
 error.o : error.cc error.h constantes.h
 	$(CXX) $(CXXFLAGS) -c error.cc -o error.o
@@ -29,8 +29,8 @@ gui.o : gui.cc gui.h ville.h graphics.h constantes.h
 prog.o : prog.cc ville.h gui.h
 	$(CXX) $(CXXFLAGS) $(LINKING) -c prog.cc -o prog.o 
 
-Archipelago : $(OFILES)
-	$(CXX) $(CXXFLAGS) $(LINKING) $(OFILES) -o Archipelago $(LDLIBS)
+projet : $(OFILES)
+	$(CXX) $(CXXFLAGS) $(LINKING) $(OFILES) -o projet $(LDLIBS)
 
 
 clean:

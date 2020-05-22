@@ -61,6 +61,7 @@ public :
 	MaFenetre(char* fichier);
 	virtual ~MaFenetre();
 	void update();
+	
 protected:
 	void on_button_clicked_exit();
 	void on_button_clicked_new();

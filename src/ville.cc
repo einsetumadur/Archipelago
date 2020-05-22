@@ -34,7 +34,8 @@ Ville::Ville(bool val):
 	error_param_deux(0), 
 	nbp_nbL(0), 
 	nbp_nbP(0), 
-	nbp_nbT(0)
+	nbp_nbT(0),
+	cmt_mta(0)
 {
 	grid.resize(1000,vector<tile>(1000));
 	cout<<"gridsize set to "<<grid.size()<<endl;
@@ -48,16 +49,20 @@ void Ville::reset()
 {
 	if(not(quartiers.empty()))
 	{
+		
 		for(auto nd : quartiers) 
 		{
 			nd->reset_tab_liens();
+			unload_in_tile(nd);
 		}
 		
 		for(auto noeud : quartiers) 
 		{
 			delete noeud;
+			noeud = nullptr;
 		}
 		quartiers.clear();
+		quartiers.shrink_to_fit();
 	}
 	chargement_verif = true;
 	msg_error = NO_ERROR;
@@ -66,6 +71,10 @@ void Ville::reset()
 	nbp_nbL = 0; 
 	nbp_nbP = 0;
 	nbp_nbT = 0;
+	cmt_mta = 0;
+	occupied_uids.clear();
+	occupied_uids.shrink_to_fit();
+	
 }
 
 void Ville::chargement(char* nom_fichier)
@@ -98,22 +107,40 @@ void Ville::chargement(char* nom_fichier)
 	}
 }
 
-double Ville::mta()
+double Ville::mta(Type_modif modif)
+{
+	if(modif == ADD_ND)  
+	{
+		if(quartiers.back()->getType() == logement)  cmt_mta += 2*infinite_time;
+	}
+	else
+	{
+		unsigned int nb_l = nb_type(logement);
+		unsigned int nb_p = nb_type(production);
+		unsigned int nb_t = nb_type(transport);
+		if(quartiers.size() == 0 or nb_l == 0) 
+		{
+			cmt_mta = 0;
+			return 0;
+		}
+		else 
+		{
+			cmt_mta = short_path(quartiers, nb_p, nb_t);
+			return cmt_mta/nb_l;
+		}
+	}
+}
+
+double Ville::get_mta()
 {
 	unsigned int nb_l = nb_type(logement);
-	unsigned int nb_p = nb_type(production);
-	unsigned int nb_t = nb_type(transport);
 
 	if(quartiers.size() == 0 or nb_l == 0) 
 	{
-		cmt_mta = 0;
-		return 0;
+			cmt_mta = 0;
+			return 0;
 	}
-	else 
-	{
-		cmt_mta = short_path(quartiers, nb_p, nb_t);
-		return cmt_mta/nb_l;
-	}
+	else  return cmt_mta/nb_l;
 }
 
 double Ville::enj()
@@ -541,22 +568,22 @@ unsigned int Ville::nb_liens() const
 
 /////////////////////////////////Modification//////////////////////////////////////////
 
-void Ville::ajout_noeud(double x, double y, Type_noeud type)
+void Ville::ajout_noeud(Point p, Type_noeud type)
 {
 	unsigned int currentUid = get_free_uid();
 	
 	switch (type)
 	{
 	case LOGEMENT:
-		check_load_noeud(new Logement(currentUid,x,y,min_capacity));
+		check_load_noeud(new Logement(currentUid, p.pos_x, p.pos_y,min_capacity));
 		if(chargement_verif)  nbp_nbL+=min_capacity;
 		break;
 	case TRANSPORT:
-		check_load_noeud(new Transport(currentUid,x,y,min_capacity));
+		check_load_noeud(new Transport(currentUid, p.pos_x, p.pos_y,min_capacity));
 		if(chargement_verif)  nbp_nbT+=min_capacity;
 		break;
 	case PRODUCTION:
-		check_load_noeud(new Production(currentUid,x,y,min_capacity));
+		check_load_noeud(new Production(currentUid, p.pos_x, p.pos_y,min_capacity));
 		if(chargement_verif)  nbp_nbP+=min_capacity;
 		break;
 	}
@@ -596,20 +623,20 @@ void Ville::unload_quartier(Noeud* node)
 
 void Ville::load_uid(unsigned int uid) //remplace la test uid ?
 {
-	if(occupied_uids.empty())	occupied_uids.push_back(uid);
+	if(occupied_uids.empty())  occupied_uids.push_back(uid);
 	else
 	{
 		if(uid > occupied_uids.back())	occupied_uids.push_back(uid);
 		else
 		{
-			for (unsigned int i = 0; i < occupied_uids.size(); i++)
+			for (unsigned int i(0); i < occupied_uids.size(); i++)
 			{
 				if(uid < occupied_uids[i])
 				{
 					occupied_uids.push_back(occupied_uids.back());
-					for (unsigned int j = occupied_uids.size()-1; j >= i ; j--)
+					for(unsigned int j = occupied_uids.size()-1 ; j >= i && j > 0 ; j--)
 					{
-						occupied_uids[j+1] = occupied_uids[j];
+						occupied_uids[j] = occupied_uids[j-1];
 					}
 					occupied_uids[i] = uid;
 					break;
@@ -621,19 +648,21 @@ void Ville::load_uid(unsigned int uid) //remplace la test uid ?
 
 void Ville::unload_uid(unsigned int uid)
 {
+	unsigned int size = occupied_uids.size();
+	
 	//could use bissection algo
-	for (uint i = 0; i < occupied_uids.size(); i++)
+	for (uint i(0); i < size; i++)
 	{
 		if(uid == occupied_uids[i])
 		{
-
-			for (uint j = i; j < occupied_uids.size()-1; j++)
+			for (uint j = i; j < size-1; j++)
 			{
 				occupied_uids[j] = occupied_uids[j+1];
 			}
 			occupied_uids.pop_back();
+			size--;
 		}
-	}
+	} 
 }
 
 unsigned int Ville::get_free_uid()
@@ -642,7 +671,7 @@ unsigned int Ville::get_free_uid()
 
 	for (unsigned int i = 0; i < occupied_uids.size()-1 ; i++)
 	{
-		if(!(occupied_uids[i]+1 == occupied_uids[i+1]))	return occupied_uids[i]+1;
+		if(occupied_uids[i]+1 != occupied_uids[i+1])  return occupied_uids[i]+1;
 	}
 
 	return occupied_uids.back()+1;
@@ -662,9 +691,9 @@ void Ville::deplace_noeud(Noeud* node, Point p)
 
 	node->setCentre(p);
 	obstruction_lien(node);
-	if(chargement_verif)	collis_noeuds(node);
+	if(chargement_verif)  collis_noeuds(node);
 
-	if(!chargement_verif)	node->setCentre(prev_point);
+	if(!chargement_verif)  node->setCentre(prev_point);
 
 }
 
@@ -699,24 +728,24 @@ Noeud* Ville::trouve_noeud(double x, double y)
 {
 	double tilesize = sqrt(max_capacity);
 
-	for(int i = -1 ; i <=1 ;i++){
-		for(int j = -1 ; j<=1 ; j++){
+	for(int i = -1 ; i <= 1 ; i++){
+		for(int j = -1 ; j<= 1 ; j++){
 			for(auto node : grid[get_tile_index(x+i*tilesize)]
-								[get_tile_index(y+j*tilesize)]){
-				if(node->is_under(x,y))	return node;
+								[get_tile_index(y+j*tilesize)])
+			{
+				if(node->is_under(x,y))	 return node;
 			}
 		}
 	}
 	return nullptr;
 	
 	//pas optimisée
-	/*
-	for(auto node : quartiers)
+	/*for(auto node : quartiers)
 	{
 		if(node->is_under(x,y))	return node;
 	}
-	return nullptr;
-	*/
+	return nullptr;*/
+	
 }
 
 void Ville::resize_node(Noeud* node, Point p1, Point p2)
@@ -737,7 +766,7 @@ void Ville::resize_node(Noeud* node, Point p1, Point p2)
 	obstruction_lien(node);
 	collis_noeuds(node);
 
-	if(!chargement_verif)	node->setNBP(prev_nbp);
+	if(!chargement_verif)  node->setNBP(prev_nbp);
 }
 
 void Ville::obstruction_lien(Noeud* node)
@@ -765,5 +794,4 @@ void Ville::obstruction_lien(Noeud* node)
 		}
 		noeud->updateIn(false);
 	}
-	
 }

@@ -51,22 +51,21 @@ public:
 	unsigned int getParent() const { return parent; }
 	bool getIn() const { return in; }
 	Couleur getPaint() const { return paint; }
+	std::vector<Noeud*> get_short_path_prod() const { return short_path_prod; }
+	std::vector<Noeud*> get_short_path_tran() const { return short_path_tran; }
 	virtual double getSpeed() const = 0;
 	virtual std::string getType() const = 0;
 	void updateIn(bool b);	
 	void updatePaint(Couleur c);
 	void setNBP(double met);
 	void setCentre(Point p);
-
-	std::vector<Noeud*> get_short_path_prod() const { return short_path_prod; }
-	std::vector<Noeud*> get_short_path_tran() const { return short_path_tran; }
 	
 	// fonctions de tests
 	bool test_uid() const;
 	Type_error test_nbp() const;
 	bool multiple_link(Noeud* b)const;
 	virtual bool maxi_link() const;
-	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b, double dist_min = 0) const; 
+	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b, double dist = 0) const; 
 	bool is_connected_to(Noeud* node) const;
 	bool is_under(double x, double y) const;
 	
@@ -104,8 +103,7 @@ protected:
 	std::vector<Noeud*> short_path_prod;
 		
 	// MTA
-	void init_queue(std::vector<int>& queue, const std::vector<Noeud*>& tn, 
-					size_t i);
+	void init_queue(std::vector<int>& queue, const std::vector<Noeud*>& tn, size_t i);
 	void sort_queue(std::vector<int>& queue, const std::vector<Noeud*>& tn);
 	unsigned int djikstra(std::vector<int>& queue, const std::vector<Noeud*>& tn, 
 						  Scenario_djikstra& scenario, int& cmt_tab, 
@@ -183,6 +181,6 @@ double short_path(const std::vector<Noeud*>& tn,unsigned int nb_p,
 				  unsigned int nb_t);			  // MTA pour être appelé par ville
 double cout_infra(const std::vector<Noeud*>& tn); // CI pour être appelé par ville
 
-void clean_vector_erase(std::vector<Noeud*>& list , unsigned int index);
+void clean_vector_erase(std::vector<Noeud*>& list, unsigned int index);
 
 #endif

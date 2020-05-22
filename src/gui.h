@@ -2,7 +2,7 @@
  * \name    gui.h
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    Mai 2020
- * \version Rendu 2 : Architecture 11 b1
+ * \version Rendu 3 - Architecture 11 b1
  */
 
 #include <gtkmm.h>
@@ -36,11 +36,12 @@ public:
 	void set_zoom(zAction act);
 	void update_show_path(bool b);
 	double get_zoom_ind() const { return space.zoom; }
-	Ville* get_ville_ptr() const { 	return maVille; }
+	Ville* get_ville_ptr() const { return maVille; }
 	bool get_show_path() const { return show_path; }
 	Noeud* get_nd_actif() const { return nd_actif; }
 	void set_nd_actif(Noeud* nd);
 	Space space;
+	void distorsion_fenetre();
 
 protected: 
 	bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
@@ -81,6 +82,12 @@ protected:
 	void on_button_release_shortestPath();
 	void on_button_press_edit();
 	void on_button_release_edit();
+	
+	void left_press_event(Noeud* clic_nd, Noeud* nd_actif);
+	void left_release_event(Noeud* clic_nd, Noeud* nd_actif);
+	void detruire_nd(Noeud* clic_nd, Noeud* nd_actif);
+	void init_show_path();
+	void updateLabels(bool mta, bool ci, bool enj, bool new_doc = false);
 
 	Dessin graph;
 	Type_noeud nd_button;
@@ -89,6 +96,7 @@ protected:
 	bool update_mta;
 	bool update_ci;
 	bool update_enj;
+	bool new_file;
 	
 	Gtk::Box mainWindow,leftPanel,rightPanel,general,display,editor,information;
 	Gtk::Button exitButton,newButton,openButton,saveButton;

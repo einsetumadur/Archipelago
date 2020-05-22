@@ -115,7 +115,31 @@ void Noeud::disconnect(Noeud* node)
 	}
 }
 
-///////////////////////////// Fonctions error //////////////////////////////////////
+void Noeud::clean_vector_erase_path_prod(unsigned int index)
+{
+	//swap node to be erased with the last one in the array then pop back
+	if(!( index == short_path_prod.size()-1)) 
+	{
+		Noeud* tmpN = short_path_prod.back();
+		short_path_prod.back() = short_path_prod[index];
+		short_path_prod[index] = tmpN;
+	}
+	short_path_prod.pop_back();
+}
+
+void Noeud::clean_vector_erase_path_tran(unsigned int index)
+{
+	//swap node to be erased with the last one in the array then pop back
+	if(!( index == short_path_tran.size()-1)) 
+	{
+		Noeud* tmpN = short_path_tran.back();
+		short_path_tran.back() = short_path_tran[index];
+		short_path_tran[index] = tmpN;
+	}
+	short_path_tran.pop_back();
+}
+
+///////////////////////////// Fonctions error /////////////////////////////////////////
 bool Noeud::test_uid() const
 {
 	if(uid == no_link)
@@ -163,7 +187,7 @@ bool Logement::maxi_link() const
 	else  return false;
 }
 
-bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b, double dist_min) const
+bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b, double dist) const
 {	
 	if(not(this == lien_a) and not(this == lien_b)) 
 	{
@@ -172,7 +196,7 @@ bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b, double dist_min) 
 			Point p = {lien_a->getX(), lien_a->getY()};
 			Seg_droite d = {p, {lien_b->getX() - lien_a->getX(), 
 								lien_b->getY() - lien_a->getY()}};
-			if(collision_droite_cercle(this->batiment, d, dist_min))  return true;
+			if(collision_droite_cercle(this->batiment, d, dist))  return true;
 		}
 	}
 	
@@ -194,7 +218,7 @@ bool Noeud::is_under(double x, double y) const
 	else  return false;
 }
 
-///////////////////////////// Section Dessin ///////////////////////////////////////
+///////////////////////////// Section Dessin //////////////////////////////////////////
 
 void Logement::draw_noeud() const 
 {
@@ -270,13 +294,13 @@ void Logement::draw_path_type(vector<Noeud*> tab, Couleur paint_f) const
 	}	
 }
 
-///////////////////////////// Section CI ///////////////////////////////////////////
+///////////////////////////// Section CI //////////////////////////////////////////////
 
 double cout_infra(const vector<Noeud*>& tn)
 {
 	double cmt(0);
 	
-	if(tn.size() == 0) return 0;
+	if(tn.size() == 0)  return 0;
 	
 	for(auto nd : tn) 
 	{
@@ -320,7 +344,7 @@ void Noeud::calcul_ci(Noeud* nd_lien, double& cmt)	const
 	}
 }
 
-///////////////////////////// Section MTA //////////////////////////////////////////
+///////////////////////////// Section MTA /////////////////////////////////////////////
 
 double short_path(const vector<Noeud*>& tn, unsigned int nb_p, unsigned int nb_t)
 {
@@ -550,8 +574,7 @@ void Noeud::sort_queue(vector<int>& queue, const vector<Noeud*>& tn)
 }
 
 // trouve le nd le plus proche à true
-unsigned int Noeud::find_min_access(const vector<int>& queue, 
-									const vector<Noeud*>& tn)
+unsigned int Noeud::find_min_access(const vector<int>& queue, const vector<Noeud*>& tn)
 {
 	for(size_t k(0) ; k < tn.size() ; ++k) 
 	{
@@ -559,14 +582,11 @@ unsigned int Noeud::find_min_access(const vector<int>& queue,
 	}
 }
 
-//	ajoute les noeuds du chemin le plus court
+// ajoute les noeuds du chemin le plus court
 		// vers un noeud production
 void Logement::path_prod(const vector<Noeud*>& tn, unsigned int nd)
 {
-	if(short_path_prod.size() != 0 or nd == no_link)  
-	{
-		short_path_prod.clear();
-	}
+	if(short_path_prod.size() != 0 or nd == no_link)  short_path_prod.clear();
 	if(nd != no_link)
 	{
 		vector<Noeud*> tab(tn.size(), nullptr);
@@ -576,6 +596,7 @@ void Logement::path_prod(const vector<Noeud*>& tn, unsigned int nd)
 			tab[i] = p;
 			++i;
 		}
+		
 		short_path_prod.resize(i);
 		size_t j(0);
 		while(j < i)
@@ -588,10 +609,7 @@ void Logement::path_prod(const vector<Noeud*>& tn, unsigned int nd)
 		// vers un noeud transport
 void Logement::path_tran(const vector<Noeud*>& tn, unsigned int nd)
 {
-	if(short_path_tran.size() != 0 or nd == no_link)  
-	{
-		short_path_tran.clear();
-	}
+	if(short_path_tran.size() != 0 or nd == no_link)  short_path_tran.clear();
 	if(nd != no_link)
 	{
 		vector<Noeud*> tab(tn.size(), nullptr);
@@ -601,6 +619,7 @@ void Logement::path_tran(const vector<Noeud*>& tn, unsigned int nd)
 			tab[i] = p;
 			++i;
 		}
+		
 		short_path_tran.resize(i);
 		size_t j(0);
 		while(j < i)
@@ -625,7 +644,7 @@ bool Noeud::operator==(const Noeud& nd) const
 	return (uid == nd.uid); 
 }
 
-void clean_vector_erase(std::vector<Noeud*>& list , unsigned int index)
+void clean_vector_erase(std::vector<Noeud*>& list, unsigned int index)
 {
 	//swap node to be erased with the last one in the array then pop back
 	if(!( index == list.size()-1)) 
@@ -635,28 +654,4 @@ void clean_vector_erase(std::vector<Noeud*>& list , unsigned int index)
 		list[index] = tmpN;
 	}
 	list.pop_back();
-}
-
-void Noeud::clean_vector_erase_path_prod(unsigned int index)
-{
-	//swap node to be erased with the last one in the array then pop back
-	if(!( index == short_path_prod.size()-1)) 
-	{
-		Noeud* tmpN = short_path_prod.back();
-		short_path_prod.back() = short_path_prod[index];
-		short_path_prod[index] = tmpN;
-	}
-	short_path_prod.pop_back();
-}
-
-void Noeud::clean_vector_erase_path_tran(unsigned int index)
-{
-	//swap node to be erased with the last one in the array then pop back
-	if(!( index == short_path_tran.size()-1)) 
-	{
-		Noeud* tmpN = short_path_tran.back();
-		short_path_tran.back() = short_path_tran[index];
-		short_path_tran[index] = tmpN;
-	}
-	short_path_tran.pop_back();
 }

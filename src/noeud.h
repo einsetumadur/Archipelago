@@ -2,7 +2,7 @@
  * \name    noeud.h
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    Mai 2020
- * \version Rendu 2 - Architecture 11 b1
+ * \version Rendu 3 - Architecture 11 b1
  */
  
 #ifndef NOEUD_H
@@ -18,10 +18,12 @@ enum Type_error {NO_ERROR, RES_U, LITTLE_NBP, BIG_NBP, SELF_L_N, L_VAC, MULT_S_L
 				 MAX_L, N_L_SUP, ID_U, N_N_SUP};
 enum Scenario_djikstra {scen_aleatoire, scen_production, scen_transport};
 enum Type_noeud {LOGEMENT,TRANSPORT,PRODUCTION};
-		 
+enum Type_modif {NO_ACTION, ADD_ND};
+
 const std::string logement = "Logement";
 const std::string production  = "Production";
 const std::string transport = "Transport";
+
 class Noeud 
 {
 public:
@@ -32,7 +34,6 @@ public:
 	std::string print_lien(Noeud* nd_lien) const;
 	void ajout_lien(Noeud* b);
 	void reset_tab_liens();
-	unsigned int get_grid_pos(double coord);
 	void disconnect(Noeud* node);
 	
 	// getters & setters 
@@ -60,9 +61,9 @@ public:
 	Type_error test_nbp() const;
 	bool multiple_link(Noeud* b)const;
 	virtual bool maxi_link() const;
-	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const; 
-	bool is_connected_to(Noeud* node);
-	bool is_under(double x, double y);
+	bool collis_lien_quartier(Noeud* lien_a, Noeud* lien_b, double dist_min = 0) const; 
+	bool is_connected_to(Noeud* node) const;
+	bool is_under(double x, double y) const;
 	
 	// fonctions de dessins
 	virtual void draw_noeud() const = 0;
@@ -78,6 +79,7 @@ public:
 								  Scenario_djikstra& scenario);
 	unsigned int scenario_nd_min(const std::vector<Noeud*>& tn, unsigned int nd_min,
 								 Scenario_djikstra& scenario);
+	
 	// CI
 	void calcul_ci(Noeud* nd_lien, double& cmt) const;
 	
@@ -107,7 +109,6 @@ protected:
 							     const std::vector<Noeud*>& tn);
 };
 
-typedef std::vector<Noeud*> tile;
 class Logement : public Noeud 
 {
 	
@@ -123,15 +124,19 @@ public:
 						   override;
 	void draw_noeud() const override;
 	void draw_path(Couleur paint) const override;
+	void draw_path_type(std::vector<Noeud*> tab, Couleur paint_f) const;
+
+	
 	void path_prod(const std::vector<Noeud*>& tn, unsigned int nd);
 	void path_tran(const std::vector<Noeud*>& tn, unsigned int nd);
-	
 	std::vector<Noeud*> get_short_path_prod() const { return short_path_prod; }
 	std::vector<Noeud*> get_short_path_tran() const { return short_path_tran; }
+
 private:
 	double speed;
 	std::vector<Noeud*> short_path_tran;
 	std::vector<Noeud*> short_path_prod;
+
 };
 
 class Transport : public Noeud
@@ -143,13 +148,8 @@ public:
 	std::string getType() const override { return transport; }
 	void draw_noeud() const override;
 
-	std::vector<Noeud*> get_short_path_prod() const { return short_path_prod; }
-	std::vector<Noeud*> get_short_path_tran() const { return short_path_tran; }
-
 private:
 	double speed;
-	std::vector<Noeud*> short_path_tran;
-	std::vector<Noeud*> short_path_prod;
 };
 
 class Production : public Noeud

@@ -405,7 +405,6 @@ void MaFenetre::on_button_clicked_zoomIn()
 	graph.encadre();
 	currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
 	graph.refresh();
-	cout<<"zoomed in"<<endl;
 }
 
 void MaFenetre::on_button_clicked_zoomOut()
@@ -414,7 +413,6 @@ void MaFenetre::on_button_clicked_zoomOut()
 	graph.encadre();
 	currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
 	graph.refresh();
-	cout<<"zoomed out"<<endl;
 }
 void MaFenetre::on_button_clicked_zoomReset()
 {
@@ -422,7 +420,6 @@ void MaFenetre::on_button_clicked_zoomReset()
 	graph.encadre();
 	currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
 	graph.refresh();
-	cout<<"zoom reset"<<endl;
 }
 
 void MaFenetre::on_button_clicked_edit()

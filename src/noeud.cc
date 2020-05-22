@@ -191,7 +191,7 @@ bool Noeud::is_connected_to(Noeud* node) const
 bool Noeud::is_under(double x, double y) const
 {
 	if(is_in_circle(x,y,batiment))	return true;
-	else return false;
+	else  return false;
 }
 
 ///////////////////////////// Section Dessin ///////////////////////////////////////
@@ -343,16 +343,16 @@ double short_path(const vector<Noeud*>& tn, unsigned int nb_p, unsigned int nb_t
 }
 
 void Noeud::controle_djikstra(vector<int>& queue, const vector<Noeud*>& tn,  
-					 Scenario_djikstra& scenario, size_t i, int& cmt_tab, 
-					 double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
+							  Scenario_djikstra& scenario, size_t i, int& cmt_tab, 
+							  double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
 {
 }
 
 // distingue les cas selon le type du noeud renvoyé par Djikstra
 // la variable int scenario impose quel type de noeud on cherche dans Djikstra
 void Logement::controle_djikstra(vector<int>& queue, const vector<Noeud*>& tn,  
-						Scenario_djikstra& scenario, size_t i, int& cmt_tab,
-						double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
+								 Scenario_djikstra& scenario, size_t i, int& cmt_tab,
+								 double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
 {
 	init_queue(queue, tn, i);
 	sort_queue(queue, tn);
@@ -361,36 +361,55 @@ void Logement::controle_djikstra(vector<int>& queue, const vector<Noeud*>& tn,
 	else
 	{		
 		nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
-		if(tn[nd]->getType() == transport)
+		if(nd != no_link)
 		{
-			cmt_mta += tn[nd]->getAccess();
-			path_tran(tn, nd);
-			scenario = scen_production;
-			nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
-			if(nd != no_link)	
-			{ 
-				cmt_mta += tn[nd]->getAccess(); 
-				path_prod(tn, nd);
-			}
-			else  cmt_mta += infinite_time;
-		}
-		else if(tn[nd]->getType() == production)
-		{
-			cmt_mta +=  tn[nd]->getAccess();
-			path_prod(tn, nd);
-			scenario = scen_transport;
-			nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
-			if(nd != no_link)	
+			if(tn[nd]->getType() == transport)
 			{
-				cmt_mta += tn[nd]->getAccess(); 
-				path_tran(tn, nd);
+				cmt_mta += tn[nd]->getAccess();
+				controle_for_tran(nd, queue, tn, scenario, i, cmt_tab, cmt_mta, nb_p, 
+								  nb_t);
+				if(nd != no_link)	
+				{ 
+					cmt_mta += tn[nd]->getAccess(); 
+					path_prod(tn, nd);
+				}
+				else  cmt_mta += infinite_time;
 			}
-			else  cmt_mta += infinite_time;
+			else if(tn[nd]->getType() == production)
+			{
+				cmt_mta +=  tn[nd]->getAccess();
+				controle_for_prod(nd, queue, tn, scenario, i, cmt_tab, cmt_mta, nb_p, 
+								  nb_t);
+				if(nd != no_link)	
+				{
+					cmt_mta += tn[nd]->getAccess(); 
+					path_tran(tn, nd);
+				}
+				else  cmt_mta += infinite_time;
+			}
 		}
 		else  cmt_mta += infinite_time + infinite_time;
 	}							
 }
 
+void Logement::controle_for_tran(unsigned int& nd, vector<int>& queue, 
+								 const vector<Noeud*>& tn, Scenario_djikstra& scenario, 
+								 size_t i, int& cmt_tab, double& cmt_mta, 
+								 unsigned int nb_p, unsigned int nb_t) 
+{
+	path_tran(tn, nd);
+	scenario = scen_production;
+	nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
+}
+void Logement::controle_for_prod(unsigned int& nd, vector<int>& queue, 
+								 const vector<Noeud*>& tn, Scenario_djikstra& scenario, 
+								 size_t i, int& cmt_tab, double& cmt_mta, 
+								 unsigned int nb_p, unsigned int nb_t) 
+{
+	path_prod(tn, nd);
+	scenario = scen_transport;
+	nd = djikstra(queue, tn, scenario, cmt_tab, nb_p, nb_t);
+}
 // applique l'algorithme de Djikstra : noeud le plus proche
 unsigned int Noeud::djikstra(vector<int>& queue, const vector<Noeud*>& tn, 
 							 Scenario_djikstra& scenario, int& cmt_tab, 
@@ -616,4 +635,28 @@ void clean_vector_erase(std::vector<Noeud*>& list , unsigned int index)
 		list[index] = tmpN;
 	}
 	list.pop_back();
+}
+
+void Noeud::clean_vector_erase_path_prod(unsigned int index)
+{
+	//swap node to be erased with the last one in the array then pop back
+	if(!( index == short_path_prod.size()-1)) 
+	{
+		Noeud* tmpN = short_path_prod.back();
+		short_path_prod.back() = short_path_prod[index];
+		short_path_prod[index] = tmpN;
+	}
+	short_path_prod.pop_back();
+}
+
+void Noeud::clean_vector_erase_path_tran(unsigned int index)
+{
+	//swap node to be erased with the last one in the array then pop back
+	if(!( index == short_path_tran.size()-1)) 
+	{
+		Noeud* tmpN = short_path_tran.back();
+		short_path_tran.back() = short_path_tran[index];
+		short_path_tran[index] = tmpN;
+	}
+	short_path_tran.pop_back();
 }

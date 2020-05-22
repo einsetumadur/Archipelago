@@ -35,7 +35,9 @@ public:
 	void ajout_lien(Noeud* b);
 	void reset_tab_liens();
 	void disconnect(Noeud* node);
-	
+	void clean_vector_erase_path_prod(unsigned int index);
+	void clean_vector_erase_path_tran(unsigned int index);
+		
 	// getters & setters 
 	unsigned int getNbp() const { return nbp; }
 	double getX() const { return batiment.centre.pos_x; }
@@ -56,6 +58,9 @@ public:
 	void setNBP(double met);
 	void setCentre(Point p);
 
+	std::vector<Noeud*> get_short_path_prod() const { return short_path_prod; }
+	std::vector<Noeud*> get_short_path_tran() const { return short_path_tran; }
+	
 	// fonctions de tests
 	bool test_uid() const;
 	Type_error test_nbp() const;
@@ -95,6 +100,9 @@ protected:
 	unsigned int parent;
 	Couleur paint;
 	
+	std::vector<Noeud*> short_path_tran;
+	std::vector<Noeud*> short_path_prod;
+		
 	// MTA
 	void init_queue(std::vector<int>& queue, const std::vector<Noeud*>& tn, 
 					size_t i);
@@ -118,24 +126,29 @@ public:
 	bool maxi_link() const override;
 	double getSpeed() const override { return speed; }
 	std::string getType() const override { return logement; }
+	
 	void controle_djikstra(std::vector<int>& queue, const std::vector<Noeud*>& tn,  
 						   Scenario_djikstra& scenario, size_t i, int& cmt_tab, 
 						   double& cmt_mta, unsigned int nb_p, unsigned int nb_t) 
 						   override;
+	void controle_for_tran(unsigned int& nd, std::vector<int>& queue, 
+						   const std::vector<Noeud*>& tn, Scenario_djikstra& scenario, 
+						   size_t i, int& cmt_tab, double& cmt_mta, unsigned int nb_p, 
+						   unsigned int nb_t);
+	void controle_for_prod(unsigned int& nd, std::vector<int>& queue, 
+						   const std::vector<Noeud*>& tn, Scenario_djikstra& scenario,
+						   size_t i, int& cmt_tab, double& cmt_mta, unsigned int nb_p, 
+						   unsigned int nb_t);
+						   
 	void draw_noeud() const override;
 	void draw_path(Couleur paint) const override;
 	void draw_path_type(std::vector<Noeud*> tab, Couleur paint_f) const;
-
 	
 	void path_prod(const std::vector<Noeud*>& tn, unsigned int nd);
 	void path_tran(const std::vector<Noeud*>& tn, unsigned int nd);
-	std::vector<Noeud*> get_short_path_prod() const { return short_path_prod; }
-	std::vector<Noeud*> get_short_path_tran() const { return short_path_tran; }
-
+	
 private:
 	double speed;
-	std::vector<Noeud*> short_path_tran;
-	std::vector<Noeud*> short_path_prod;
 
 };
 

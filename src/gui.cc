@@ -511,8 +511,9 @@ void MaFenetre::left_press_event(Noeud* clic_nd, Noeud* nd_actif)
 {
 	if(clic_nd == nullptr && editButton.get_active() == false && nd_actif == nullptr)
 	{
-		graph.get_ville_ptr()->ajout_noeud(press_click.pos_x, press_click.pos_y, nd_button);  // DONNER SLMNT PRESS_CLICK EN PARAMETRE !!!
-		if(graph.get_ville_ptr()->get_chargement_verif())  graph.get_ville_ptr()->mta(ADD_ND);
+		graph.get_ville_ptr()->ajout_noeud(press_click, nd_button); 
+		if(graph.get_ville_ptr()->get_chargement_verif())  graph.get_ville_ptr()->
+														   mta(ADD_ND);
 		graph.get_ville_ptr()->set_chargement_verif(true);
 		updateLabels(true, false, true);
 	}
@@ -521,7 +522,8 @@ void MaFenetre::left_press_event(Noeud* clic_nd, Noeud* nd_actif)
 		if(editButton.get_active() && nd_actif != nullptr)
 		{
 			graph.get_ville_ptr()->edit_lien(clic_nd, nd_actif);
-			if(graph.get_show_path() && graph.get_ville_ptr()->get_chargement_verif())  init_show_path();
+			if(graph.get_show_path() && graph.get_ville_ptr()->get_chargement_verif())  
+																	init_show_path();
 			graph.get_ville_ptr()->set_chargement_verif(true);
 			updateLabels(true, true, false);
 		}

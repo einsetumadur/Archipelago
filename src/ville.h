@@ -15,6 +15,7 @@
 #include "noeud.h"
 
 enum Etat_lecture {NBL,LOGE,NBP,PROD,NBT,TRAN,NBLI,LIENS,FIN};
+typedef std::vector<Noeud*> tile;
 
 class Ville
 {
@@ -22,7 +23,8 @@ public:
 	Ville(bool val);
 	~Ville();
 	
-	double mta();	
+	double mta(Type_modif = NO_ACTION);	
+	double get_mta();
 	double enj();
 	double ci();
 	void chargement(char* nom_fichier);
@@ -31,7 +33,6 @@ public:
 	void set_chargement_verif(bool c);
 	unsigned int get_error_param_un() const { return error_param_un; }
 	unsigned int get_error_param_deux() const { return error_param_deux; }
-	std::vector<Noeud*> getQuartiers() const { return quartiers; }
 	void reset();
 	
 	// sauvegarde du fichier :
@@ -49,7 +50,7 @@ public:
 
 	//modification
 	Noeud* trouve_noeud(double x, double y);
-	void ajout_noeud(double x, double y, Type_noeud type);
+	void ajout_noeud(Point p, Type_noeud type);
 	void retire_noeud(Noeud* node);
 	void resize_node(Noeud* node, Point p1, Point p2);
 	void deplace_noeud(Noeud* node, Point p);
@@ -91,4 +92,3 @@ private:
 };
 
 #endif
-

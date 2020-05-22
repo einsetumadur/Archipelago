@@ -26,6 +26,7 @@ namespace
 
 constexpr char nb[] = " # nb";
 constexpr char nb_link[] = "# nb link";
+constexpr unsigned int gridmax = 30;
 
 Ville::Ville(bool val): 
 	chargement_verif(val), 
@@ -37,8 +38,7 @@ Ville::Ville(bool val):
 	nbp_nbT(0),
 	cmt_mta(0)
 {
-	grid.resize(1000,vector<tile>(1000));
-	cout<<"gridsize set to "<<grid.size()<<endl;
+	grid.resize(gridmax,vector<tile>(gridmax));
 }
 
 Ville::~Ville()
@@ -269,10 +269,10 @@ void Ville::check_load_noeud(Noeud* newNoeud)
 
 void Ville::load_in_tile(Noeud* node)
 {
-	// load the node in the corresponding tile of the infinite grid.
-	/*cout<<"loading in tile index["<<get_tile_index(node->getX())<<":"
-		<<get_tile_index(node->getY())<<"]"<<endl;*/
-	grid[get_tile_index(node->getX())][get_tile_index(node->getY())].push_back(node);
+	unsigned int m = get_tile_index(node->getX()); //get position in grid.
+	unsigned int n = get_tile_index(node->getY());
+	check_grid_resize(m,n);
+	grid[m][n].push_back(node);
 }
 
 unsigned int Ville::get_tile_index(double coord)
@@ -596,6 +596,23 @@ void Ville::retire_noeud(Noeud* node)
 	unload_uid(node->getUid());
 	string type = node->getType();
 	
+	for(auto nd : quartiers) {
+        for(size_t j(0) ; j < nd->get_short_path_prod().size() ; ++j) {
+            if(nd->get_short_path_prod()[j] == node)
+            {
+                nd->clean_vector_erase_path_prod(j);
+            }
+        }
+    }
+    for(auto nd : quartiers) {
+        for(size_t j(0) ; j < nd->get_short_path_tran().size() ; ++j) {
+            if(nd->get_short_path_tran()[j] == node)
+            {
+                nd->clean_vector_erase_path_tran(j);
+            }
+        }
+    }
+
 	if(type == "Logement")
 			nbp_nbL -= node->getNbp();
 	if(type == "Transport")
@@ -688,13 +705,33 @@ void Ville::set_ville_color(Couleur color)
 void Ville::deplace_noeud(Noeud* node, Point p)
 {
 	Point prev_point = node->getCentre();
-
+	unload_in_tile(node);
 	node->setCentre(p);
 	obstruction_lien(node);
-	if(chargement_verif)  collis_noeuds(node);
+	if(chargement_verif)	collis_noeuds(node);
+	if(chargement_verif)
+	{
+		for(auto noeud : quartiers)
+		{
+			for(auto lien : node->getLiens())
+			{
+				if(noeud->collis_lien_quartier(lien,node))
+				{
+					cout << error::node_link_superposition(node->getUid());
+					chargement_verif = false;
+					msg_error = N_L_SUP;
+					error_param_un = node->getUid();
+				}
+			}
+		}
+	}
+	if(chargement_verif)	load_in_tile(node);
 
-	if(!chargement_verif)  node->setCentre(prev_point);
-
+	if(!chargement_verif) 
+	{
+		node->setCentre(prev_point);
+		load_in_tile(node);
+	}
 }
 
 void Ville::update_node_paint(Noeud* node, Couleur color)
@@ -730,22 +767,16 @@ Noeud* Ville::trouve_noeud(double x, double y)
 
 	for(int i = -1 ; i <= 1 ; i++){
 		for(int j = -1 ; j<= 1 ; j++){
-			for(auto node : grid[get_tile_index(x+i*tilesize)]
-								[get_tile_index(y+j*tilesize)])
+			unsigned int m = get_tile_index(x+i*tilesize);
+			unsigned int n = get_tile_index(y+j*tilesize);
+			check_grid_resize(m,n);
+			for(auto node : grid[m][n])
 			{
 				if(node->is_under(x,y))	 return node;
 			}
 		}
 	}
 	return nullptr;
-	
-	//pas optimisée
-	/*for(auto node : quartiers)
-	{
-		if(node->is_under(x,y))	return node;
-	}
-	return nullptr;*/
-	
 }
 
 void Ville::resize_node(Noeud* node, Point p1, Point p2)
@@ -793,5 +824,18 @@ void Ville::obstruction_lien(Noeud* node)
 			}	
 		}
 		noeud->updateIn(false);
+	}
+}
+
+
+void Ville::check_grid_resize(unsigned int m,unsigned int n)
+{
+	unsigned int biggest;
+	if(m > n)	biggest = m;
+	else	biggest = n;
+	if(grid.size() < biggest)
+	{
+		grid.resize(biggest+2,vector<tile>(biggest+2));
+		cout<<"resized grid to "<<biggest+2<<endl;
 	}
 }

@@ -77,6 +77,7 @@ private:
 	void load_uid(unsigned int uid);
 	void unload_uid(unsigned int uid);
 	unsigned int get_free_uid();
+	void check_grid_resize(unsigned int m,unsigned int n);
 
 	bool chargement_verif;
 	Type_error msg_error;

@@ -2,7 +2,7 @@
  * \name    noeud.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    Mai 2020
- * \version Rendu 2 - Architecture 11 b1
+ * \version Rendu 3 - Architecture 11 b1
  */
 
 #include <iostream>
@@ -97,7 +97,7 @@ void Noeud::setCentre(Point p)
 {
 	batiment.centre = p;
 }
-
+	
 void Noeud::ajout_lien(Noeud* b) 
 {
 	tab_liens.push_back(b);
@@ -113,22 +113,6 @@ void Noeud::disconnect(Noeud* node)
 			break;
 		}
 	}
-	
-}
-
-bool Noeud::is_connected_to(Noeud* node)
-{
-	for(auto noeud : tab_liens)
-	{
-		if(noeud == node) return true;
-	}
-	return false;
-}
-
-bool Noeud::is_under(double x, double y)
-{
-	if(is_in_circle(x,y,batiment))	return true;
-	else return false;
 }
 
 ///////////////////////////// Fonctions error //////////////////////////////////////
@@ -179,7 +163,7 @@ bool Logement::maxi_link() const
 	else  return false;
 }
 
-bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const
+bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b, double dist_min) const
 {	
 	if(not(this == lien_a) and not(this == lien_b)) 
 	{
@@ -194,6 +178,21 @@ bool Noeud::collis_lien_quartier(Noeud* lien_a, Noeud* lien_b) const
 	
 	return false;
 } 
+
+bool Noeud::is_connected_to(Noeud* node) const
+{
+	for(auto noeud : tab_liens)
+	{
+		if(noeud == node)  return true;
+	}
+	return false;
+}
+
+bool Noeud::is_under(double x, double y) const
+{
+	if(is_in_circle(x,y,batiment))	return true;
+	else return false;
+}
 
 ///////////////////////////// Section Dessin ///////////////////////////////////////
 
@@ -234,61 +233,41 @@ void Noeud::draw_path(Couleur paint) const
 void Logement::draw_path(Couleur paint_f) const
 {
 	// chemin le plus court pour production :
-	for(auto nd : get_short_path_prod()) 
+	for(auto nd : short_path_prod) 
 	{
 		nd->updatePaint(paint_f);
 	}
-	unsigned int p_size = short_path_prod.size();
+	draw_path_type(short_path_prod, paint_f);
+	
+	// chemin le plus court pour transport : 
+	for(auto nd : short_path_tran) 
+	{
+		nd->updatePaint(paint_f);
+	}
+	draw_path_type(short_path_tran, paint_f);
+}
+
+void Logement::draw_path_type(vector<Noeud*> tab, Couleur paint_f) const
+{
+	unsigned int p_size = tab.size();
 	if(p_size == 1)
 	{
-		draw_ligne(short_path_prod[0]->getCentre(), 
-				   getCentre(), VERT);
-		short_path_prod[0]->draw_noeud();
+		draw_ligne(tab[0]->getCentre(), getCentre(), VERT);
+		tab[0]->draw_noeud();
 		draw_noeud();
 	}
 	else if (p_size > 0)
 	{
-		draw_ligne(short_path_prod.back()->getCentre(), 
-				   getCentre(), paint_f);
-		short_path_prod.back()->draw_noeud();
+		draw_ligne(tab.back()->getCentre(), getCentre(), paint_f);
+		tab.back()->draw_noeud();
 		draw_noeud();
 		for(size_t i(0) ; p_size != 0 && i != p_size - 1; ++i) 
 		{
-			draw_ligne(short_path_prod[i]->getCentre(),
-					   short_path_prod[i+1]->getCentre(), paint_f);
-			short_path_prod[i]->draw_noeud();
-			short_path_prod[i+1]->draw_noeud();
+			draw_ligne(tab[i]->getCentre(), tab[i+1]->getCentre(), paint_f);
+			tab[i]->draw_noeud();
+			tab[i+1]->draw_noeud();
 		}
-	}
-	
-	// chemin le plus court pour transport : 
-	for(auto nd : get_short_path_tran()) 
-	{
-		nd->updatePaint(VERT);
-	}
-	unsigned int t_size = short_path_tran.size();	
-		
-	if(t_size == 1)
-	{
-		draw_ligne(short_path_tran[0]->getCentre(), 
-				   getCentre(), paint_f);
-		short_path_tran[0]->draw_noeud();
-		draw_noeud();
-	}
-	else if (t_size > 0)
-	{
-		draw_ligne(short_path_tran.back()->getCentre(), 
-				   getCentre(), paint_f);
-		short_path_tran.back()->draw_noeud();
-		draw_noeud();
-		for(size_t i(0) ; t_size != 0 && i != t_size - 1; ++i) 
-		{
-			draw_ligne(short_path_tran[i]->getCentre(), 
-					   short_path_tran[i+1]->getCentre(), paint_f);
-			short_path_tran[i]->draw_noeud();
-			short_path_tran[i+1]->draw_noeud();
-		}
-	}
+	}	
 }
 
 ///////////////////////////// Section CI ///////////////////////////////////////////
@@ -520,11 +499,11 @@ void Noeud::init_queue(vector<int>& queue, const vector<Noeud*>& tn, size_t i)
 
 void Noeud::sort_queue(vector<int>& queue, const vector<Noeud*>& tn)
 {
-	vector<double> tab_access;
+	vector<double> tab_access(tn.size());
 
 	for(size_t k(0) ; k < tn.size() ; ++k) 
 	{
-		tab_access.push_back(tn[queue[k]]->access);
+		tab_access[k] = tn[queue[k]]->access;
 	}
 
 	bool swap(true);
@@ -565,29 +544,51 @@ unsigned int Noeud::find_min_access(const vector<int>& queue,
 		// vers un noeud production
 void Logement::path_prod(const vector<Noeud*>& tn, unsigned int nd)
 {
-	if(short_path_prod.size() != 0)  short_path_prod.clear();
-	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) 
+	if(short_path_prod.size() != 0 or nd == no_link)  
 	{
-		bool tmp(true);
-		for(auto nd : short_path_prod)
-		{
-			if(nd == p)  tmp = false;
+		short_path_prod.clear();
+	}
+	if(nd != no_link)
+	{
+		vector<Noeud*> tab(tn.size(), nullptr);
+		size_t i(0);
+		for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) 
+		{ 
+			tab[i] = p;
+			++i;
 		}
-		if(tmp)  short_path_prod.push_back(p);
-	}	
+		short_path_prod.resize(i);
+		size_t j(0);
+		while(j < i)
+		{
+			short_path_prod[j] = tab[j];
+			++j;
+		}
+	}
 }
 		// vers un noeud transport
 void Logement::path_tran(const vector<Noeud*>& tn, unsigned int nd)
 {
-	if(short_path_tran.size() != 0)  short_path_tran.clear();
-	for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) 
+	if(short_path_tran.size() != 0 or nd == no_link)  
 	{
-		bool tmp(true);
-		for(auto nd : short_path_tran)
-		{
-			if(nd == p)  tmp = false;
+		short_path_tran.clear();
+	}
+	if(nd != no_link)
+	{
+		vector<Noeud*> tab(tn.size(), nullptr);
+		size_t i(0);
+		for(Noeud* p = tn[nd] ; p->getParent() != no_link ; p = tn[p->getParent()]) 
+		{ 
+			tab[i] = p;
+			++i;
 		}
-		if(tmp)  short_path_tran.push_back(p);
+		short_path_tran.resize(i);
+		size_t j(0);
+		while(j < i)
+		{
+			short_path_tran[j] = tab[j];
+			++j;
+		}
 	}
 }
 // temps de connexion d'un lien

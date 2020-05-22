@@ -2,7 +2,7 @@
  * \name    gui.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    Mai 2020
- * \version Rendu 2 : Architecture 11b1
+ * \version Rendu 3 - Architecture 11b1
  */
 
 #include <iostream>
@@ -19,7 +19,10 @@ using namespace std;
 
 ///////////////////////////// Section Dessin //////////////////////////////////////////
 
-Dessin::Dessin(): empty(false), nd_actif(nullptr), show_path(false)
+Dessin::Dessin(): 
+	empty(false), 
+	nd_actif(nullptr), 
+	show_path(false)
 {
 	space.zoom = 1;
 	space.size = dim_max;
@@ -78,7 +81,7 @@ void Dessin::projectionOrtho(const Cairo::RefPtr<Cairo::Context>& cr, Space spac
 	cr->translate(space.xc, space.yc);
 	cr->scale(space.width/(space.xMax - space.xMin), -space.height/(space.yMax - 
 																	space.yMin));
-	cr->translate(-(space.xMin + space.xMax)/2, -(space.yMin + space.yMax)/2);
+	cr->translate(-(space.xMin + space.xMax)/2, - (space.yMin + space.yMax)/2);
 }
 
 bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
@@ -86,6 +89,43 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 	Gtk::Allocation allocation = get_allocation();
 	space.width = allocation.get_width();
 	space.height = allocation.get_height();
+	
+	distorsion_fenetre();
+	
+	space.xc = space.width/2;
+	space.yc = space.height/2;
+	encadre();
+	projectionOrtho(cr,space);
+	graphic_set_context(cr);    //pour dessiner ville	
+	
+	if(not empty)
+	{		
+		cr->set_line_width(epaisseur_trait);
+		cr->set_source_rgb(1,1,1);
+		cr->move_to(0,0);
+		cr->line_to(space.width,0);
+		cr->line_to(space.width, space.height);
+		cr->line_to(0, space.height);
+		cr->line_to(0,0);
+		cr->paint();
+		cr->stroke();		
+			
+		if(!(maVille == nullptr))
+		{
+			if(show_path == true && nd_actif != nullptr) 
+			{
+				maVille->draw_ville();
+				maVille->draw_short_path(VERT, nd_actif);
+			}
+			else  maVille->draw_ville();
+		}
+	}
+	return true;
+}
+
+void Dessin::distorsion_fenetre()
+{
+	Gtk::Allocation allocation = get_allocation();
 	if(allocation.get_width() < allocation.get_height()) 
 	{
 		space.width = allocation.get_width();
@@ -96,35 +136,6 @@ bool Dessin::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 		space.width = allocation.get_height();
 		space.height = allocation.get_height();
 	}
-	space.xc = space.width/2;
-	space.yc = space.height/2;
-	encadre();
-	projectionOrtho(cr,space);
-	graphic_set_context(cr);    //pour dessiner ville
-		
-		if(not empty)
-		{		
-			cr->set_line_width(epaisseur_trait);
-			cr->set_source_rgb(1,1,1);
-			cr->move_to(0,0);
-			cr->line_to(space.width,0);
-			cr->line_to(space.width, space.height);
-			cr->line_to(0, space.height);
-			cr->line_to(0,0);
-			cr->paint();
-			cr->stroke();		
-				
-			if(!(maVille == nullptr))
-			{
-				if(show_path == true && nd_actif != nullptr) 
-				{
-					maVille->draw_ville();
-					maVille->draw_short_path(VERT, nd_actif);
-				}
-				else maVille->draw_ville();
-			}
-	}
-	return true;
 }
 
 void Dessin::set_nd_actif(Noeud* nd)
@@ -149,7 +160,7 @@ MaFenetre::MaFenetre(char* fichier):
 	editor(Gtk::ORIENTATION_VERTICAL,10),
 	information(Gtk::ORIENTATION_VERTICAL,10),
 	generalFrame("General"),
-	exitButton("exit"),newButton("new"),openButton("open"),saveButton("save"),
+	exitButton("exit"), newButton("new"), openButton("open"), saveButton("save"),
 	displayFrame("Display"),
 	shortPathButton("shortest path"),zoominButton("zoom in"),zoomoutButton("zoom out"),
 	zoomresetButton("zoom reset"),currentZoom("zoom : ?"),
@@ -159,7 +170,7 @@ MaFenetre::MaFenetre(char* fichier):
 	infoFrame("Information"),
 	MTA("MTA : 0"),CI("CI : 0"),ENJ("ENJ : 0"),
 	nd_button(LOGEMENT),
-	update_mta(true), update_ci(true), update_enj(true)
+	update_mta(true), update_ci(true), update_enj(true), new_file(true)
 {
 	graph.set_ville(new Ville(true));
 	graph.get_ville_ptr()->chargement(fichier);
@@ -188,8 +199,7 @@ void MaFenetre::construct_scaffolding()
 	mainWindow.pack_start(leftPanel, Gtk::PACK_SHRINK);
 	mainWindow.pack_start(rightPanel);
 	rightPanel.pack_start(m_Frame_Area);
-	m_Frame_Area.add(graph);
-	
+	m_Frame_Area.add(graph);	
 	general.set_border_width(epaisseur_bord);
 	general.pack_start(exitButton,false,false);
 	general.pack_start(newButton,false,false);
@@ -224,7 +234,6 @@ void MaFenetre::construct_scaffolding()
 	displayFrame.add(display);
 	editorFrame.add(editor);
 	infoFrame.add(information);
-	
 }
 
 void MaFenetre::connect_signal_handlers()
@@ -259,16 +268,32 @@ void MaFenetre::connect_signal_handlers()
 
 void MaFenetre::on_button_clicked_exit()
 {
-	cout << "Exit" << endl;
 	close();
+}
+
+void MaFenetre::updateLabels(bool mta, bool ci, bool enj, bool new_doc)
+{
+	update_mta = mta;
+	update_ci = ci;
+	update_enj = enj;
+	new_file = new_doc;
 }
 
 void MaFenetre::on_button_clicked_new()
 {
-	if(graph.get_ville_ptr() == nullptr)  graph.set_ville(new Ville(true));
+	if(graph.get_ville_ptr() == nullptr)  
+	{
+		shortPathButton.set_active(false);
+		editButton.set_active(false);
+		graph.set_nd_actif(nullptr);
+		graph.set_ville(new Ville(true));
+	}
 	else 
 	{
-		graph.get_ville_ptr()->reset();
+		shortPathButton.set_active(false);
+		editButton.set_active(false);
+		graph.set_nd_actif(nullptr);
+		graph.get_ville_ptr()->set_chargement_verif(false);
 		update();
 	}
 }
@@ -291,10 +316,13 @@ void MaFenetre::on_button_clicked_open()
 			string filename = dialog.get_filename();
 
 			if(graph.get_ville_ptr()==nullptr)  graph.set_ville(new Ville(true));
-
+			graph.update_show_path(false);
+			editButton.set_active(false);
+			shortPathButton.set_active(false);
+			graph.set_nd_actif(nullptr);
 			graph.get_ville_ptr()->reset();
 			graph.get_ville_ptr()->chargement(&filename[0]);
-			update_mta = true; update_ci = true; update_enj = true;
+			updateLabels(true, true, true, true);
 			update();
 			break;
 		}
@@ -316,7 +344,6 @@ void MaFenetre::on_button_clicked_save()
 	if(graph.get_ville_ptr() == nullptr)  cout<<"nothing to save"<<endl;
 	else 
 	{
-		cout << "Save" << endl;
 		Gtk::FileChooserDialog dialog("Please choose a file",
 									  Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.set_transient_for(*this);
@@ -364,13 +391,10 @@ void MaFenetre::on_button_press_shortestPath()
 void MaFenetre::on_button_release_shortestPath()
 {
 	graph.update_show_path(false);
-
-	for(auto nd : graph.get_ville_ptr()->getQuartiers())
-	{
-		graph.get_ville_ptr()->update_node_paint(nd, NOIR);
-	}
+	graph.get_ville_ptr()->set_ville_color(NOIR);
 	if(graph.get_nd_actif() != nullptr)  graph.get_ville_ptr()->update_node_paint
-															    (graph.get_nd_actif(), ROUGE);
+															    (graph.get_nd_actif(), 
+															     ROUGE);
 
 	update();
 }
@@ -417,7 +441,6 @@ void MaFenetre::on_button_press_edit()
 }
 void MaFenetre::on_button_release_edit()
 {
-	cout << "release! " << editButton.get_active() << endl;
 }
 
 void MaFenetre::on_button_clicked_housing()
@@ -438,7 +461,8 @@ void MaFenetre::on_button_clicked_production()
 string d_to_sci(double num)
 {
 	ostringstream strstream;
-	if(num > 99999)  strstream << setprecision(precision) << scientific << num;
+	if(num > seuil_de_precision)  strstream << setprecision(precision)	<< scientific 
+																		<< num;
 	else  strstream << fixed << setprecision(2*precision) << num;
 	return strstream.str();
 }
@@ -451,118 +475,112 @@ bool MaFenetre::on_button_press_event(GdkEventButton * event)
 		double clic_y = event->y ;
 		double dessin_x = graph.get_allocation().get_x();
 		double dessin_y = graph.get_allocation().get_y();
+		
 		double width = graph.space.width;
 		double height= graph.space.height;
-		double x_d = clic_x - dessin_x;
-		double y_d = clic_y - dessin_y;
-		double x_m = (x_d/width)*(graph.space.xMax - graph.space.xMin) + graph.space.xMin;
-		double y_m = graph.space.yMax - (graph.space.yMax - graph.space.yMin)*(y_d/height);
+		double x_d = event->x - graph.get_allocation().get_x();
+		double y_d = event->y - graph.get_allocation().get_y();
+		double x_m = (x_d/width)*(graph.space.xMax - graph.space.xMin) 
+					  + graph.space.xMin;
+		double y_m = graph.space.yMax - (graph.space.yMax - graph.space.yMin)
+										*(y_d/height);
 		
 		if(clic_x >= dessin_x && clic_y >= dessin_y)
 		{ 			
 			Noeud* clic_nd = graph.get_ville_ptr()->trouve_noeud(x_m, y_m);
 			Noeud* nd_actif = graph.get_nd_actif();
 			press_click = {x_m, y_m};
-			
-			if(event->button == left_click)	
+
+			if(event->button == left_click)
 			{
-				if(clic_nd == nullptr && editButton.get_active() == false)
-				{
-					if(nd_actif == nullptr)
-					{
-						graph.get_ville_ptr()->ajout_noeud(x_m, y_m, nd_button);
-						graph.get_ville_ptr()->set_chargement_verif(true);
-						update_mta = true; update_ci = false; update_enj = true; 
-					}	
-				}
-				else if(clic_nd != nullptr && clic_nd != nd_actif)
-				{
-				    if(editButton.get_active() && nd_actif != nullptr)
-				    {
-						graph.get_ville_ptr()->edit_lien(clic_nd, nd_actif);
-							
-						if(graph.get_show_path() && graph.get_ville_ptr()->get_chargement_verif())  
-						{
-							graph.update_show_path(false);
-							for(auto nd : graph.get_ville_ptr()->getQuartiers())
-							{
-								graph.get_ville_ptr()->update_node_paint(nd, NOIR);
-							}
-							update();
-							graph.update_show_path(true);
-						}
-						graph.get_ville_ptr()->set_chargement_verif(true);
-						update_mta = true; update_ci = true; update_enj = false; 
-					}
-				    else if(not(editButton.get_active()))
-				    {
-						if(nd_actif == nullptr)
-						{
-							graph.get_ville_ptr()->update_node_paint(clic_nd, ROUGE);
-							graph.set_nd_actif(clic_nd);
-						}
-						else
-						{
-							if(graph.get_show_path() == true)
-							{
-								graph.update_show_path(false);
-								for(auto nd : graph.get_ville_ptr()->getQuartiers())
-								{
-									graph.get_ville_ptr()->update_node_paint(nd, NOIR);
-								}
-								update();
-								graph.update_show_path(true);
-							}
-								graph.get_ville_ptr()->update_node_paint(nd_actif, NOIR);						
-								graph.get_ville_ptr()->update_node_paint(clic_nd, ROUGE);
-								graph.set_nd_actif(clic_nd);
-						}
-						update_mta = false; update_ci = false; update_enj = false;
-					}
-				}
-				else if(clic_nd == nd_actif and nd_actif != nullptr)
-				{
-					if(editButton.get_active())  cout << "Node cannot connect to itself" << endl;
-					else 
-					{
-						graph.get_ville_ptr()->retire_noeud(clic_nd);	
-						//RAJOUTER LE CAS MTA.
-						update_mta = true; update_ci = true; update_enj = true; 
-						graph.set_nd_actif(nullptr);
-					}
-				}
-				update();	
+				left_press_event(clic_nd, nd_actif);
 			}
-			
 			else if(event->button == right_click && nd_actif != nullptr)
 			{
-				cout << "HEY" << endl;
 				graph.get_ville_ptr()->deplace_noeud(nd_actif, press_click);
 				graph.get_ville_ptr()->set_chargement_verif(true);
-				update_mta = true; update_ci = true; update_enj = false;
-				update();
+				updateLabels(true, true, false);
 			}
+			update();	
 		}
-	return true;
+		return true;
 	}
+}
+
+void MaFenetre::left_press_event(Noeud* clic_nd, Noeud* nd_actif)
+{
+	if(clic_nd == nullptr && editButton.get_active() == false && nd_actif == nullptr)
+	{
+		graph.get_ville_ptr()->ajout_noeud(press_click.pos_x, press_click.pos_y, nd_button);  // DONNER SLMNT PRESS_CLICK EN PARAMETRE !!!
+		if(graph.get_ville_ptr()->get_chargement_verif())  graph.get_ville_ptr()->mta(ADD_ND);
+		graph.get_ville_ptr()->set_chargement_verif(true);
+		updateLabels(true, false, true);
+	}
+	else if(clic_nd != nullptr && clic_nd != nd_actif)
+	{
+		if(editButton.get_active() && nd_actif != nullptr)
+		{
+			graph.get_ville_ptr()->edit_lien(clic_nd, nd_actif);
+			if(graph.get_show_path() && graph.get_ville_ptr()->get_chargement_verif())  init_show_path();
+			graph.get_ville_ptr()->set_chargement_verif(true);
+			updateLabels(true, true, false);
+		}
+		else if(not(editButton.get_active()) && nd_actif == nullptr)
+		{	
+			graph.get_ville_ptr()->update_node_paint(clic_nd, ROUGE);
+			graph.set_nd_actif(clic_nd);
+			updateLabels(false, false, false);
+		}
+		else if(not(editButton.get_active()) && nd_actif != nullptr)
+		{
+			if(graph.get_show_path() == true)  init_show_path();
+			graph.get_ville_ptr()->update_node_paint(nd_actif, NOIR);						
+			graph.get_ville_ptr()->update_node_paint(clic_nd, ROUGE);
+			graph.set_nd_actif(clic_nd);
+			updateLabels(false, false, false);
+		}
+	}
+	else if(clic_nd == nd_actif and nd_actif != nullptr)
+	{
+		if(editButton.get_active())  cout << "Node cannot connect to itself" << endl;
+		else  detruire_nd(clic_nd, nd_actif);
+	}
+}
+
+void MaFenetre::detruire_nd(Noeud* clic_nd, Noeud* nd_actif)
+{
+	if(graph.get_show_path())  graph.get_ville_ptr()->set_ville_color(NOIR);
+	
+	graph.get_ville_ptr()->retire_noeud(clic_nd);	
+	updateLabels(true, true, true);
+	graph.set_nd_actif(nullptr);	
+}
+
+void MaFenetre::init_show_path()
+{
+	graph.update_show_path(false);
+	graph.get_ville_ptr()->set_ville_color(NOIR);
+	graph.refresh();
+	graph.update_show_path(true);
 }
 
 bool MaFenetre::on_button_release_event(GdkEventButton * event)
 {
 	if(event->type == GDK_BUTTON_RELEASE)
-	{
-		
+	{	
 		double clic_x = event->x ;
 		double clic_y = event->y ;
 		double dessin_x = graph.get_allocation().get_x();
 		double dessin_y = graph.get_allocation().get_y();
+		
 		double width = graph.space.width;
 		double height= graph.space.height;
-		
-		double x_d = clic_x - dessin_x;
-		double y_d = clic_y - dessin_y;
-		double x_m = (x_d/width)*(graph.space.xMax - graph.space.xMin) + graph.space.xMin;
-		double y_m = graph.space.yMax - (graph.space.yMax - graph.space.yMin)*(y_d/height);
+		double x_d = event->x - graph.get_allocation().get_x();
+		double y_d = event->y - graph.get_allocation().get_y();
+		double x_m = (x_d/width)*(graph.space.xMax - graph.space.xMin) 
+					  + graph.space.xMin;
+		double y_m = graph.space.yMax - (graph.space.yMax - graph.space.yMin)
+										 *(y_d/height);
 		
 		if(clic_x >= dessin_x && clic_y >= dessin_y)
 		{ 		
@@ -572,37 +590,34 @@ bool MaFenetre::on_button_release_event(GdkEventButton * event)
 
 			if(event->button == left_click)
 			{
-				if(clic_nd == nullptr && nd_actif != nullptr && editButton.get_active() == false)
-				{
-					if(press_click.pos_x == release_click.pos_x && press_click.pos_y == release_click.pos_y)	
-					{
-						if(graph.get_show_path() == true)
-						{
-							for(auto nd : graph.get_ville_ptr()->getQuartiers())
-							{
-								graph.get_ville_ptr()->update_node_paint(nd, NOIR);
-							}
-						}
-						else  graph.get_ville_ptr()->update_node_paint(nd_actif, NOIR);
-						update_mta = false; update_ci = false; update_enj = false;
-						graph.set_nd_actif(nullptr); 
-					}
-					else
-					{
-						graph.get_ville_ptr()->resize_node(nd_actif, press_click, release_click);
-						graph.get_ville_ptr()->set_chargement_verif(true);
-						update_mta = false; update_ci = true; update_enj = true;
-					}
-				}
+				left_release_event(clic_nd, nd_actif);
 				update();
 			}
-			else if(event->button == right_click) 
-			{
-			}
 		}
-		
 	}
 	return true;
+}
+
+void MaFenetre::left_release_event(Noeud* clic_nd, Noeud* nd_actif)
+{
+	if(clic_nd == nullptr && nd_actif != nullptr && editButton.get_active() == false)
+	{
+		if(press_click.pos_x == release_click.pos_x && 
+		   press_click.pos_y == release_click.pos_y)	
+		{
+			if(graph.get_show_path() == true)  graph.get_ville_ptr()->set_ville_color
+																				(NOIR);
+			else  graph.get_ville_ptr()->update_node_paint(nd_actif, NOIR);
+			updateLabels(false, false, false);
+			graph.set_nd_actif(nullptr); 
+		}
+		else
+		{
+			graph.get_ville_ptr()->resize_node(nd_actif, press_click, release_click);
+			graph.get_ville_ptr()->set_chargement_verif(true);
+			updateLabels(false, true, true);
+		}
+	}
 }
 
 bool MaFenetre::on_key_press_event(GdkEventKey * key_event)
@@ -612,19 +627,13 @@ bool MaFenetre::on_key_press_event(GdkEventKey * key_event)
 		switch(gdk_keyval_to_unicode(key_event->keyval))
 		{
 			case 'i':
-				cout<<"typed i"<<endl;
 				on_button_clicked_zoomIn();
 				break;
 			case 'o':
-				cout<<"typed o"<<endl;
 				on_button_clicked_zoomOut();
 				break;
 			case 'r':
-				cout<<"typed r"<<endl;
 				on_button_clicked_zoomReset();
-				break;
-			case 'd':
-				cout<<"typed d"<<endl;
 				break;
 		}
 	}
@@ -634,34 +643,37 @@ bool MaFenetre::on_key_press_event(GdkEventKey * key_event)
 
 void MaFenetre::update()
 {
-	currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));
-	bool update_labels = update_ci && update_mta && update_enj;
-	
-	if(graph.get_ville_ptr()->get_chargement_verif())
+	bool chargement = graph.get_ville_ptr()->get_chargement_verif();
+
+	currentZoom.set_label("zoom : " + to_string(graph.get_zoom_ind()));	
+	if(chargement && update_ci && update_mta && update_enj && new_file)
 	{
-		if(update_labels)
-		{
-			ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
-			CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
-			MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
-		}
-		else if(update_enj && update_ci)
-		{
-			ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
-			CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
-		}
-		else if(update_enj && update_mta)
-		{
-			ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
-			MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
-		}
-		else if(update_ci && update_mta)
-		{
-			CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
-			MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
-		}
+		ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
+		CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
+		MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
 	}
-	else
+	else if(chargement && update_ci && update_mta && update_enj)
+	{
+		ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
+		CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
+		MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
+	}
+	else if(chargement && update_enj && update_ci)
+	{
+		ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
+		CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
+	}
+	else if(chargement && update_enj && update_mta)
+	{
+		ENJ.set_label("ENJ :" + d_to_sci(graph.get_ville_ptr()->enj()));
+		MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->get_mta()));
+	}
+	else if(chargement && update_ci && update_mta)
+	{
+		CI.set_label("CI : "+ d_to_sci(graph.get_ville_ptr()->ci()));
+		MTA.set_label("MTA : "  + d_to_sci(graph.get_ville_ptr()->mta()));
+	}
+	else if(not(chargement))
 	{
 		graph.get_ville_ptr()->reset();
 		ENJ.set_label("ENJ : 0");

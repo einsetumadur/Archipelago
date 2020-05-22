@@ -2,7 +2,7 @@
  * \name    prog.cc
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    Mai 2020
- * \version Rendu 2 - Architecture 11 b1
+ * \version Rendu 3 - Architecture 11 b1
  */
 
 #include <iostream>

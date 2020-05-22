@@ -2,7 +2,7 @@
  * \name    ville.h
  * \author  Regamey Gilles & Zakeeruddin Sufyan 
  * \date    Mai 2020
- * \version Rendu 2 - Architecture 11 b1
+ * \version Rendu 3 - Architecture 11 b1
  */
 
 #ifndef VILLE_H
@@ -64,12 +64,12 @@ private:
 	void ajout_noeud(std::istringstream& param,int& counter, Etat_lecture type);
 	void error_noeud(Noeud* const nd);
 	void creation_lien(unsigned int uid_a, unsigned int uid_b);
-	void error_lien(Noeud* const a, Noeud* const b);
-	void obstruction_lien(Noeud* node);
+	void error_lien(Noeud* const a, Noeud* const b, double dist = 0);
+	void obstruction_lien(Noeud* node, double dist = 0);
 	Noeud* trouve_lien(unsigned int uid) const; 
 	void redondance_uid(unsigned int numid);
-	void collis_noeuds(Noeud* node);
-	void check_load_noeud(Noeud* newNoeud);
+	void collis_noeuds(Noeud* node, double dist = 0);
+	void check_load_noeud(Noeud* newNoeud, double dist = 0);
 	void load_in_tile(Noeud* node);
 	unsigned int get_tile_index(double coord);
 	void unload_quartier(Noeud* node);
@@ -77,7 +77,7 @@ private:
 	void load_uid(unsigned int uid);
 	void unload_uid(unsigned int uid);
 	unsigned int get_free_uid();
-	void check_grid_resize(unsigned int m,unsigned int n);
+	void check_grid_resize(unsigned int m, unsigned int n);
 
 	bool chargement_verif;
 	Type_error msg_error;
